@@ -1,0 +1,14 @@
+{
+  "name": "素账 PlainLedger",
+  "short_name": "素账",
+  "description": "无广告、本地优先、零账号共享的记账工具",
+  "start_url": "./index.html#/ledger",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F6F6F2",
+  "theme_color": "#3D5A80",
+  "lang": "zh-CN",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

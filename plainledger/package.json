@@ -1,0 +1,13 @@
+{
+  "name": "plainledger",
+  "version": "0.1.0",
+  "description": "素账 PlainLedger：无广告、本地优先、零账号共享的记账 PWA",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "serve": "python3 -m http.server 8765",
+    "samples": "python3 samples/make_samples.py"
+  },
+  "license": "MIT"
+}

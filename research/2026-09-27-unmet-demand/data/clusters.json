@@ -1,0 +1,1943 @@
+[
+ {
+  "id": "C01",
+  "title": "记账者要无广告自动导账单可多人共享的记账",
+  "description": "想坚持记账的学生、上班族、情侣/家庭与自由职业者被主流记账App的开屏广告（不开会员跳不过、晃一下就跳转）、以前免费突然付费、按条目限额扣费、理财贷款导流、家庭共享弱、手动录入累所困扰，\"找来找去没有功能差不多的软件\"，不少人退回Excel/Numbers/腾讯文档（\"没有任何广告且能永久保存数据\"，但Numbers仅iOS）；HN从2017年\"为什么没有好用的个人理财App\"到2026年仍有人自造轮子，抱怨Mint停服、YNAB/Monarch贵且订阅、银行同步不稳定。诉求：只做记账、无广告不套会员、微信/支付宝/银行账单自动同步、家庭/多人共享账本、安卓+iOS+电脑同步、数据本地或可导出。",
+  "audience": "学生与年轻上班族、情侣/夫妻/室友/多人旅行分账者、安卓+iOS混用家庭、多账户多币种个人与自由职业者、海外华人…",
+  "domain": "个人财务/记账",
+  "platforms": [
+   "小红书",
+   "知乎",
+   "GitHub",
+   "Hacker News",
+   "TikTok"
+  ],
+  "evidence": [
+   {
+    "url": "https://github.com/mayswind/ezbookkeeping/issues/53",
+    "quote": "Feature Request: Add shared/co-owned accounts —— …",
+    "engagement": "👍29，14 评论，无维护者回复；仓库 5.7k st…"
+   },
+   {
+    "url": "https://github.com/mayswind/ezbookkeeping",
+    "quote": "ezBookkeeping is an open source, powerful…",
+    "engagement": "5,666 stars"
+   },
+   {
+    "url": "https://github.com/TNT-Likely/BeeCount",
+    "quote": "对比表：\"❌ 隐私可能被分析利用 → ✅ 离线优先 + 自建云端,开发者无法访问\"；",
+    "engagement": "2,436 stars / 329 forks / 1…"
+   }
+  ],
+  "existing_solutions": "随手记/鲨鱼记账/挖财/一木/钱迹/网易有钱等（广告+会员+金融导流，家庭共享弱）；钱迹导入账单、熊猫/一木/AutoAccounting自动记账（读通知栏易漏、iOS受限）；百事AA记账/微信\"共享记账\"小程序；Excel/Numbers/腾讯文档；",
+  "why_unsolved": "微信/支付宝/银行不开放个人交易接口，自动导入只能靠不稳定手段；记账App靠会员与理财导流变现，与\"极简免费无广告\"直接冲突；多人共享+自动化+隐私三者兼顾需重做权限/拆分/结算数据模型，独立开发者多为iOS单端且缺同步后端投入；",
+  "crowd_signal": "viral",
+  "independent_source_count": 28,
+  "member_titles": [
+   "记账者要无广告、自动同步账单、可共享的App",
+   "年轻人要隐私优先、自动导账单、多人共享记账",
+   "多账户个人与自由职业者要真正好用的记账软件",
+   "家庭记账要自动导入账单发票与共享账本"
+  ],
+  "merged_from": [
+   "A15",
+   "B16",
+   "C23",
+   "D30"
+  ]
+ },
+ {
+  "id": "C02",
+  "title": "听歌用户要免费无广告一站听全并迁移歌单",
+  "description": "因版权分裂被迫装3个音乐App、各买会员、忍受开屏与信息流广告、歌单里大量灰色歌曲不能播的听歌用户，想要一个免费无广告、能搜遍全网或聚合自建曲库、把整张歌单放出来，并能一键把歌单在平台间搬家的播放器。洛雪音乐54k★在2023-10收到腾讯警告信后去掉所有内置音源、只做本地播放器（公告帖👍558/530），用户靠互传\"自定义音源\"脚本续命（\"免费无永久\"\"大家不要开issue避免名气大了引起某方注意\"）；MusicFree 27k★走插件制但\"不开魔法只有B站插件可用\"、自动换源无效、歌单导入限500首，最高票讨论\"求Spotify源插件\"无人回答；",
+  "audience": "中国大陆普通听歌用户、不愿为多家平台分别付费的学生与年轻上班族、在网易云/QQ音乐/汽水之间切换或想转向本地/海外流媒…",
+  "domain": "娱乐/音乐",
+  "platforms": [
+   "GitHub",
+   "appinn.com"
+  ],
+  "evidence": [
+   {
+    "url": "https://github.com/lyswhut/lx-music-desktop/issues/1912",
+    "quote": "LX Music 项目发展调整与新项目计划 —— 软件本身只是一个可以播放本地歌曲的播放器…",
+    "engagement": "👍558，❤173，88 评论；仓库 54k star"
+   },
+   {
+    "url": "https://github.com/lyswhut/lx-music-desktop",
+    "quote": "\"一个基于 Electron 的音乐软件\"；免责声明\"本项目内置的包括酷我、酷狗…",
+    "engagement": "53,969 stars / 7,037 forks …"
+   },
+   {
+    "url": "https://github.com/qier222/YesPlayMusic",
+    "quote": "\"高颜值的第三方网易云播放器，支持 Windows / macOS / Linux\"",
+    "engagement": "33,327 stars / 652 open iss…"
+   }
+  ],
+  "existing_solutions": "QQ音乐/网易云/酷狗/汽水官方App+VIP（曲库割裂、广告、多份会员）；洛雪/MusicFree/listen1/YesPlayMusic/UnblockNeteaseMusic等聚合播放器（依赖灰色音源频繁失效、作者要求24小时内清除版权数据、iOS无法上架）；",
+  "why_unsolved": "唱片公司版权独占与平台会员商业模式使合法的\"一站式无广告\"难成立；腾讯对聚合工具发警告信，作者被迫抽掉内置源；音源与歌单解析依赖非公开接口周期性失效且作者承压不敢公开维护；合法路径（歌单管理/跨平台跳转/自建曲库/多账号聚合）至今无人系统做，平台也不希望用户带着歌单离开。",
+  "crowd_signal": "viral",
+  "independent_source_count": 28,
+  "member_titles": [
+   "听歌用户要免费无广告、能放全歌单的聚合播放器",
+   "听歌用户要一站听全网并迁移歌单",
+   "换平台听歌的人一键迁移歌单并管理本地曲库"
+  ],
+  "merged_from": [
+   "B01",
+   "D01",
+   "B24"
+  ]
+ },
+ {
+  "id": "C03",
+  "title": "微信用户要免电脑可读可搜的聊天记录导出与瘦身",
+  "description": "微信重度用户换机、手机提示空间不足（《微信为什么会有几十个G》《微信聊天记录可以断舍离吗》上热搜）、想留存家人对话或工作/维权证据时，希望不依赖电脑、跨iOS/安卓，按联系人/时间/类型选择性把聊天记录（含图片语音）导出成HTML/PDF等可读可检索格式并释放空间。微信官方只提供整机迁移和加密备份（不可读、需电脑同时操作）；腾讯文件助手小程序不开会员仅500M；开源方案十年反复重造（WeChatMsg 42k★已放弃维护、WeFlow 9个月14.5k★遭DMCA后\"不再提取密钥/不再解密数据库\"、echotrace停更），全部依赖在电脑上解密本地数据库，微信4.x一升级即失效且有封号风险，安卓端尤缺方案；小红书上至少4个同题问答页反复问导出/恢复聊天记录。",
+  "audience": "微信重度用户（尤其小容量iPhone用户）、换机迁移者、需留存家人/恋人对话或工作对接与维权证据的人…",
+  "domain": "个人数据主权/即时通讯备份",
+  "platforms": [
+   "微博",
+   "小红书",
+   "GitHub"
+  ],
+  "evidence": [
+   {
+    "url": "https://github.com/LC044/WeChatMsg",
+    "quote": "README 首行：\"此项目很久没有（也不会）更新了（未来也许会考虑截图+OCR实现…",
+    "engagement": "42,086 stars / 5,329 forks；"
+   },
+   {
+    "url": "https://github.com/search?q=%E5%BE%AE%E4%BF%A1+%E8%81%8A%E5%A4%A9%E8%AE%B0%E5%BD%95+%E5%AF%BC%E5%87%BA&type=repositories&s=stars&o=desc",
+    "quote": "198 repositories：WeFlow 14.5k / WechatExporter 8.…",
+    "engagement": "198 个仓库；top-8 合计约 37k stars"
+   },
+   {
+    "url": "https://github.com/hicccc77/WeFlow",
+    "quote": "\"我们曾天真地以为，你和家人的聊天记录、你和老板的工作对接、你保存在本地电脑上的数据…",
+    "engagement": "14.5k stars, 484 forks…"
+   }
+  ],
+  "existing_solutions": "微信内置存储管理与电脑端备份（全量、加密、不可读、需电脑）；腾讯文件助手小程序（免费500M）；WX Backup/楼月/万兴等付费单端工具；\"改日期腾20G\"偏方；开源 WeChatMsg/WeFlow/WechatExporter/echotrace/WechatBakTo…",
+  "why_unsolved": "微信数据库封闭加密，腾讯视解密为\"绕过技术保护措施\"，对开源作者发律师函/DMCA，作者纷纷删库或阉割；每次微信升级即打破解密方案；iOS沙盒限制第三方读取；腾讯无动力做精细化归档与可读导出；独立开发者难以承担法律风险，但需求十年不减并随微信4.x与AI年度报告玩法再度爆发。",
+  "crowd_signal": "viral",
+  "independent_source_count": 21,
+  "member_titles": [
+   "微信用户要免电脑选择性备份导出聊天记录并瘦身",
+   "微信用户把聊天记录导出为可读可搜的本地备份",
+   "微信用户要导出自己的聊天记录"
+  ],
+  "merged_from": [
+   "A01",
+   "B07",
+   "D04"
+  ]
+ },
+ {
+  "id": "C04",
+  "title": "用户要把微信读书等平台数据整体导出带走",
+  "description": "有系统读书笔记习惯的知识工作者想把微信读书、Kindle的划线、想法、书评一键导成Markdown并持续同步到Notion/Obsidian/flomo，付费读者想把读过的书导出到本地/Kindle；Apple Notes用户想批量导出全部笔记含附件；重视数据主权的用户想统一拿回京东/淘宝/支付宝订单、运营商账单、知乎/B站/邮箱等历史数据做迁移或年度总结；自托管用户想把Paperless/Mealie/memos的数据以通用格式整体带走。",
+  "audience": "微信读书/Kindle/Apple Notes等封闭生态用户、想迁移到Obsidian/Notion/flomo的知识…",
+  "domain": "个人数据可携带/知识管理/备份",
+  "platforms": [
+   "GitHub"
+  ],
+  "evidence": [
+   {
+    "url": "https://github.com/hicccc77/WeFlow",
+    "quote": "WeFlow - 一个本地的微信聊天记录导出和年度报告应用（同属『拿回自己的数据』动机）",
+    "engagement": "14,486 stars"
+   },
+   {
+    "url": "https://github.com/kangvcar/InfoSpider",
+    "quote": "INFO-SPIDER 是一个集众多数据源于一身的爬虫工具箱，旨在安全快捷的帮助用户拿回自己的数据…",
+    "engagement": "8,258 stars"
+   },
+   {
+    "url": "https://github.com/malinkang/weread2notion",
+    "quote": "\"将微信读书划线同步到Notion\"",
+    "engagement": "2,926 stars"
+   }
+  ],
+  "existing_solutions": "微信读书笔记导出（仅划线/想法、有数量限制、格式差）；weread2notion/obsidian-weread-plugin/wereader/weread-toolbox/readneo/weread-exporter/Canvas Hook（非公开接口、易失效、封号风险）；",
+  "why_unsolved": "封闭平台有意维持生态锁定（Canvas渲染+加密接口、不提供批量导出API），国内无GDPR式数据可携带权强约束；第三方只能逆向私有格式，随改版反复失效、法律边界模糊、有封号风险；导出需求分散在多个知识库生态，单一平台市场小，商业公司不愿投入；",
+  "crowd_signal": "viral",
+  "independent_source_count": 21,
+  "member_titles": [
+   "微信读书用户把划线笔记导出到自己的知识库",
+   "用户要把应用/平台数据整体导出带走",
+   "用户一键拿回并导出自己在各平台的历史数据"
+  ],
+  "merged_from": [
+   "B15",
+   "D06",
+   "B29"
+  ]
+ },
+ {
+  "id": "C05",
+  "title": "用户要批量下载备份抖音/B站/视频号内容",
+  "description": "普通用户想把自己或关注博主在微信视频号、抖音、小红书、B站上的视频/图集/直播回放（无水印、含字幕弹幕、高清）下载到本地长期保存，或在收藏夹视频\"已失效\"、下架无通知前自动把收藏夹/稍后再看/点赞列表备份到本地/NAS；运营者与研究者想批量获取公开笔记/视频/评论做分析。平台均不提供下载导出：视频号无保存按钮且视频流加密、抖音只给带水印单条且作者可禁用、B站缓存加密不可导出、官方API仅面向企业。社区造轮子规模巨大（MediaCrawler 66k★、res-downloader 20k★、Douyin_TikTok_Download_API 20k★、TikTokDownloader 16k★、DouyinLiveRecorder 11k★）",
+  "audience": "把短视频/笔记当学习资料库的普通用户、想备份自己作品或做二创的UP主与自媒体、离线看课程的学习者…",
+  "domain": "内容保存/个人数据备份/自媒体数据",
+  "platforms": [
+   "GitHub"
+  ],
+  "evidence": [
+   {
+    "url": "https://github.com/search?q=%E6%8A%96%E9%9F%B3+%E4%B8%8B%E8%BD%BD&type=repositories&s=stars&o=desc",
+    "quote": "Douyin_TikTok_Download_API 20.4k（无水印视频下载 API）",
+    "engagement": "top-6 合计 ~80k stars"
+   },
+   {
+    "url": "https://github.com/NanmiCoder/MediaCrawler",
+    "quote": "\"小红书笔记 | 评论爬虫、抖音视频 | 评论爬虫、快手视频 | 评论爬虫…",
+    "engagement": "65,794 stars / 12,686 forks…"
+   },
+   {
+    "url": "https://github.com/search?q=%E8%A7%86%E9%A2%91%E5%8F%B7+%E4%B8%8B%E8%BD%BD&type=repositories&s=stars&o=desc",
+    "quote": "res-downloader 20.2k / wx_channels_download 9.5k（…",
+    "engagement": "6 个专用工具合计 ~44k stars…"
+   }
+  ],
+  "existing_solutions": "平台自带保存（带水印、单条、可禁用）；抓包+解密桌面工具（需装证书驱动，微信升级即失效）；开源 MediaCrawler/TikTokDownloader/XHS-Downloader/res-downloader/BilibiliDown/mybili/DouyinLiveR…",
+  "why_unsolved": "平台把内容与数据留在生态内视为核心资产，持续升级签名算法与风控，并以律师函/DMCA清除非官方接口文档与下载器；下载/导出与会员收入及版权协议冲突，没有官方\"导出我的数据/收藏\"功能；合规边界模糊（README多标\"仅供学习\"），开源作者因合规压力主动放弃核心模块或归档；",
+  "crowd_signal": "viral",
+  "independent_source_count": 19,
+  "member_titles": [
+   "运营者与用户批量保存抖音小红书B站内容评论",
+   "普通用户要下载备份视频号/抖音/B站视频"
+  ],
+  "merged_from": [
+   "B03",
+   "D02"
+  ]
+ },
+ {
+  "id": "C06",
+  "title": "手机用户要装上即用的开屏/摇一摇广告屏蔽",
+  "description": "国内用户打开任何国产App都要看3-5秒开屏广告，\"摇一摇/滑动\"误触跳转淘宝京东，微信支付完成页摇一摇跳转，地铁乘车码App频繁弹窗、儿童早教App跳成人广告（多次上热搜；2026年监管整治后开屏广告消失，但摇一摇、支付后跳转、弹窗仍普遍）。诉求：装上就能自动跳过所有开屏广告、屏蔽摇一摇与弹窗、老人儿童误触保护，并覆盖iOS/鸿蒙。现有GKD 42k★/SKIP 3.7k★/李跳跳依赖无障碍权限与社区规则订阅（GKD默认不带规则、主流第三方订阅仓库1.2万★后归档），HyperOS/ColorOS一更新就\"对微信无效\"\"后台保不住\"\"自动删除快照和规则\"，新机型规则失效被维护者标not planned（338个closed-not-planned）",
+  "audience": "全体国内手机用户，尤其OPPO/vivo/小米HyperOS用户、为长辈与儿童配机的家庭、iOS/鸿蒙用户",
+  "domain": "移动端体验/广告屏蔽",
+  "platforms": [
+   "微博",
+   "GitHub"
+  ],
+  "evidence": [
+   {
+    "url": "https://github.com/gkd-kit/gkd",
+    "quote": "\"某些软件可能在启动时存在一些烦人的流程, 这个软件可以帮你点击跳过这个流程\"；",
+    "engagement": "42.3k star；13 open / 338 cl…"
+   },
+   {
+    "url": "https://github.com/ddgksf2013/ddgksf2013",
+    "quote": "\"墨鱼去广告计划 | QuantumultX 去广告 | 去开屏广告 | 应用净化 | 会员解锁…\"",
+    "engagement": "13,634 stars"
+   },
+   {
+    "url": "https://github.com/AIsouler/GKD_subscription",
+    "quote": "GKD 第三方订阅规则（仓库已 archived，规则维护中断）",
+    "engagement": "12,010 stars / 495 forks"
+   }
+  ],
+  "existing_solutions": "GKD/SKIP/李跳跳等无障碍点击器（需找规则订阅、厂商杀后台、被App检测拒绝运行）；HyperCeiler等Xposed方案（需root）；QuantumultX/Clash/墨鱼去广告规则（门槛高、要付费App）；系统纯净模式（只拦安装）；",
+  "why_unsolved": "开屏与跳转广告是App厂商和手机厂商的核心收入，SDK持续对抗、控件ID频繁更换，系统厂商自己也卖广告不会开放接口；无障碍权限被安全策略不断收紧；规则需人工逐App维护无商业公司愿做；工具一出名就面临下架压力，维护者主动收缩拒绝上架；iOS无任何可行路径；",
+  "crowd_signal": "viral",
+  "independent_source_count": 18,
+  "member_titles": [
+   "手机用户要屏蔽摇一摇/支付后跳转等App广告",
+   "国产安卓用户一键跳过开屏广告与摇一摇跳转",
+   "安卓用户要自动跳过开屏广告弹窗"
+  ],
+  "merged_from": [
+   "A09",
+   "B04",
+   "D05"
+  ]
+ },
+ {
+  "id": "C07",
+  "title": "读者要把公众号等封闭平台变成RSS并归档",
+  "description": "不想被推荐算法喂养的读者希望在RSS阅读器/热点聚合页里统一订阅微信公众号、小红书，乃至Telegram频道、商品降价、App版本更新等没有RSS的服务，按自己节奏追更并全文检索归档；自媒体人与研究者想把公众号文章（含阅读量、评论）批量导出为HTML/PDF/Markdown。微信不提供任何RSS/开放接口：1.3万★的wechat-article-exporter 2026-07-30因微信关闭上游接口宣布停止维护并提醒用户在域名到期前导出；近万★的wewe-rss借道微信读书账号，每个账号只能稳定订阅约10个公众号超出即被封控\"小黑屋\"，2026-05归档留下270个open issue；we-mp-rss活跃但\"重新授权后订阅丢失\"\"大部分公众号永远不被更新\"；",
+  "audience": "想主动掌控信息流的重度阅读者、RSS/Obsidian知识管理用户与程序员、需跟踪多个公众号的自媒体运营与记者/研究者…",
+  "domain": "内容订阅/RSS/信息归档",
+  "platforms": [
+   "GitHub"
+  ],
+  "evidence": [
+   {
+    "url": "https://github.com/DIYgod/RSSHub",
+    "quote": "Everything is RSSible / 万物皆可 RSS（覆盖 wechat、weibo…",
+    "engagement": "46,332 stars / 10,242 forks"
+   },
+   {
+    "url": "https://github.com/ourongxing/newsnow/issues/199",
+    "quote": "后续能否增加微信公众号和小红书版块（newsnow 21.8k star 热点聚合项目）",
+    "engagement": "仓库 21.8k star，142 open issu…"
+   },
+   {
+    "url": "https://github.com/search?q=%E5%85%AC%E4%BC%97%E5%8F%B7+RSS&type=repositories&s=stars&o=desc",
+    "quote": "112 repositories：wewe-rss 9.7k / we-mp-rss 4.7k /…",
+    "engagement": "112 个仓库；6 个同类项目合计 ~20k star…"
+   }
+  ],
+  "existing_solutions": "微信订阅号信息流（折叠、无导出）；wewe-rss（微信读书通道，已归档）/we-mp-rss（依赖登录态频繁掉线）/wechat-feeds（已停服）/wechat-article-exporter（已停维护）/wechatDownload；RSSHub（需自建、路由不稳定）；",
+  "why_unsolved": "腾讯、小红书刻意封闭内容分发以留住用户，主动关闭接口；所有方案都在灰色地带爬微信读书/搜狗等旁路，触发风控即封号，接口一变就要重写，全文还要再爬正文页；维护成本高导致开源项目一个个停服归档，单个开发者无法长期对抗。",
+  "crowd_signal": "viral",
+  "independent_source_count": 17,
+  "member_titles": [
+   "公众号读者批量导出文章并生成 RSS 追更",
+   "读者要把公众号等封闭平台变成RSS源"
+  ],
+  "merged_from": [
+   "B05",
+   "D03"
+  ]
+ },
+ {
+  "id": "C08",
+  "title": "自建书库用户要无线投递电纸书与手写批注",
+  "description": "自建书库、手持Kobo/Boox等非Kindle设备的读者想要Kindle+Audible生态同等体验：像Send-to-Kindle一样一键无线把EPUB推到电纸书并同步进度（Audiobookshelf #3504 👍256，仓库最高票、两年内超过所有老issue，但只标\"possible plugin\"而插件系统未落地；Kobo不支持邮件导入只能插数据线）、通过OPDS让任何阅读器直接浏览下载（👍72）；有声书与电子书\"读听同步\"高亮当前句、Whisper自动转写（EPUB3 👍55、Whisper 👍44）；",
+  "audience": "用Audiobookshelf/Calibre-Web/Foliate/KOReader自建电子书与有声书库的读者…",
+  "domain": "阅读/电子书/硬件生态互操作",
+  "platforms": [
+   "GitHub"
+  ],
+  "evidence": [
+   {
+    "url": "https://github.com/advplyr/audiobookshelf/issues/3504",
+    "quote": "Support kobo sync for ebooks — \"Currently send to…",
+    "engagement": "👍 256, ❤11, 14 评论, labels: …"
+   },
+   {
+    "url": "https://github.com/koreader/koreader/issues/2633",
+    "quote": "I'm using Onyx Boox Max 13.3 inches android eink …",
+    "engagement": "👍 95, ❤22, 🚀16, 47 评论…"
+   },
+   {
+    "url": "https://github.com/advplyr/audiobookshelf/issues/189",
+    "quote": "[enhancement] sync ebooks and audiobooks via proc…",
+    "engagement": "👍 91, 36 评论"
+   }
+  ],
+  "existing_solutions": "Calibre（USB、老旧）；Calibre-Web Kobo Sync（逆向API、配置门槛高、两份书库）；Send-to-Kindle（仅Kindle）；Audible/Kindle Whispersync与Immersion Reading（仅亚马逊购买、DRM）；",
+  "why_unsolved": "Kobo官方无开放同步API，每个书库软件都要各自逆向；EPUB3 media overlay播放器与e-ink低延迟手写层（笔迹渲染、压感输入、文档格式回写）实现复杂且跨移动端要重写；Whisper转写需GPU与长任务，单人维护项目不愿引入重依赖；",
+  "crowd_signal": "viral",
+  "independent_source_count": 16,
+  "member_titles": [
+   "自托管书库要投递电纸书、读听同步与手写批注",
+   "自建书库用户要无线同步到Kobo阅读器",
+   "手写笔e-ink用户要在开源阅读器里批注"
+  ],
+  "merged_from": [
+   "C01",
+   "D24",
+   "D25"
+  ]
+ },
+ {
+  "id": "C09",
+  "title": "做饭者要结构化可检索菜谱与今天吃什么决策",
+  "description": "自己做饭的人与减脂者每天面对\"今天吃什么\"的决策疲劳和\"吃完要记热量\"两件事割裂：菜谱App广告多、UGC步骤不严谨、按食材/忌口/难度找菜难；饮食记录App手动搜食物、拍照识别不准、会员太贵、弹窗广告多（\"薄荷app害死人\"问答线程），推荐替代品时\"小弹窗广告较少（目前为0）\"竟成卖点；外卖平台只推广告不替人决策。诉求：像程序文档一样精确、按食材/难度/时间/过敏原检索、有步骤图与成品图、按人数换算、生成购物清单、扫小票反推能做的菜、可被AI调用，并基于口味历史、当前餐次与现有食材自动给\"今天吃这个\"建议、顺手完成无广告的饮食记录。",
+  "audience": "自己做饭的年轻人与新手、家庭主厨与双职工父母、减脂/健身备餐者、独居上班族、负责家庭三餐的人",
+  "domain": "饮食/生活/健康",
+  "platforms": [
+   "GitHub",
+   "小红书"
+  ],
+  "evidence": [
+   {
+    "url": "https://github.com/Anduin2017/HowToCook/issues/60",
+    "quote": "使用规范定义的标记语言、JSON 或 yaml 来定义每一个菜谱。",
+    "engagement": "👍105 😄15，59 评论；仓库 102.4k st…"
+   },
+   {
+    "url": "https://github.com/Anduin2017/HowToCook",
+    "quote": "程序员在家做饭方法指南 / Programmer's guide about how to coo…",
+    "engagement": "102,351 stars / 11,101 fork…"
+   },
+   {
+    "url": "https://github.com/tastejs/awesome-app-ideas",
+    "quote": "Recipes app — Cooking instructions and ingredient…",
+    "engagement": "5.7k stars"
+   }
+  ],
+  "existing_solutions": "下厨房/豆果/懒饭（UGC质量参差、广告与会员、不开放数据）；HowToCook（纯Markdown无图无结构、无库存/采购/周菜单）；Mealie/Tandoor/Grocy（自托管需部署，不做小票识别与比价）；",
+  "why_unsolved": "菜谱与饮食记录商业产品靠广告电商/卖会员代餐变现，与\"干净精确、轻决策\"诉求冲突；把上千篇自由文本菜谱迁移为结构化schema需大规模重写与社区约定，维护者只标open discussion；成品图需真实拍摄难以众包保证质量；中餐热量估算困难；",
+  "crowd_signal": "viral",
+  "independent_source_count": 16,
+  "member_titles": [
+   "自己做饭的人要结构化无广告可按食材检索的菜谱",
+   "做饭的人要结构化可检索可算的菜谱库",
+   "减脂/独居者要'吃什么'决策加无广告饮食记录"
+  ],
+  "merged_from": [
+   "B12",
+   "D11",
+   "A19"
+  ]
+ },
+ {
+  "id": "C10",
+  "title": "多网盘用户要聚合挂载成本地盘且断点上传",
+  "description": "多网盘用户被\"每个网盘一个App、非会员限速到几十KB/s、不给直链、不支持WebDAV\"割裂多年，想在一个入口把所有网盘挂成本地盘符/WebDAV给播放器与备份用，直接浏览、搜索、网盘间互传，并能像网盘一样生成带密码/有效期/次数限制的分享短链。AList 50k★是事实标准，但2025年被收购引发信任危机，社区立刻fork出OpenList（15个月2.5万★，迁移公告👍386）；524个open issue里经免费Cloudflare访问>100MB上传直接413且失败要从头传，前端分块/断点续传2023年起被反复要求（标accepted未做）；sign分享链接暴露完整路径且过期时间全局；",
+  "audience": "同时持有百度/阿里/夸克/115/OneDrive等多个网盘的个人与家庭NAS用户、Emby/Jellyfin影音用户…",
+  "domain": "云存储/文件管理/家庭NAS",
+  "platforms": [
+   "GitHub",
+   "v2ex.com",
+   "meta.appinn.net"
+  ],
+  "evidence": [
+   {
+    "url": "https://github.com/AlistGo/alist",
+    "quote": "\"一个支持多存储的文件列表/WebDAV程序\"",
+    "engagement": "50,229 stars / 7,937 forks …"
+   },
+   {
+    "url": "https://github.com/OpenListTeam/OpenList",
+    "quote": "\"A new AList Fork to Anti Trust Crisis…a resilien…",
+    "engagement": "24.8k stars, 2.3k forks…"
+   },
+   {
+    "url": "https://github.com/qjfoidnh/BaiduPCS-Go",
+    "quote": "\"iikira/BaiduPCS-Go原版基础上集成了分享链接/秒传链接转存功能\"",
+    "engagement": "5,667 stars / 237 open issu…"
+   }
+  ],
+  "existing_solutions": "各网盘官方客户端（不互通、限速、非会员无WebDAV）；AList/OpenList+rclone/WinFsp/RaiDrive（需自建Docker、配token、接口变更即失效、商业化后被质疑植入）；BaiduPCS-Go；CloudDrive2（闭源付费）；",
+  "why_unsolved": "限速是网盘的付费转化手段，官方无动力开放API；第三方依赖逆向私有接口随时被封；带宽成本使免费不限速难盈利；分块上传需对每种网盘驱动分别适配并在服务器临时落盘；分享系统需新增权限模型；开源项目治理与商业化冲突反复出现，维护者精力被信任危机与迁移消耗；技术门槛使普通用户用不起来。",
+  "crowd_signal": "viral",
+  "independent_source_count": 15,
+  "member_titles": [
+   "个人用户把多个网盘挂成本地盘且下载不限速",
+   "NAS用户要多网盘聚合挂载与断点上传"
+  ],
+  "merged_from": [
+   "B02",
+   "D08"
+  ]
+ },
+ {
+  "id": "C11",
+  "title": "本地优先用户要自托管多端同步与选择性差量同步",
+  "description": "用\"不需要账号、数据在本地\"应用的多设备用户，在手机、平板、电子书、电脑之间切换时订阅、播放列表、书签、高亮、设置、阅读历史、时间追踪数据都不能同步，只能手工导入导出（\"我有两部手机和一台平板，要手动逐个添加订阅\"NewPipe #5325 👍46；ActivityWatch同步👍101挂bounty无人接；Organic Maps书签同步因私有服务器关闭被禁用👍63；KOReader高亮不同步；Joplin移动端无后台同步）。",
+  "audience": "手机+平板+电子书+电脑多设备的隐私用户、NewPipe/Organic Maps/KOReader/Joplin/A…",
+  "domain": "跨设备同步/本地优先软件/自托管云盘",
+  "platforms": [
+   "GitHub"
+  ],
+  "evidence": [
+   {
+    "url": "https://github.com/search?q=repo%3Asyncthing%2Fsyncthing+is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc&type=issues",
+    "quote": "syncthing/syncthing #3388 Use decentralized disco…",
+    "engagement": "123 / 101 👍"
+   },
+   {
+    "url": "https://github.com/syncthing/syncthing/issues/2491",
+    "quote": "Next Gen Ignores: Requirements — Simple tree-view…",
+    "engagement": "👍 116, ❤21, 101 评论, 0/20 子任…"
+   },
+   {
+    "url": "https://github.com/organicmaps/organicmaps/issues/622",
+    "quote": "Bookmark synchronization/online backup ... I'm th…",
+    "engagement": "👍 63, ❤11, 113 评论"
+   }
+  ],
+  "existing_solutions": "手工导入导出JSON/zip；用Syncthing同步应用数据库文件（易损坏、冲突）；gpodder.net（仅播客）；Obsidian Sync/RescueTime/Toggl等云端付费；Syncthing手写.stignore；rsync/rclone脚本；",
+  "why_unsolved": "无账号体系的应用没有服务器也不想承担运营；端到端加密同步的冲突合并与设备身份体系是大工程，单人维护项目标了bounty也无人接；Android后台执行限制与React Native生态限制；Syncthing核心维护者少且对复杂度极其谨慎；",
+  "crowd_signal": "viral",
+  "independent_source_count": 15,
+  "member_titles": [
+   "本地优先应用用户要自托管多端同步",
+   "多设备用户要选择性与差量文件同步"
+  ],
+  "merged_from": [
+   "D07",
+   "D12"
+  ]
+ },
+ {
+  "id": "C12",
+  "title": "消费者要自动盘点订阅/免密授权并代为取消",
+  "description": "同时订阅多个视频/音乐/SaaS/健身会员并开着多处免密支付的消费者（含被默认勾选的老人）不记得自己订了什么、何时扣款、哪些长期没用，取消入口被商家刻意做深：爱奇艺会员被连续扣费25年退费难、老人免密误买550只鸡崽、关闭支付功能后仍被扣184万、为关闭扣费下载\"软件\"反被骗18万，两会提出严禁免密默认勾选；HN用户明确\"愿为之付费\"，Mixpanel创始人Suhail愿付$10/月。诉求：一个工具自动汇总苹果/微信/支付宝/银行卡与各App的订阅与免密授权，识别未使用项，到期与异常扣费预警，自动替用户走取消/暂停流程、想用时一键恢复并协助退费。",
+  "audience": "有多个流媒体/SaaS/健身/云账号订阅的城市消费者与家庭、中老年人及其子女、独立创业者与创作者",
+  "domain": "个人财务/消费者权益",
+  "platforms": [
+   "微博",
+   "小红书",
+   "Hacker News",
+   "TikTok",
+   "X/Twitter",
+   "Medium",
+   "App Store"
+  ],
+  "evidence": [
+   {
+    "url": "https://s.weibo.com//weibo?q=%23%E5%A4%9A%E6%96%B9%E5%9B%9E%E5%BA%94%E5%85%B3%E9%97%AD%E6%94%AF%E4%BB%98%E5%8A%9F%E8%83%BD%E5%90%8E%E8%A2%AB%E6%89%A3184%E4%B8%87%23&t=31&band_rank=32&Refer=top",
+    "quote": "热搜话题：《多方回应关闭支付功能后被扣184万》(相关《关闭支付宝支付功能后被扣捐赠184万》《支…",
+    "engagement": "微博热搜榜(快照排名#32，上榜2天)；"
+   },
+   {
+    "url": "https://s.weibo.com//weibo?q=%23%E7%94%B7%E5%AD%90%E7%88%B1%E5%A5%87%E8%89%BA%E4%BC%9A%E5%91%98%E5%85%85%E4%BA%8625%E5%B9%B4%E9%81%87%E9%80%80%E8%B4%B9%E9%9A%BE%23&t=31&band_rank=2&Refer=top",
+    "quote": "热搜话题：《男子爱奇艺会员充了25年遇退费难》(同日《视频平台不能因为监督才退费》《爱奇艺回应充2…",
+    "engagement": "微博热搜榜(快照排名#2，上榜1天)；同事件3个话题上榜"
+   },
+   {
+    "url": "https://s.weibo.com//weibo?q=%23%E5%BB%BA%E8%AE%AE%E4%B8%A5%E7%A6%81%E5%85%8D%E5%AF%86%E6%94%AF%E4%BB%98%E9%BB%98%E8%AE%A4%E5%8B%BE%E9%80%89%23&t=31&band_rank=10&Refer=top",
+    "quote": "热搜话题：《建议严禁免密支付默认勾选》(两会建议)",
+    "engagement": "微博热搜榜(快照排名#10，上榜1天)"
+   }
+  ],
+  "existing_solutions": "支付宝\"自动扣款\"、微信\"自动续费\"、Apple/Google订阅页（三处互不汇总、无预警、无退费协助）；Rocket Money/Truebill/Trim（仅美国、连银行、抽成、自身订阅、隐私顾虑）；MonoBoost等\"一键取消\"App（实际只能引导）；",
+  "why_unsolved": "续费是平台核心营收，取消流程被刻意设置摩擦且成百上千商家无统一接口，Apple/Google不开放第三方代取消；第三方无法读取支付授权列表，只能解析账单/邮件/短信；需同时接入邮箱、银行流水、密码库，隐私与合规门槛高；监管以约谈与个案通报为主，没有强制的统一管理入口。",
+  "crowd_signal": "viral",
+  "independent_source_count": 14,
+  "member_titles": [
+   "消费者要统一管理自动续费与免密授权并预警扣款",
+   "多订阅消费者要自动盘点、审计并代为取消"
+  ],
+  "merged_from": [
+   "A03",
+   "C21"
+  ]
+ },
+ {
+  "id": "C13",
+  "title": "家人要远程守护父母手机防骗与异常扣费预警",
+  "description": "父母独自用智能手机被骗老人App、直播套路、免密支付、短剧套娃付费、AI仿冒亲人语音电话诱导（《真的建议检查一下爸妈的手机》《老年人对时代的无力感》反复上热搜，两会呼吁老人大额转账24小时冷静期，中消协调查近半数老年人迫切需要专用App、被小字体、满屏广告、关不掉的弹窗、误触跳转困扰，媒体称\"中国的老年人正遭受系统性围猎\"）；配偶与家长面对丈夫网游充20多万、孩子退款后又充5万、全家打赏650万退款被拒。子女不在身边无法及时发现异常扣款、可疑App安装、大额转账，只能事后追回。",
+  "audience": "30-50岁在外地的子女、60岁以上独自用智能手机的老人、有沉迷充值打赏家人的配偶与家长",
+  "domain": "家庭/适老/反诈/理财",
+  "platforms": [
+   "微博",
+   "知乎",
+   "北京日报",
+   "文学城",
+   "中新网/中消协",
+   "GitHub"
+  ],
+  "evidence": [
+   {
+    "url": "https://s.weibo.com//weibo?q=%E7%BB%88%E4%BA%8E%E6%87%82%E8%80%81%E5%B9%B4%E4%BA%BA%E5%AF%B9%E6%97%B6%E4%BB%A3%E7%9A%84%E6%97%A0%E5%8A%9B%E6%84%9F%E4%BA%86&t=31&band_rank=33&Refer=top",
+    "quote": "热搜话题：《终于懂老年人对时代的无力感了》(同类话题《终于明白老年人玩智能机的无力感了》2025-…",
+    "engagement": "微博热搜榜(快照排名#33，上榜1天)；"
+   },
+   {
+    "url": "https://s.weibo.com//weibo?q=%23%E5%91%BC%E5%90%81%E8%80%81%E4%BA%BA%E5%A4%A7%E9%A2%9D%E8%BD%AC%E8%B4%A6%E8%AE%BE24%E5%B0%8F%E6%97%B6%E5%86%B7%E9%9D%99%E6%9C%9F%23&t=31&band_rank=18&Refer=top",
+    "quote": "热搜话题：《呼吁老人大额转账设24小时冷静期》",
+    "engagement": "微博热搜榜(快照排名#18，上榜2天)"
+   },
+   {
+    "url": "https://s.weibo.com//weibo?q=%E7%9C%9F%E7%9A%84%E5%BB%BA%E8%AE%AE%E6%A3%80%E6%9F%A5%E4%B8%80%E4%B8%8B%E7%88%B8%E5%A6%88%E7%9A%84%E6%89%8B%E6%9C%BA&t=31&band_rank=12&Refer=top",
+    "quote": "热搜话题：《真的建议检查一下爸妈的手机》",
+    "engagement": "微博热搜榜(归档快照排名#12，上榜1天)"
+   }
+  ],
+  "existing_solutions": "厂商亲情守护/远程协助与新机AI诈骗识别（品牌绑定、新机独占）；国家反诈中心App（号码库拦截，对AI变声熟人电话无效）；淘宝/微信/微博长辈模式、老人桌面App（只改字体与桌面）；李跳跳类无障碍工具（灰色、频繁下架、老人装不了）；未成年退款通道（繁琐、成年人无保护）；",
+  "why_unsolved": "需要跨App、跨支付渠道的授权/安装监控与通话内容实时分析权限，第三方在iOS完全拿不到、安卓受厂商限制；厂商各自为战，把守护做成新机卖点而非普惠功能，无统一标准；广告与充值打赏是平台核心营收，无动力真正去掉；老人隐私与子女监护、成年人消费自由的边界敏感；监管仍停在代表建议阶段；",
+  "crowd_signal": "viral",
+  "independent_source_count": 14,
+  "member_titles": [
+   "子女要远程守护父母手机防骗防误扣费",
+   "老人通话实时识别AI伪造亲人诈骗并推送子女",
+   "子女为父母一键配出无广告不误触的老人手机环境",
+   "家长/配偶要家庭大额充值打赏预警与退款助手"
+  ],
+  "merged_from": [
+   "A05",
+   "B21",
+   "B20",
+   "A27"
+  ]
+ },
+ {
+  "id": "C14",
+  "title": "家庭要不限量可拍照/小票自动录入的物品管理",
+  "description": "想管理衣橱、囤货、化妆品与家庭库存的用户系统测评多款物品管理/电子衣橱App后结论是每款都有硬伤：积分用完不能再添加（变相收费）、免费但丢过图片、无法加图、超过30/49件就付费、唯一不限量的只能加一张照片，\"以前用过很多app都不方便\"，最后退回备忘录贴图；细分诉求包括忘记自己有哪些衣服（2019年至今仍在问）、记录物品每次使用均摊成本、化妆品按品牌批号查保质期与开封到期提醒（8个按品牌重复提问的聚合页）、东西放哪有多少。",
+  "audience": "衣服多/囤货多的年轻女性、整理收纳爱好者、租房小户型与有娃家庭、消费复盘型用户、管理家庭库存与账单的无纸化家庭…",
+  "domain": "生活管理/家庭库存/物品与衣橱管理",
+  "platforms": [
+   "小红书",
+   "GitHub"
+  ],
+  "evidence": [
+   {
+    "url": "https://github.com/paperless-ngx/paperless-ngx/discussions/categories/feature-requests?discussions_q=is%3Aopen+sort%3Atop",
+    "quote": "Fill custom fields from machine learning（另有 Add a…",
+    "engagement": "162 upvotes, 35 评论"
+   },
+   {
+    "url": "https://github.com/tasks/tasks/issues/784",
+    "quote": "I really liked that feature in TickTick (Smart Da…",
+    "engagement": "👍 32, 6 评论 — tasks 仓库 👍 第 1"
+   },
+   {
+    "url": "https://github.com/grocy/grocy/issues/404",
+    "quote": "Feature Request: OCR shopping receipts（自动提取商品与价格入…",
+    "engagement": "👍 30, 17 评论 — grocy 仓库 👍 第 1"
+   }
+  ],
+  "existing_solutions": "收纳先生/收纳屋助手/橘兜/我的物品/啥都记/氧气电子衣橱/尽简衣橱/My衣橱管家/蜗牛衣橱（限量、丢图、收费）；真我/美丽修行/凹凹啦（批号查询）；备忘录贴图/Excel/Notion自建；grocy/Paperless/tasks（自托管、无OCR/NLP录入）；",
+  "why_unsolved": "用户量小，开发者只能靠数量限额/积分变现；每件拍照+抠图+打标签录入成本高致留存差；各品牌批号规则不统一无统一数据库；小团队不愿引入重ML依赖、隐私用户排斥云端API；多模态AI批量识别与账单自动导入2025-2026年才刚具备可行性。",
+  "crowd_signal": "viral",
+  "independent_source_count": 12,
+  "member_titles": [
+   "收纳用户要不限量不丢图可到期提醒的物品管理",
+   "家庭库存/文档用户要OCR与AI自动录入"
+  ],
+  "merged_from": [
+   "A16",
+   "D22"
+  ]
+ },
+ {
+  "id": "C15",
+  "title": "笔记用户要层级标签、多归属与工作私人分库",
+  "description": "从Evernote迁到Joplin的用户要像Evernote那样可折叠的嵌套/层级标签（#375 2018年提出，👍121 ❤43、77条评论，标high优先级8年未做，2026-08仍在更新，用户靠\"a/b/c\"命名前缀模拟）；Trilium、Readest、AFFiNE社区反复要\"更好的标签系统/全局标签视图/给笔记与批注打标签\"；Paperless无纸化用户要多组档案编号ASN（Discussions票数第1，222票）和一份文档多个通信方（139票）；Simplenote用户要文件夹；KOReader用户要扁平书库视图（👍76）。共同痛点：开源工具只有一维扁平分类，无法表达\"一份文件属于多个人/多个层级\"的现实结构。",
+  "audience": "Joplin/Trilium/Readest/AFFiNE等开源笔记用户、从Evernote迁出的知识管理者…",
+  "domain": "笔记/知识管理/文档归档",
+  "platforms": [
+   "GitHub"
+  ],
+  "evidence": [
+   {
+    "url": "https://github.com/paperless-ngx/paperless-ngx/discussions/1841",
+    "quote": "Multiple ASN-groups",
+    "engagement": "222 upvotes, 115 评论"
+   },
+   {
+    "url": "https://github.com/koreader/koreader/issues/8472",
+    "quote": "FR: Flat/Library view",
+    "engagement": "👍 76, 196 评论"
+   },
+   {
+    "url": "https://github.com/paperless-ngx/paperless-ngx/discussions/categories/feature-requests?discussions_q=is%3Aopen+sort%3Atop",
+    "quote": "Allow multiple correspondents for a given document",
+    "engagement": "139 upvotes, 31 评论"
+   }
+  ],
+  "existing_solutions": "Evernote（有层级标签但闭源订阅）；Obsidian/Bear嵌套标签（闭源或订阅、同步付费）；Joplin \"parent/child\"命名约定或社区插件模拟、--profile手工启动（切换需重启）；Trilium属性系统（学习成本高）；",
+  "why_unsolved": "层级标签与多主体归属涉及数据模型与同步格式的破坏性变更，需保持旧版/多端兼容，Joplin维护者标high但8年未动，Paperless维护者认为ASN唯一性是设计基石；标签树UI在移动端复杂；多实例涉及数据库锁、同步冲突与Electron单实例限制；",
+  "crowd_signal": "viral",
+  "independent_source_count": 12,
+  "member_titles": [
+   "Joplin等笔记用户要可折叠的层级标签",
+   "笔记用户要层级标签与工作私人分库"
+  ],
+  "merged_from": [
+   "C11",
+   "D09"
+  ]
+ },
+ {
+  "id": "C16",
+  "title": "旅客观众要合规的余票监控与候补成功率工具",
+  "description": "节假日旅客面对12306\"开票即候补\"\"长途有票短途却需候补\"\"取消订单3次当日禁购\"\"四天三崩\"，不知道候补概率、买长乘短/换乘/邻站方案是否可行、规则频繁变化；演出观众面对大麦/猫眼/纷玩岛开票秒空、黄牛横行，回流票靠手动刷新。诉求：基于历史数据的候补成功率估算、余票/方案规划器（换乘、邻站、买长乘短）、多平台开票日历、有票立即微信通知的合规回流监控与规则变更提醒。现有：12306官方候补成功率不透明且无回流提醒，大麦无候补；携程/智行加速包被质疑无效，2026-02第三方抢票被约谈、12306拒绝出票105万张；",
+  "audience": "节假日/春运铁路出行者与返乡学生、演唱会/音乐节/体育赛事观众",
+  "domain": "出行/娱乐",
+  "platforms": [
+   "微博",
+   "GitHub"
+  ],
+  "evidence": [
+   {
+    "url": "https://github.com/testerSunshine/12306",
+    "quote": "\"12306智能刷票，订票\"",
+    "engagement": "34,070 stars / 9,584 forks（…"
+   },
+   {
+    "url": "https://github.com/WECENG/ticket-purchase",
+    "quote": "\"大麦自动抢票，支持人员、城市、日期场次、价格选择\"；\"双端支持：支持Web端（Selenium）",
+    "engagement": "7,280 stars / 897 forks / 5…"
+   },
+   {
+    "url": "https://github.com/shiyutim/tickets",
+    "quote": "大麦网、bilibili会员购 演唱会调用接口的抢票软件，余票监控，微信通知。",
+    "engagement": "3,359 stars / 85 open issues"
+   }
+  ],
+  "existing_solutions": "12306候补（成功率不透明）；携程/飞猪/智行加速包与抢票（约谈、出票被拒）；大麦/猫眼（无候补、回流弱、退票苛刻）；开源 testerSunshine/12306（归档）",
+  "why_unsolved": "余票与候补队列数据仅12306/票务平台掌握，第三方抓取被封，放票策略不公开；供需失衡下平台以风控与实名制打击自动化，自动下单处于灰色地带；但合法的\"候补概率估算、余票/回流提醒、方案规划、开票日历\"至今缺面向普通人的产品。",
+  "crowd_signal": "viral",
+  "independent_source_count": 10,
+  "member_titles": [
+   "12306用户要候补成功率与余票方案透明工具",
+   "观众/旅客要余票回流监控与合规抢票提醒"
+  ],
+  "merged_from": [
+   "A11",
+   "B06"
+  ]
+ },
+ {
+  "id": "C17",
+  "title": "多生态设备间要不靠云直连传文件与同步剪贴板",
+  "description": "跨生态多设备用户想像AirDrop一样在设备间直接发现并可靠传文件、持续同步，并能在手机与电脑间共享剪贴板历史（文本/图片/文件、带OCR搜索），且不依赖云、不依赖同一路由器、不被单一生态锁定。LocalSend用户反复要求Wi-Fi Direct/扫码建连（#850 👍48）、手机流量与PC Wi-Fi不同网也能传（#189 👍63）、蓝牙发现（👍35）、Wi-Fi Aware（👍40）；Syncthing用户自2014年起要官方iOS客户端（👍68、74条评论，被官方锁定\"仅供投票/悬赏\"）；PowerToys用户要Mouse Without Borders安卓版（👍146）；a16z的Steph Smith公开喊\"谁能做一个能可靠airdrop的简单app\"。",
+  "audience": "同时持有iPhone/Android/Windows/Mac/Linux设备的普通用户、办公与写作人群、开发者…",
+  "domain": "效率/跨设备/隐私",
+  "platforms": [
+   "GitHub",
+   "X/Twitter"
+  ],
+  "evidence": [
+   {
+    "url": "https://github.com/EcoPasteHub/EcoPaste",
+    "quote": "\"跨平台的剪贴板管理工具\"；\"A local-first clipboard manager fo…",
+    "engagement": "7,452 stars / 127 open issu…"
+   },
+   {
+    "url": "https://github.com/jimuzhe/tiez-clipboard",
+    "quote": "\"TieZ 是一款基于 Tauri 的跨平台剪贴板管理器 / with history, tags…",
+    "engagement": "2,882 stars（6 个月）"
+   },
+   {
+    "url": "https://github.com/localsend/localsend/issues/850",
+    "quote": "Currently it is impossible to discover devices ou…",
+    "engagement": "👍48, 27 条评论 (另 #144 蓝牙传输 👍3…"
+   }
+  ],
+  "existing_solutions": "AirDrop/Quick Share（生态锁定、常搜不到设备）；Shareit/Xender（广告多）；LocalSend/Snapdrop（需同一局域网、无后台）；微信/Telegram传输助手（走云端、压缩）；",
+  "why_unsolved": "Wi-Fi Direct/Wi-Fi Aware/蓝牙API在各平台碎片化，iOS对第三方后台与近场发现限制严格；Go工具链在iOS上打包困难，Syncthing核心团队明确不做苹果平台；平台厂商有意用传输功能做生态锁定；商业工具订阅化；独立开源项目人力有限各做一端。",
+  "crowd_signal": "viral",
+  "independent_source_count": 10,
+  "member_titles": [
+   "多生态设备间不靠同一Wi-Fi直连传文件同步",
+   "多设备用户要本地优先跨手机电脑同步的剪贴板"
+  ],
+  "merged_from": [
+   "C04",
+   "B18"
+  ]
+ },
+ {
+  "id": "C18",
+  "title": "多屏Windows用户要按屏独立桌面自动平铺",
+  "description": "Windows多显示器用户希望切换虚拟桌面时只切某一块屏（\"Outlook一直在1号屏，2、3号屏切换多组应用时不丢1号屏\"，PowerToys #58 👍337）、窗口在FancyZones分区内\"最大化\"（#279 👍333）、像i3一样新窗口自动平铺（👍246）、按快捷键启动应用时若已运行就聚焦而不是再开一个实例（👍71）、Alt+Tab不弹缩略图、在文件对话框中一键跳到已打开的资源管理器路径（Listary式）。这些是PowerToys仓库自2019年起票数最高的一簇未实现需求（合计👍1300+），标为Idea长期不排期，2026-09仍在更新。",
+  "audience": "Windows多显示器办公/开发用户、交易员、超宽屏用户、从macOS（Alfred/Raycast）",
+  "domain": "桌面效率/窗口管理",
+  "platforms": [
+   "GitHub"
+  ],
+  "evidence": [
+   {
+    "url": "https://github.com/search?q=repo%3Amicrosoft%2FPowerToys+is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc&type=issues",
+    "quote": "Improved subpixel text rendering for OLED (#25595)",
+    "engagement": "354 / 189 / 65 / 65 / 63 👍"
+   },
+   {
+    "url": "https://github.com/microsoft/PowerToys/issues/279",
+    "quote": "Maximize window within the zone. Maximizing the w…",
+    "engagement": "👍333, 189 条评论"
+   },
+   {
+    "url": "https://github.com/microsoft/PowerToys/issues/4",
+    "quote": "Full window manager including specific layouts fo…",
+    "engagement": "👍293, 27 条评论"
+   }
+  ],
+  "existing_solutions": "Windows内置虚拟桌面（所有显示器一起切）；PowerToys FancyZones（手动拖放、无自动平铺）与Run Window Walker（需前缀、非同一快捷键launch-or-focus）；DisplayFusion（付费、部分模拟）；Dexpot（停更）；",
+  "why_unsolved": "Windows虚拟桌面缺少公开API，按屏独立需系统级改动，Shell限制大；缺统一\"应用单实例聚焦\"API，需针对UWP/Win32/Electron各类窗口分别处理；微软自身不做，PowerToys团队精力放在Command Palette重构，这些issue多年只积累👍。",
+  "crowd_signal": "viral",
+  "independent_source_count": 9,
+  "member_titles": [
+   "Windows多屏用户要独立桌面与自动平铺",
+   "多显示器用户要按屏独立的虚拟桌面"
+  ],
+  "merged_from": [
+   "C02",
+   "D27"
+  ]
+ },
+ {
+  "id": "C19",
+  "title": "家庭要跨端共享日历待办与家务分工轮换",
+  "description": "情侣、夫妻与合租室友想把家务分工明确化、可轮换、可统计谁做了多少，共享日历与待办、纪念日与位置，但搜\"家务分配app\"只返回家政保洁服务；两人共同记账只能靠百事AA或微信\"共享记账\"小程序，家庭日历+待办被引导到个人向多合一App米橙；很多情侣App只有iOS或双端功能不对等（抖音搜\"苹果安卓通用情侣app\"）。自建Nextcloud的家庭想把订阅的外部日历（学校、球队、节假日webcal）在内部共享给家人（#1600 👍102，开放10年）、把私人日历以\"仅显示忙/闲\"共享给同事（#11214 👍83）、控制生日日历是否提醒（👍70）、通过任意CalDAV客户端把家务/待办标记完成（grocy）。",
+  "audience": "同居情侣、双职工夫妻、有小孩与多代同住的家庭、合租室友、异平台（一人iPhone一人安卓）",
+  "domain": "家庭协作/共享日程",
+  "platforms": [
+   "小红书",
+   "抖音",
+   "GitHub"
+  ],
+  "evidence": [
+   {
+    "url": "https://github.com/nextcloud/server/issues/1600",
+    "quote": "Allow (internal) sharing of subscribed webcal cal…",
+    "engagement": "👍 102, 26 评论"
+   },
+   {
+    "url": "https://github.com/nextcloud/server/issues/11214",
+    "quote": "Share calendar to users or groups with \"show only…",
+    "engagement": "👍 83, ❤21, 🚀11, 53 评论"
+   },
+   {
+    "url": "https://github.com/nextcloud/server/issues/1505",
+    "quote": "Users should be able to choose whether reminders …",
+    "engagement": "👍 70（👍 排序列表第 13 位）"
+   }
+  ],
+  "existing_solutions": "家政O2O App（花钱请人做，不解决分配）；滴答清单/微信群/备忘录（无家务模板、无轮换、无公平统计）；百事AA记账/微信\"共享记账\"小程序、米橙（个人向）；恋爱记/小恩爱（广告多、会员墙、iOS为主）；Tody/Sweepy（海外付费）；",
+  "why_unsolved": "国内效率工具以个人为单位设计，家庭多人协作被视为小需求、付费意愿不明；家务公平话题敏感需要激励设计；情侣App生命周期短、付费低，跨平台开发成本高；Nextcloud侧需CalDAV服务端扩展（只暴露忙闲的虚拟日历）与权限模型改动，calendar应用团队优先级低。",
+  "crowd_signal": "viral",
+  "independent_source_count": 9,
+  "member_titles": [
+   "情侣/家庭要跨端共享账本、待办日历与家务分工",
+   "自建日历家庭要订阅共享与忙闲共享"
+  ],
+  "merged_from": [
+   "A22",
+   "D21"
+  ]
+ },
+ {
+  "id": "C20",
+  "title": "办公学生要免费离线批量OCR含表格Mac版",
+  "description": "学生、财务行政与研究人员想把截图、扫描件、PDF、屏幕上的文字、公式、表格批量识别成可编辑文本/Markdown/Excel，排除水印页眉页脚，且不上传云端、不按页付费、不限次。Umi-OCR以\"免费、离线、可批量、解压即用\"拿下47.5k★，MinerU（PDF→Markdown）80k★，独立开发者清单里61款PDF工具、16款OCR工具多数强调\"纯本地不上传、免登录、无广告\"，少数派把\"完全免费的扫描件矫正\"当作稀缺亮点推荐——说明大厂云端按量收费方案不被接受。",
+  "audience": "学生/科研人员、行政财务文员教师等需把扫描件/纸质表格数码化的办公人群、处理论文PDF的人…",
+  "domain": "效率/文档/OCR",
+  "platforms": [
+   "GitHub",
+   "少数派"
+  ],
+  "evidence": [
+   {
+    "url": "https://github.com/opendatalab/MinerU",
+    "quote": "\"Transforms complex documents like PDFs and Offic…",
+    "engagement": "80,700 stars / 6,734 forks"
+   },
+   {
+    "url": "https://github.com/hiroi-sora/Umi-OCR",
+    "quote": "\"免费，开源，可批量的离线OCR软件\"；\"免费：本项目所有代码开源，完全免费。",
+    "engagement": "47,514 stars / 4,645 forks …"
+   },
+   {
+    "url": "https://github.com/xushengfeng/eSearch",
+    "quote": "作者在 Windows 上用 Snipaste，换到 Linux 后没有等价物（Flameshot…",
+    "engagement": "7,214 stars / 518 forks / 7…"
+   }
+  ],
+  "existing_solutions": "WPS/福昕/ABBYY/扫描全能王（会员、限次、按页收费）；百度/腾讯云OCR与微信/QQ截图提取（云端、限次、隐私顾虑）；在线OCR站点（上传、广告、限次）；Umi-OCR/PaddleOCR/MinerU（桌面/命令行、需配置、仅Win/Linux）；",
+  "why_unsolved": "大厂把OCR作为云服务变现，不做免费离线版；表格结构还原需版面分析模型且资源占用大，离线端侧难兼顾精度与体积；macOS打包与Qt/PaddleOCR依赖适配工作量大，个人开发者兼职维护未排期；开源模型成熟但缺产品化与长期维护，停留在桌面端与技术用户群体。",
+  "crowd_signal": "viral",
+  "independent_source_count": 8,
+  "member_titles": [
+   "学生财务要免费离线批量OCR与PDF转文档",
+   "办公学生要免费离线OCR含表格与Mac版"
+  ],
+  "merged_from": [
+   "B09",
+   "D16"
+  ]
+ },
+ {
+  "id": "C21",
+  "title": "普通人要免登录、多模型切换核验的AI入口",
+  "description": "普通AI用户、学生、上班族：DeepSeek反复崩溃（同一话题上榜13天）、豆包崩了、豆包收费后月活减610万、5家AI答案不一样、'你问AI得到的答案可能是广告'、'突然发现很多人不会用AI'；抖音用户同时在搜'免费的ai聊天软件不用登录'。痛点：单一模型不可用时无处可去、答案冲突不知信谁、必须手机号注册、免费额度少。诉求：一个入口自动切换可用模型、并列对比/交叉核验答案、标注广告、免登录即用、给小白现成模板。",
+  "audience": "普通AI用户、学生、办公族、对注册/隐私敏感的用户",
+  "domain": "AI/效率",
+  "platforms": [
+   "微博",
+   "抖音"
+  ],
+  "evidence": [
+   {
+    "url": "https://s.weibo.com//weibo?q=%23DeepSeek%E5%B4%A9%E4%BA%86%23&t=31&band_rank=47&Refer=top",
+    "quote": "热搜话题：《DeepSeek崩了》(另有《豆包崩了》2026-01-28上榜3天…",
+    "engagement": "微博热搜榜(快照排名#47)；同一话题上榜13天"
+   },
+   {
+    "url": "https://s.weibo.com//weibo?q=%23%E5%88%98%E7%BE%8E%E5%90%AB%E5%90%90%E6%A7%BD5%E5%AE%B6AI%E7%AD%94%E6%A1%88%E4%B8%8D%E4%B8%80%E6%A0%B7%23&t=31&band_rank=42&Refer=top",
+    "quote": "热搜话题：《刘美含吐槽5家AI答案不一样》(另有《你问AI得到的答案可能是广告》2026-03-1…",
+    "engagement": "微博热搜榜(快照排名#42，上榜1天)"
+   },
+   {
+    "url": "https://s.weibo.com//weibo?q=%E7%AA%81%E7%84%B6%E5%8F%91%E7%8E%B0%E5%BE%88%E5%A4%9A%E4%BA%BA%E4%B8%8D%E4%BC%9A%E7%94%A8AI&t=31&band_rank=45&Refer=top",
+    "quote": "热搜话题：《突然发现很多人不会用AI》(另有《豆包收费 大模型将告别免费时代》2026-05-13…",
+    "engagement": "微博热搜榜(快照排名#45，上榜2天)"
+   }
+  ],
+  "existing_solutions": "各家独立App（DeepSeek/豆包/元宝/千问/Kimi，均需手机号登录）；小型聚合工具（不稳定、无核验）；海外Poe/ChatGPT（需翻墙）；星野等AI陪聊App（会员墙重）。",
+  "why_unsolved": "各家API成本与限流、国内实名制监管要求登录；广告植入成为新营收模式无动力标注；答案交叉核验需要额外推理成本；面向小白的模板化产品尚缺。",
+  "crowd_signal": "viral",
+  "independent_source_count": 7,
+  "member_titles": [
+   "普通人要免登录、多模型切换核验的AI入口"
+  ],
+  "merged_from": [
+   "A02"
+  ]
+ },
+ {
+  "id": "C22",
+  "title": "多机用户要可靠的短信验证码跨设备转发",
+  "description": "副卡备用机用户、海外华人与代管父母手机的子女被\"验证码发到另一台手机上要跑去拿、老人手机收到重要短信家人看不到\"困扰，想把短信/来电/App通知自动转发到主力手机、电脑、微信/钉钉/飞书/Telegram/邮箱并自动提取、复制验证码。运营商与手机系统均不提供跨品牌跨设备转发（iOS仅苹果生态内、安卓厂商互联不跨品牌）。SmsForwarder 28k★是唯一主流方案但需自建webhook/机器人通道，对非技术用户门槛高，且被厂商后台管控折磨：小米HyperOS开锁屏密码后首次开机无法自启（FBE加密，标help wanted）、一加\"锁不住会掉线\"、澎湃OS4后bark通道失效、鸿蒙NEXT不能装APK；用户在issue里问\"验证码如何自动复制\"；",
+  "audience": "有副卡/备用机的双卡多机用户、常在电脑上操作的人、人在海外用国内号码的留学生与华人、帮父母管手机的子女…",
+  "domain": "通讯/移动端工具",
+  "platforms": [
+   "GitHub"
+  ],
+  "evidence": [
+   {
+    "url": "https://github.com/pppscn/SmsForwarder",
+    "quote": "短信转发器——监控Android手机短信、来电、APP通知，并根据指定规则转发到其他手机：钉钉群自…",
+    "engagement": "28.1k stars, 3.4k forks…"
+   },
+   {
+    "url": "https://github.com/huahaotech/smsforwarder.cn",
+    "quote": "短信转发助手-再也不错过任何重要短信 轻量、稳定、开源的 Android 短信转发应用。",
+    "engagement": "2025-12 新建"
+   },
+   {
+    "url": "https://github.com/pppscn/SmsForwarder/issues/760",
+    "quote": "希望增加对小米手机（HyperOS / 澎湃OS）无人值守运行的支持——开启锁屏密码后首次开机无法…",
+    "engagement": "open, label help wanted…"
+   }
+  ],
+  "existing_solutions": "SmsForwarder（需配机器人/服务器通道、被HyperOS/ColorOS杀后台）；smsforwarder.cn等新项目；运营商\"和多号\"等付费业务（不覆盖验证码转发）；iOS/华为/小米生态内同步（不跨品牌）；ESP32/4G模块硬件自建（有门槛）。",
+  "why_unsolved": "运营商与手机厂商没有动力做跨品牌跨平台短信同步；安卓短信权限与后台管控持续收紧，FBE加密让常驻服务不可靠；鸿蒙NEXT不能装安卓APK；单人维护项目要对每个厂商系统逐个适配；开源方案停留在技术用户。",
+  "crowd_signal": "viral",
+  "independent_source_count": 6,
+  "member_titles": [
+   "多设备用户把短信验证码自动转发到电脑微信邮箱",
+   "备用机用户要短信验证码转发到主力机"
+  ],
+  "merged_from": [
+   "B11",
+   "D17"
+  ]
+ },
+ {
+  "id": "C23",
+  "title": "自建相册家庭要好用的共享与断点上传",
+  "description": "把手机照片从Google Photos/iCloud迁到自托管Immich/PhotoPrism/Nextcloud的家庭，想像Google Photos一样把照片、相册、堆叠、人物/标签元数据顺畅分享给伴侣与家人，能管理对方放进共享相册的内容、给伴侣照片点收藏，并清楚知道\"这张能不能分享、为什么不能\"；同时希望智能相册与网盘共用一份存储而非两边各同步一份照片。Immich官方承认共享\"confusing and limiting\"，相册共享/伴侣共享/分享链接/外部库共享四套机制互不一致、只能整库共享不能按图库挑选，2024-09对sharing实施feature freeze等待整体重设计（#12614 👍749、259条评论，仓库最高票…",
+  "audience": "用Immich/PhotoPrism/Nextcloud替代Google Photos/iCloud的家庭与隐私用户…",
+  "domain": "家庭照片备份/自托管",
+  "platforms": [
+   "GitHub"
+  ],
+  "evidence": [
+   {
+    "url": "https://github.com/immich-app/immich/issues/12614",
+    "quote": "Sharing precious photos and videos is an importan…",
+    "engagement": "👍 749, 总 reactions 1020 (❤9…"
+   },
+   {
+    "url": "https://github.com/immich-app/immich/discussions/categories/feature-request?discussions_q=is%3Aopen+sort%3Atop",
+    "quote": "[Feature]: Upload large files in chunks 780 upvot…",
+    "engagement": "780 / 291 / 261 / 232 / 198…"
+   },
+   {
+    "url": "https://github.com/immich-app/immich/issues/16549",
+    "quote": "[META] Stacks on all views — For album sharing sp…",
+    "engagement": "👍 96, 14 评论, Backlog"
+   }
+  ],
+  "existing_solutions": "Google Photos/iCloud伴侣共享与家庭群组（云端、隐私差、付费扩容）；Immich现有四套共享机制（权限模型混乱、已冻结）；PhotoPrism/Nextcloud Memories（偏单用户、AI能力弱、只能WebDAV挂载互通、账号不打通）；",
+  "why_unsolved": "共享涉及访问控制与安全模型整体重构，志愿者团队选择冻结先做内部设计，人力集中在ML、稳定性与API变更；分块/断点上传需客户端+服务端协议改造；PhotoPrism与Nextcloud架构与账号体系不同，集成需一方大改；Nextcloud App生态对重型AI后端不友好。",
+  "crowd_signal": "viral",
+  "independent_source_count": 6,
+  "member_titles": [
+   "自托管家庭相册要好用的共享与网盘合一",
+   "自建相册家庭要好用共享与断点上传"
+  ],
+  "merged_from": [
+   "C08",
+   "D23"
+  ]
+ },
+ {
+  "id": "C24",
+  "title": "离线地图用户要公交换乘、轨迹导航与同步",
+  "description": "不想用Google Maps的隐私/离线地图用户想要：完全离线的公共交通/地铁换乘规划（目标是\"做出比Google更好的全球公交路线开源替代\"，Organic Maps #5331 👍82、82条评论，仓库最高票，已开Polar.sh悬赏仍无人完成）、导入GPX/KML后沿轨迹转向导航（#1360 👍77、78条评论）、书签跨设备同步/备份（原同步因依赖私有服务器被禁用，#622 👍63、113条评论）、各平台显示限速标志（👍70）；驾驶者最想要实时路况绕行（OsmAnd #6878 👍102，\"it would be an enormous relief\"，维护者仅标Nice to Have）、地点评分。这些2021-2023年提出的需求2026-09仍在更新。",
+  "audience": "用Organic Maps/OsmAnd等隐私离线地图的旅行者、徒步骑行者、出境无流量用户…",
+  "domain": "出行/地图导航",
+  "platforms": [
+   "GitHub"
+  ],
+  "evidence": [
+   {
+    "url": "https://github.com/organicmaps/organicmaps/issues/622",
+    "quote": "I see that it was disabled because of proprietary…",
+    "engagement": "👍63, 113 条评论, 最近更新 2026-09-…"
+   },
+   {
+    "url": "https://github.com/osmandapp/OsmAnd/issues/6878",
+    "quote": "Possibility of avoiding traffic jam? — “it would …",
+    "engagement": "102 👍, label: Nice to Have"
+   },
+   {
+    "url": "https://github.com/organicmaps/organicmaps/issues/5331",
+    "quote": "Implement public transport routing — 目标是做 \"worldw…",
+    "engagement": "👍82 ❤️22, 82 条评论, 最近更新 2026…"
+   }
+  ],
+  "existing_solutions": "Google Maps/Apple Maps/Waze/高德/Transit/Moovit（在线、追踪、靠海量用户数据）；OsmAnd（复杂、部分付费、无路况）；Organic Maps（无公交与路况、同步禁用）；手动加途经点模拟轨迹；TomTom/HERE付费API；",
+  "why_unsolved": "全球GTFS时刻表聚合与实时数据需服务器基础设施、资金与数据许可，实时路况需大规模匿名探针或付费数据源、无开放数据集；书签同步需自建服务端；地点评分需防刷与社区运营；志愿者项目人力不足，OSM生态缺乏商业化主体承担持续运营成本。",
+  "crowd_signal": "viral",
+  "independent_source_count": 6,
+  "member_titles": [
+   "隐私离线地图要公交规划、轨迹导航与书签同步",
+   "开源地图用户要公交换乘与实时路况"
+  ],
+  "merged_from": [
+   "C13",
+   "D14"
+  ]
+ },
+ {
+  "id": "C25",
+  "title": "读者要无广告可换源导入自有书跨端同步阅读器",
+  "description": "网文重度读者想在一个无广告的阅读器里追更多个来源、换源、导出 TXT/EPUB、听书；电子书读者（含 Kindle 中国区停服后的原 Kindle 用户）想导入自有电子书、跨平台（含微信读书/Kindle 内容）同步进度和笔记、无广告。\"阅读 3.0\"（legado）4.7 万 star 后因侵权诉讼被迫删库；番茄小说下载器、koodo-reader（2.8 万 star）、readest（两年 2.5 万 star）继续涌现；豆瓣用户整理\"能够取代 Kindle 手机版的 APP\"豆列。",
+  "audience": "网文重度读者、有自有电子书库的重度阅读者、原 Kindle 用户、不愿被单一平台锁定的人",
+  "domain": "阅读/娱乐/学习",
+  "platforms": [
+   "GitHub",
+   "豆瓣豆列"
+  ],
+  "evidence": [
+   {
+    "url": "https://github.com/gedoor/legado",
+    "quote": "描述：\"阅读是一款可以自定义来源阅读网络内容的工具，为广大网络文学爱好者提供一种方便…",
+    "engagement": "47,105 stars / 5,570 forks"
+   },
+   {
+    "url": "https://github.com/koodo-reader/koodo-reader",
+    "quote": "\"A modern ebook manager and reader with sync and …",
+    "engagement": "28,317 stars"
+   },
+   {
+    "url": "https://github.com/readest/readest",
+    "quote": "\"a modern, feature-rich ebook reader…seamless cro…",
+    "engagement": "24,640 stars（两年）"
+   }
+  ],
+  "existing_solutions": "番茄/七猫/起点：广告、章节付费、平台锁定、无法导出；微信读书/Kindle/掌阅/静读天下：封闭格式、广告/会员、导入自有书麻烦、笔记与进度不能跨平台同步；开源自定义书源阅读器触碰版权红线被起诉。",
+  "why_unsolved": "内容版权归平台，\"换源\"本质是盗版分发；国内阅读 App 以版权内容+会员变现为主，对\"导入自有书\"的纯工具型需求投入少；合法路径（正版跨平台聚合、无广告付费阅读、自有书库管理与同步）没有大厂愿做。",
+  "crowd_signal": "viral",
+  "independent_source_count": 5,
+  "member_titles": [
+   "读者要无广告可换源导入自有书跨端同步阅读器"
+  ],
+  "merged_from": [
+   "B08"
+  ]
+ },
+ {
+  "id": "C26",
+  "title": "多端用户要隐私友好离线的中文拼音与语音输入",
+  "description": "隐私敏感的办公人群与多设备用户不满搜狗/百度/讯飞等商业输入法的弹窗广告、词库与音频上传、各平台体验不一致，系统自带输入法词库弱、语音听写必须联网、延迟高且不可自定义热词。诉求：完全离线、隐私友好、跨平台一致、一键安装、词库自动更新与多端同步的中文拼音输入法，以及按住即说松开上屏、响应极快、可自定义热词的离线中文语音输入。雾凇拼音作为Rime配置包近2万★主打\"完全离线、隐私友好、跨平台一致\"，rime-pure等整合包上千★，但都需用户自己下载部署配置文件，普通人门槛高；",
+  "audience": "对隐私敏感的办公人群与程序员、Mac/Linux/Windows多设备用户、写作者与文字工作者、老年人与手部不便者",
+  "domain": "输入法/语音识别/系统工具",
+  "platforms": [
+   "GitHub"
+  ],
+  "evidence": [
+   {
+    "url": "https://github.com/iDvel/rime-ice",
+    "quote": "\"雾凇拼音是一份开箱即用的简体中文 Rime 输入法配置，词库长期维护，基本功能齐全，使用完全离线…",
+    "engagement": "19,514 stars / 1,190 forks"
+   },
+   {
+    "url": "https://github.com/HaujetZhao/CapsWriter-Offline",
+    "quote": "完全离线（不受网络限制）、响应极快、高准确率 且 高度自定义……macOS unsupported…",
+    "engagement": "6.9k stars / 637 forks / 19…"
+   },
+   {
+    "url": "https://github.com/SivanLaai/rime-pure",
+    "quote": "\"基于 Rime（小狼毫 / 同文）的极简、优雅、好用的中英文输入方案整合包。",
+    "engagement": "1,133 stars"
+   }
+  ],
+  "existing_solutions": "搜狗/百度/讯飞/微信输入法与语音输入（广告、词库与音频上传、需联网、隐私）；微软/苹果自带输入法与听写（词库弱、云同步弱、不可自定义热词）；Rime+雾凇拼音/rime-pure（手动下载部署配置）；CapsWriter-Offline（仅Windows）；",
+  "why_unsolved": "商业输入法靠广告与数据变现，无动力做离线版；开源方案缺产品化（一键安装、词库自动更新、多端同步）；高质量离线中文ASR模型（Paraformer/SenseVoice/Qwen3-ASR）近两年才成熟，个人开发者打包跨平台客户端（尤其macOS键盘hook权限）成本高。",
+  "crowd_signal": "viral",
+  "independent_source_count": 4,
+  "member_titles": [
+   "多端用户要隐私友好无广告一键装的中文输入法",
+   "文字工作者要完全离线的中文语音输入"
+  ],
+  "merged_from": [
+   "B14",
+   "D29"
+  ]
+ },
+ {
+  "id": "C27",
+  "title": "独居者要定时签到、超时自动报警的守护App",
+  "description": "独居青年、空巢老人担心独自在家突发疾病/意外无人知晓。2026年1月独立开发者的'死了么'App（定时签到、超时未响应自动通知紧急联系人）登顶App Store付费榜第一，5天内上热搜10余次，随后因名称争议改名、功能被砍、最终下架，需求突然空窗；同期《老人5次打120未接通后身亡》进一步印证。诉求：低心理负担的定时签到+超时自动通知联系人/物业/120。",
+  "audience": "独居青年、空巢老人及其子女",
+  "domain": "健康/安全",
+  "platforms": [
+   "微博"
+  ],
+  "evidence": [
+   {
+    "url": "https://s.weibo.com//weibo?q=%23%E6%AD%BB%E4%BA%86%E4%B9%88APP%E5%9B%9E%E5%BA%94%E4%B8%8B%E8%BD%BD%E9%87%8F%E7%99%BB%E9%A1%B6%E4%BB%98%E8%B4%B9%E6%A6%9C%E7%AC%AC%E4%B8%80%23&t=31&band_rank=34&Refer=top",
+    "quote": "热搜话题：《死了么APP回应下载量登顶付费榜第一》——付费榜第一，直接证明愿意付费",
+    "engagement": "微博热搜榜(快照排名#34)；死了么相关话题2026-…"
+   },
+   {
+    "url": "https://s.weibo.com//weibo?q=%23%E6%AD%BB%E4%BA%86%E4%B9%88APP%E7%9C%9F%E7%9A%84%E8%83%BD%E6%95%91%E5%91%BD%E5%90%97%23&t=31&band_rank=47&Refer=top",
+    "quote": "热搜话题：《死了么APP真的能救命吗》",
+    "engagement": "微博热搜榜(快照排名#47，上榜1天)"
+   },
+   {
+    "url": "https://s.weibo.com//weibo?q=%23%E6%AD%BB%E4%BA%86%E4%B9%88APP%E4%B8%8B%E6%9E%B6%23&t=31&band_rank=11&Refer=top",
+    "quote": "热搜话题：《死了么APP下架》(前有《死了么APP仅剩2个功能》2026-01-13…",
+    "engagement": "微博热搜榜(快照排名#11，上榜1天)"
+   }
+  ],
+  "existing_solutions": "死了么/活了么（已下架或功能阉割）；手机SOS紧急联络（需本人主动触发，晕倒无用）；智能手环跌倒检测（需硬件、老人不戴）；社区'敲门行动'（靠人力）。",
+  "why_unsolved": "独立开发者产品因命名与合规争议夭折；大厂认为市场小、涉及生死责任不愿碰；理想方案需与物业/社区/120打通；用户对'晦气'的心理抗拒需要产品设计化解。",
+  "crowd_signal": "viral",
+  "independent_source_count": 4,
+  "member_titles": [
+   "独居者要定时签到、超时自动报警的守护App"
+  ],
+  "merged_from": [
+   "A04"
+  ]
+ },
+ {
+  "id": "C28",
+  "title": "中小商家要AI假图鉴别与恶意仅退款申诉工具",
+  "description": "中小电商、生鲜/水果/榴莲商家：买家用AI生成烂水果/死螃蟹假图申请仅退款、职业退款人一人退款上千次、榴莲商家申诉两次被驳回、损失20万后'有单也不敢接'（榴莲事件10余个话题连续上榜近2个月）。痛点：缺乏鉴别AI假图的工具、缺少跨店铺恶意买家识别、申诉材料准备耗时且被拒率高。诉求：售后场景的AI假图检测+申诉材料生成+高退款买家风险提示。",
+  "audience": "中小电商商家、生鲜/农产品卖家",
+  "domain": "电商/商家工具",
+  "platforms": [
+   "微博"
+  ],
+  "evidence": [
+   {
+    "url": "https://s.weibo.com//weibo?q=%23%E5%A4%AE%E8%A7%86%E6%9B%9D%E5%85%89%E7%94%A8AI%E9%80%A0%E5%81%87%E5%9B%BE%E9%AA%97%E9%80%80%E6%AC%BE%E4%B9%B1%E8%B1%A1%23&t=31&band_rank=30&Refer=top",
+    "quote": "热搜话题：《央视曝光用AI造假图骗退款乱象》(另有《用AI造假图仅退款》2025-08-21…",
+    "engagement": "微博热搜榜(快照排名#30，上榜1天)；"
+   },
+   {
+    "url": "https://s.weibo.com//weibo?q=%23%E9%81%AD%E6%81%B6%E6%84%8F%E4%BB%85%E9%80%80%E6%AC%BE%E6%A6%B4%E8%8E%B2%E5%95%86%E5%AE%B6%E4%B8%A4%E6%AC%A1%E7%94%B3%E8%AF%89%E8%A2%AB%E6%8B%92%23&t=31&band_rank=20&Refer=top",
+    "quote": "热搜话题：《遭恶意仅退款榴莲商家两次申诉被拒》(榴莲仅退款事件2026-05-08~06-26 共…",
+    "engagement": "微博热搜榜(快照排名#20)；同事件10+话题持续上榜…"
+   },
+   {
+    "url": "https://s.weibo.com//weibo?q=%23%E9%81%AD%E4%BB%85%E9%80%80%E6%AC%BE%E6%8D%9F%E5%A4%B120%E4%B8%87%E8%80%81%E6%9D%BF%E6%9C%89%E5%8D%95%E4%B9%9F%E4%B8%8D%E6%95%A2%E6%8E%A5%23&t=31&band_rank=11&Refer=top",
+    "quote": "热搜话题：《遭仅退款损失20万老板有单也不敢接》",
+    "engagement": "微博热搜榜(快照排名#11，上榜1天)"
+   }
+  ],
+  "existing_solutions": "平台申诉通道（驳回率高）；部分平台'高退款人群屏蔽'（单向、覆盖有限）；通用AI图鉴别工具不面向售后；商家只能自费追人或报警。",
+  "why_unsolved": "平台策略倾向买家体验，商家申诉弱势；跨平台恶意买家黑名单涉及个人信息合规；AI假图鉴别有技术门槛且需与平台售后流程集成。",
+  "crowd_signal": "viral",
+  "independent_source_count": 4,
+  "member_titles": [
+   "中小商家要AI假图鉴别与恶意仅退款申诉工具"
+  ],
+  "merged_from": [
+   "A06"
+  ]
+ },
+ {
+  "id": "C29",
+  "title": "消费者要一键直达各企业人工客服的路径库",
+  "description": "遇到售后、快递、银行、运营商纠纷的所有消费者被智能客服绕圈、找不到人工入口；人民日报点名'智能客服不智能'，同日3个相关话题在榜，多省因此取消12345语音导航。每家企业转人工路径不同且经常变动，用户浪费大量时间。诉求：持续更新的各企业人工客服直达路径库+自动拨号按键序列+投诉升级话术模板。",
+  "audience": "全体消费者，尤其老年人",
+  "domain": "效率/消费者权益",
+  "platforms": [
+   "微博"
+  ],
+  "evidence": [
+   {
+    "url": "https://s.weibo.com//weibo?q=%23%E4%BA%BA%E6%B0%91%E6%97%A5%E6%8A%A5%E6%89%B9%E6%99%BA%E8%83%BD%E5%AE%A2%E6%9C%8D%E4%B8%8D%E6%99%BA%E8%83%BD%23&t=31&band_rank=12&Refer=top",
+    "quote": "热搜话题：《人民日报批智能客服不智能》",
+    "engagement": "微博热搜榜(快照排名#12，上榜1天)"
+   },
+   {
+    "url": "https://s.weibo.com//weibo?q=%E4%BA%BA%E5%B7%A5%E5%AE%A2%E6%9C%8D%E9%9A%BE%E6%89%BE%E5%AF%B9%E6%B6%88%E8%B4%B9%E8%80%85%E5%B8%A6%E6%9D%A5%E5%93%AA%E4%BA%9B%E5%9B%B0%E6%89%B0&t=31&band_rank=20&Refer=top",
+    "quote": "热搜话题：《人工客服难找对消费者带来哪些困扰》",
+    "engagement": "微博热搜榜(快照排名#20，上榜1天)"
+   },
+   {
+    "url": "https://s.weibo.com//weibo?q=%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E6%99%BA%E8%83%BD%E5%AE%A2%E6%9C%8D%E4%B8%8D%E6%99%BA%E8%83%BD&t=31&band_rank=18&Refer=top",
+    "quote": "热搜话题：《如何解决智能客服不智能》",
+    "engagement": "微博热搜榜(快照排名#18，上榜1天)；"
+   }
+  ],
+  "existing_solutions": "各企业自家客服（故意隐藏人工）；黑猫投诉/12315只做投诉不做接通；网友自发整理的'转人工口诀'帖零散且过期快。",
+  "why_unsolved": "企业以客服成本为先，人工入口刻意隐藏且频繁改动，需要持续众包维护；没有人做'反客服'工具产品；企业侧不会主动配合。",
+  "crowd_signal": "viral",
+  "independent_source_count": 4,
+  "member_titles": [
+   "消费者要一键直达各企业人工客服的路径库"
+  ],
+  "merged_from": [
+   "A07"
+  ]
+ },
+ {
+  "id": "C30",
+  "title": "消费者要多账号同时比价取证大数据杀熟的工具",
+  "description": "点餐、OTA订酒店机票、办运营商套餐的消费者：瑞幸4部手机点出3种价格且会员更贵、携程被罚51.79亿后仍被追问'为何还在杀熟'、运营商老用户比新用户贵。个人无法举证价格歧视，只能借朋友手机对比。诉求：多账号/多设备同时比价、价差自动记录与举证、跨平台历史价格追踪。",
+  "audience": "外卖/咖啡/OTA/运营商用户",
+  "domain": "理财/消费者权益",
+  "platforms": [
+   "微博"
+  ],
+  "evidence": [
+   {
+    "url": "https://s.weibo.com//weibo?q=%23%E7%91%9E%E5%B9%B8%E5%9B%9E%E5%BA%944%E9%83%A8%E6%89%8B%E6%9C%BA%E7%82%B9%E5%87%BA3%E7%A7%8D%E4%BB%B7%E6%A0%BC%23&t=31&band_rank=8&Refer=top",
+    "quote": "热搜话题：《瑞幸回应4部手机点出3种价格》(前有《开了瑞幸会员卡价格反比别人贵》…",
+    "engagement": "微博热搜榜(快照排名#8，上榜2天)；同事件3个话题上榜"
+   },
+   {
+    "url": "https://s.weibo.com//weibo?q=%23%E7%BD%9A%E4%BA%8651.79%E4%BA%BF%E6%90%BA%E7%A8%8B%E4%B8%BA%E4%BD%95%E8%BF%98%E5%9C%A8%E6%9D%80%E7%86%9F%23&t=31&band_rank=20&Refer=top",
+    "quote": "热搜话题：《罚了51.79亿携程为何还在杀熟》",
+    "engagement": "微博热搜榜(快照排名#20，上榜1天)"
+   },
+   {
+    "url": "https://s.weibo.com//weibo?q=%E6%90%BA%E7%A8%8B%20%E6%9D%80%E7%86%9F&t=31&band_rank=5&Refer=top",
+    "quote": "热搜话题：《携程 杀熟》",
+    "engagement": "微博热搜榜(快照排名#5，上榜1天)"
+   }
+  ],
+  "existing_solutions": "平台自查声明（不可信）；监管事后罚款；现有比价App只比跨平台商品价，不比同平台不同账号差价；用户手工截图对比。",
+  "why_unsolved": "定价数据在平台侧，个体无法批量对比；举证需多账号多设备；平台用优惠券/会员包装规避法律定义；监管执行滞后。",
+  "crowd_signal": "viral",
+  "independent_source_count": 4,
+  "member_titles": [
+   "消费者要多账号同时比价取证大数据杀熟的工具"
+  ],
+  "merged_from": [
+   "A08"
+  ]
+ },
+ {
+  "id": "C31",
+  "title": "重度用户要跨App的深夜静默与刷屏限额工具",
+  "description": "想戒短视频的成年人、担心父母和孩子的家庭：越刷越焦虑、'脑腐'、两会建议短视频凌晨1-5点深夜静默（热搜#1、上榜2天）、建议老年人防沉迷模式；'50个神仙网站逃离信息流App'类帖受欢迎。系统屏幕时间易绕过，各App青少年模式成人不用。诉求：跨App的深夜锁定、时长限额、算法关闭与替代内容推荐。",
+  "audience": "成年重度用户、家长、老年人子女",
+  "domain": "健康/效率",
+  "platforms": [
+   "微博"
+  ],
+  "evidence": [
+   {
+    "url": "https://s.weibo.com//weibo?q=%23%E5%BB%BA%E8%AE%AE%E7%9F%AD%E8%A7%86%E9%A2%91%E5%87%8C%E6%99%A81%E7%82%B9%E8%87%B35%E7%82%B9%E6%B7%B1%E5%A4%9C%E9%9D%99%E9%BB%98%23&t=31&band_rank=1&Refer=top",
+    "quote": "热搜话题：《建议短视频凌晨1点至5点深夜静默》(两会建议；另有《建议推出老年人防沉迷模式》2026…",
+    "engagement": "微博热搜榜(快照排名#1，上榜2天)"
+   },
+   {
+    "url": "https://s.weibo.com//weibo?q=%23%E7%9F%AD%E8%A7%86%E9%A2%91%E5%8F%AF%E8%83%BD%E8%B6%8A%E5%88%B7%E8%B6%8A%E7%84%A6%E8%99%91%23&t=31&band_rank=34&Refer=top",
+    "quote": "热搜话题：《短视频可能越刷越焦虑》",
+    "engagement": "微博热搜榜(快照排名#34，上榜1天)"
+   },
+   {
+    "url": "https://s.weibo.com//weibo?q=%23%E9%A2%91%E7%B9%81%E5%88%B7%E6%89%8B%E6%9C%BA%E5%8F%AF%E8%83%BD%E5%AF%BC%E8%87%B4%E8%84%91%E8%85%90%23&t=31&band_rank=36&Refer=top",
+    "quote": "热搜话题：《频繁刷手机可能导致脑腐》(另有《如果不玩手机可以干什么》2025-06-24…",
+    "engagement": "微博热搜榜(快照排名#36，上榜1天)"
+   }
+  ],
+  "existing_solutions": "iOS屏幕使用时间/安卓数字健康（密码易绕过、无跨App策略）；各App青少年模式（成人不用）；Forest等专注App（不拦截）；'逃离信息流'网站清单帖。",
+  "why_unsolved": "平台以时长为核心KPI；系统级限制可绕过且无正反馈；成年人防沉迷缺乏法规支撑；替代内容供给需要运营。",
+  "crowd_signal": "viral",
+  "independent_source_count": 4,
+  "member_titles": [
+   "重度用户要跨App的深夜静默与刷屏限额工具"
+  ],
+  "merged_from": [
+   "A13"
+  ]
+ },
+ {
+  "id": "C32",
+  "title": "UP主与学习者本地免费生成翻译配音视频字幕",
+  "description": "视频搬运/知识类 UP 主、外语学习者、需要看外文课程与会议的用户想给视频一键生成中英字幕、断句校对、翻译、配音并烧录，而不按分钟付费或上传云端。VideoLingo、卡卡字幕助手两年各拿 1.6-1.85 万 star，SmartSub 主打\"免费开源一站式桌面工具，基于 Whisper/FunASR 本地离线\"，2026 年新出的 VideoSyncMaster 做本地多语言配音；独立开发者清单里字幕相关产品达 34 款。",
+  "audience": "自媒体/知识类 UP 主、外语学习者、需要看外文课程与会议的用户",
+  "domain": "自媒体/学习/AI 工具",
+  "platforms": [
+   "GitHub"
+  ],
+  "evidence": [
+   {
+    "url": "https://github.com/Huanshere/VideoLingo",
+    "quote": "\"Netflix级字幕切割、翻译、对齐、甚至加上配音，一键全自动视频搬运AI字幕组\"",
+    "engagement": "18,529 stars"
+   },
+   {
+    "url": "https://github.com/WEIFENG2333/VideoCaptioner",
+    "quote": "\"卡卡字幕助手 - 基于 LLM 的智能字幕助手 - 视频字幕生成、断句、校正、字幕翻译全流程处理\"",
+    "engagement": "16,114 stars"
+   },
+   {
+    "url": "https://github.com/buxuku/SmartSub",
+    "quote": "\"视频转字幕、字幕翻译、AI 配音与声音克隆、字幕烧录——免费开源的一站式桌面工具。",
+    "engagement": "5,373 stars"
+   }
+  ],
+  "existing_solutions": "剪映/必剪字幕需会员且只能云端；商业 SaaS 按分钟收费；开源工具需自配 Python、模型和 API Key，普通创作者上手难，独立开源版本维护不稳定。",
+  "why_unsolved": "本地大模型与 GPU 门槛、多环节（ASR+翻译+TTS+烧录）拼装复杂，商业产品倾向云端订阅；开源方案停留在技术用户。",
+  "crowd_signal": "viral",
+  "independent_source_count": 4,
+  "member_titles": [
+   "UP主与学习者本地免费生成翻译配音视频字幕"
+  ],
+  "merged_from": [
+   "B10"
+  ]
+ },
+ {
+  "id": "C33",
+  "title": "家长学生海外华人免费获取按年级检索的电子教材",
+  "description": "家长、学生、教师、海外华人家庭和自学者想免费下载官方小初高/大学课本 PDF 用于预习、辅导、海外中文教育。官方平台需登录且下载/离线/检索体验差，导致有人在电商平台售卖带水印版本。ChinaTextbook 仅靠收集 PDF 就获得 8.2 万 star、1.87 万 fork，作者明言\"希望海外华人能够让自己的孩子继续了解国内教育\"；独立开发者清单里还有\"全站无广告、无付费门槛\"的儿童学习平台。需求极大且长期未被官方渠道友好地满足。",
+  "audience": "K12 家长与学生、教师、海外华人家庭、自学者",
+  "domain": "学习/教育",
+  "platforms": [
+   "GitHub"
+  ],
+  "evidence": [
+   {
+    "url": "https://github.com/TapXWorld/ChinaTextbook",
+    "quote": "\"虽然国内教育网站已提供免费资源，但大多数普通人获取信息的途径依然受限。",
+    "engagement": "82,329 stars / 18,674 forks…"
+   },
+   {
+    "url": "https://raw.githubusercontent.com/1c7/chinese-independent-developer/master/README.md",
+    "quote": "\"[WithoutAD]：面向孩子的学习与益智游戏平台…全站无广告、无付费门槛\""
+   }
+  ],
+  "existing_solutions": "国家中小学智慧教育平台可在线看但下载/离线/检索体验差、需账号；电商平台售卖带水印盗版；GitHub 仓库下载体积巨大、无按年级/版本检索与阅读功能。",
+  "why_unsolved": "出版社版权与官方平台运营惯性，缺乏面向家庭的产品化（按年级/版本检索、离线阅读、配套练习）；开源仓库只解决了\"有\"没解决\"好用\"。",
+  "crowd_signal": "viral",
+  "independent_source_count": 2,
+  "member_titles": [
+   "家长学生海外华人免费获取按年级检索的电子教材"
+  ],
+  "merged_from": [
+   "B13"
+  ]
+ },
+ {
+  "id": "C34",
+  "title": "用户与独立开发者要可信的干净软件发现分发渠道",
+  "description": "同一缺口的两端。用户侧：国产App每天强制更新、安装包越来越大、基础功能要会员、充斥广告套路，找软件或替代品时搜索结果满是捆绑\"高速下载器\"与假官网，曾经好用的轻量软件（冰刃、MD等）停更后找不到同样简洁干净的替代（知乎\"为什么我国各大软件几乎都需要收费\"\"如何获取软件资源\"\"我是如何在网上找软件的\"\"有哪些失传了的优秀软件\"长期高频）；小米/真我自带商店搜不到想要的App、iPhone遇\"App Store已不再提供该App\"，不知道去哪找安全安装包（抖音高频搜索词）。",
+  "audience": "找不到无广告/不强更/免费替代软件的普通手机与PC用户、学生与办公人群、想用小众/海外/已下架应用的国产安卓与iPho…",
+  "domain": "效率/工具/应用分发/开发者",
+  "platforms": [
+   "知乎",
+   "抖音",
+   "v2ex.com"
+  ],
+  "evidence": [
+   {
+    "url": "https://www.zhihu.com/question/371060188",
+    "quote": "苹果手机app不更新就用不了怎么解决？每天都一大堆APP等着更新 烦都烦死了 而且越来越大！！"
+   },
+   {
+    "url": "https://www.zhihu.com/question/624443834",
+    "quote": "为什么我国各大软件几乎都需要收费？"
+   },
+   {
+    "url": "https://www.zhihu.com/question/427898783",
+    "quote": "上架app到应用商店到底有多难？"
+   }
+  ],
+  "existing_solutions": "AlternativeTo/Mergeek（英文、缺国产软件）；良心软件推荐专栏与个人下载站清单（零散、过时快）；软件管家/下载站（捆绑推广）；旧版本存档站（不安全、不兼容）；厂商应用商店（要企业资质/软著/备案）；",
+  "why_unsolved": "国内下载站靠捆绑推广盈利，做干净目录没有商业模式；App厂商依赖广告与会员无动力改；监管与商店政策门槛是制度性的，厂商商店审核与生态封闭是根源；跨商店分发涉及合规与版权，大厂不做、小团队易被封；替代品信息分散在个人博客与开源社区，作者放弃维护后无人接手；",
+  "crowd_signal": "many",
+  "independent_source_count": 20,
+  "member_titles": [
+   "普通用户要免费无广告不强更软件的中文发现目录",
+   "开发者与用户要一个可信的商店外App分发渠道",
+   "中文独立开发者要低成本可信的产品曝光渠道"
+  ],
+  "merged_from": [
+   "A17",
+   "A18",
+   "B25"
+  ]
+ },
+ {
+  "id": "C35",
+  "title": "厌倦订阅者要买断制无广告的单功能工具",
+  "description": "从 HN 开发者到 Google Play/App Store 普通用户，跨平台一致的怨声：记事本、症状记录、课程表、音量控制、桌面小组件这类功能简单的工具，打开就弹订阅墙、付费后仍有广告、核心功能锁付费、强制 onboarding/登录/AI 侧栏/后台联网；App Store 甚至拒收\"太简单\"的应用。用户明确想要：一次性买断或 $1-5/月、离线、零登录零追踪、只做一件事的软件（\"一个记事本永远不该碰网络\"），宁愿买断也不愿\"为一个不需要持续服务的工具付一辈子月费\"。",
+  "audience": "开发者、注重隐私与专注的知识工作者、对广告和订阅疲劳的普通手机用户（含只需一个小工具的人、个性化主屏的青少年）",
+  "domain": "效率/独立软件/消费者工具",
+  "platforms": [
+   "Hacker News",
+   "Google Play",
+   "App Store",
+   "Medium",
+   "Substack"
+  ],
+  "evidence": [
+   {
+    "url": "https://news.ycombinator.com/item?id=46482268",
+    "quote": "preference for simple apps without ads…",
+    "engagement": "unknown"
+   },
+   {
+    "url": "https://news.ycombinator.com/item?id=34041962",
+    "quote": "Ask HN: Anyone tired of everything being a subscr…",
+    "engagement": "unknown"
+   },
+   {
+    "url": "https://news.ycombinator.com/item?id=45769481",
+    "quote": "Ask HN: Is anybody running a successful non-subsc…",
+    "engagement": "unknown"
+   }
+  ],
+  "existing_solutions": "主流 SaaS/移动应用几乎全部转向订阅制（Tracky、Time Table Notes、Volume Control、Widgetsmith 类），免费版功能极少且部分订阅后仍有广告；系统自带记事本已加 Copilot 和登录；",
+  "why_unsolved": "订阅与广告是资本回报最优的商业模式，平台分成与增长指标奖励复杂化与联网追踪，平台锁定用户后有激励降级体验；买断制对小开发者收入不可持续、缺渠道；用户诉求分散在各 App 评论区，没有形成对某一产品的集中需求。",
+  "crowd_signal": "many",
+  "independent_source_count": 15,
+  "member_titles": [
+   "厌倦订阅者要买断制无广告的单功能工具"
+  ],
+  "merged_from": [
+   "C20"
+  ]
+ },
+ {
+  "id": "C36",
+  "title": "自由行用户要把小红书攻略一键变成可协作行程",
+  "description": "20-35岁自由行游客（尤其以小红书为攻略来源的女性、结伴出行者）：收藏几十篇攻略，出行前要手动抄地点到备忘录、逐个搜地图、另开记账和购物清单，很多人喊'不想做攻略'（该主题在23次查询中复现5次）。新品圆周旅迹可贴链接生成行程，但多人协作必须每个同伴都下载注册App，'协作的第一步变成了先让朋友下载一个App'，最后退回微信群发截图；出境游还要装地图/翻译/打车/支付十几个app；有人干脆用Gemini自制旅行网页App。诉求：贴入攻略链接→自动抽取地点生成逐日行程→免下载链接多人共编→一键导航/记账/购物清单/出境服务入口。",
+  "audience": "自由行游客、结伴出行组织者、首次出境的中国游客",
+  "domain": "出行/旅行规划",
+  "platforms": [
+   "小红书"
+  ],
+  "evidence": [
+   {
+    "url": "https://www.xiaohongshu.com/explore/698ff00a000000001d0108bd",
+    "quote": "标题：天呐！所有不想做旅行攻略的姐妹都给我去用；摘要：复制喜欢的小红书攻略链接…"
+   },
+   {
+    "url": "https://www.xiaohongshu.com/explore/6a48c8bb000000002103f29e",
+    "quote": "圆周旅迹，用起来到底顺不顺？——多人协作功能需要下载App才能参与编辑和查看详情，在真实旅行场景里…"
+   },
+   {
+    "url": "https://www.xiaohongshu.com/explore/698c3c8b000000001d013706",
+    "quote": "标题：日本旅行ために ー 我自制了日本旅行 APP。用户用Gemini自制网页版旅行APP…"
+   }
+  ],
+  "existing_solutions": "圆周旅迹（新品，协作需全员下载）；点点AI（重生成轻协作）；携程/马蜂窝/穷游行程助手（不能读小红书笔记）；Notion/飞书模板；微信群截图；出境需Google Maps/Klook/Grab等十余个app分别注册绑卡。",
+  "why_unsolved": "攻略是非结构化UGC且小红书不开放收藏数据，只能靠用户逐条粘贴；旅行App依赖装机量，不愿把协作做成免下载链接；小程序难承载地图+多人实时编辑；跨国服务整合涉及牌照，大厂无动力，单次旅行留存差。",
+  "crowd_signal": "many",
+  "independent_source_count": 10,
+  "member_titles": [
+   "自由行用户要把小红书攻略一键变成可协作行程"
+  ],
+  "merged_from": [
+   "A14"
+  ]
+ },
+ {
+  "id": "C37",
+  "title": "手机用户要一站式隐私体检、拦骚扰与泄露溯源",
+  "description": "手机用户面对央视曝光的\"App小程序成隐私刺客\"、\"不同意授权不能用App\"被定性霸王条款、快递单信息裸奔、微信步数被窥探、AI眼镜偷拍，以及315曝光的骚扰电话黑色产业链、莫名收到20多条验证码隔天6万没了、投诉快递后手机号被发到征婚群、有人起诉银行骚扰电话获赔5000元。权限设置分散在系统各处用户无感知直到出事，快递隐私面单默认关闭且难找；拦截靠运营商/手机各自为政且需主动开通，验证码轰炸是盗刷前兆却无预警，泄露源头无法追溯，投诉/起诉取证繁琐。诉求：一站式隐私体检与批量关权限、快递面单/步数/位置等隐私开关清单与提醒、骚扰拦截、泄露溯源（分号标记）、验证码轰炸预警、一键投诉/起诉材料生成。现有系统权限管理术语难懂、鸿蒙权限拦截仅华为、12321举报无反馈。",
+  "audience": "隐私敏感的手机用户、女性用户、所有被营销电话与验证码轰炸困扰的手机用户",
+  "domain": "安全/隐私/反诈",
+  "platforms": [
+   "微博"
+  ],
+  "evidence": [
+   {
+    "url": "https://s.weibo.com//weibo?q=%23AI%E7%9C%BC%E9%95%9C%E6%88%90%E4%B8%BA%E9%9A%90%E7%A7%81%E9%87%8D%E7%81%BE%E5%8C%BA%23&t=31&band_rank=26&Refer=top",
+    "quote": "热搜话题：《AI眼镜成为隐私重灾区》",
+    "engagement": "微博热搜榜(快照排名#26，上榜2天)"
+   },
+   {
+    "url": "https://s.weibo.com//weibo?q=%23%E5%A4%AE%E8%A7%86%E6%9B%9DApp%E5%B0%8F%E7%A8%8B%E5%BA%8F%E6%88%90%E9%9A%90%E7%A7%81%E5%88%BA%E5%AE%A2%23&t=31&band_rank=10&Refer=top",
+    "quote": "热搜话题：《央视曝App小程序成隐私刺客》",
+    "engagement": "微博热搜榜(快照排名#10，上榜1天)"
+   },
+   {
+    "url": "https://s.weibo.com//weibo?q=%23%E6%8E%A5%E4%B8%8D%E5%AE%8C%E7%9A%84%E9%AA%9A%E6%89%B0%E7%94%B5%E8%AF%9D%E6%9C%89%E6%9D%A1%E9%BB%91%E8%89%B2%E4%BA%A7%E4%B8%9A%E9%93%BE%23&t=31&band_rank=15&Refer=top",
+    "quote": "热搜话题：《接不完的骚扰电话有条黑色产业链》(同日《315曝光骚扰电话产业链》…",
+    "engagement": "微博热搜榜(快照排名#15，上榜1天)；315晚会主题"
+   }
+  ],
+  "existing_solutions": "iOS/安卓系统权限管理（分散、术语难懂）；鸿蒙权限拦截（仅华为）；快递平台隐私面单（需手动开、入口深）；各App隐私设置各自为政；运营商高频骚扰电话防护（需主动开通、误拦）；手机自带拦截/标记；12321举报平台（无反馈）；起诉需自行取证。",
+  "why_unsolved": "跨系统跨App无统一入口，第三方App自身读取权限也受限，只能做检查清单+引导；平台靠数据变现无动力；黑产号码池更新快，运营商自身就是营销方；泄露溯源依赖用户分号使用习惯；取证与法律流程门槛高。",
+  "crowd_signal": "many",
+  "independent_source_count": 8,
+  "member_titles": [
+   "手机用户要一站式隐私体检与批量关闭App索权",
+   "手机用户要拦截骚扰电话并溯源泄露、预警轰炸"
+  ],
+  "merged_from": [
+   "A25",
+   "A26"
+  ]
+ },
+ {
+  "id": "C38",
+  "title": "技术用户要过滤AI/SEO垃圾的搜索与资讯流",
+  "description": "HN 技术用户日常搜索资料与看技术资讯的两个入口都在被\"腐化\"：Google 搜索被 SEO 垃圾与 AI 内容淹没，2026 年 8 月起用户开始抱怨 DuckDuckGo 也在 enshittify，付费替代 Kagi $120/年被认为太贵；HN 首页被 AI/LLM 内容淹没，多次有人求\"HN 之外的替代品\"、提议\"把 HN 拆成 AI 和其他\"，\"What are you working on\"系列甚至出现专门的 (Non AI) 版本。用户想要：结果干净、无广告、可按主题/是否 AI 语义过滤、价格合理（或有免费层）的搜索与技术资讯聚合方案。",
+  "audience": "开发者、研究者、注重隐私的高频搜索用户、对 AI 话题疲劳的技术阅读者",
+  "domain": "效率/信息获取/开发者社区",
+  "platforms": [
+   "Hacker News"
+  ],
+  "evidence": [
+   {
+    "url": "https://news.ycombinator.com/item?id=49155492",
+    "quote": "Ask HN: What are the viable alternatives to DuckD…",
+    "engagement": "unknown"
+   },
+   {
+    "url": "https://news.ycombinator.com/item?id=42281581",
+    "quote": "Ask HN: How do I search the web in the age of ens…",
+    "engagement": "unknown"
+   },
+   {
+    "url": "https://news.ycombinator.com/item?id=48202486",
+    "quote": "Alternatives to HN for 'tech outside of AI' discu…",
+    "engagement": "unknown"
+   }
+  ],
+  "existing_solutions": "Google（广告+SEO 垃圾+AI 摘要）、DuckDuckGo（依赖 Bing、2026 被指变差）、Kagi（$120/年太贵）、自建 SearXNG（门槛高）；HN 本身无主题过滤、Lobste.rs 小众邀请制、RSS 无法按\"是否 AI\"语义过滤。",
+  "why_unsolved": "搜索索引成本极高，免费模式必然走向广告，付费搜索用户规模小难摊薄成本，开源方案依赖上游大厂 API；语义级分类过滤需要 LLM 成本且社区网络效应难以迁移；HN 官方无意增加话题过滤。",
+  "crowd_signal": "many",
+  "independent_source_count": 7,
+  "member_titles": [
+   "技术用户要过滤AI/SEO垃圾的搜索与资讯流"
+  ],
+  "merged_from": [
+   "C22"
+  ]
+ },
+ {
+  "id": "C39",
+  "title": "大学生要教务课表导入与选课余量捡漏提醒",
+  "description": "在校大学生想把学校教务系统课表一键导入手机，配桌面/锁屏小组件与上课提醒，不要广告和社交功能；选课一开放就崩、热门课秒满，退课名额靠手动刷新，想自动监控课程余量、有空位立刻提醒或选上。超级课程表等商业App广告与社交臃肿（多位开发者以\"无广告、极简\"作差异化卖点反衬），学校官方App体验差；2025-2026年出现多款开源课表（拾光课程表一年921★、轻屿课表支持100+高校教务导入/HyperOS超级岛/WebDAV同步、ClassIsland 2.8k★）但教务系统数百种无统一接口，每所学校要社区写适配脚本；正方教务通用抢课脚本一年近千★\"多省市高校实测\"，南科大、北邮等各校各有专属脚本，需求普遍但只被技术学生用脚本解决且有违规风险。",
+  "audience": "在校大学生、中小学班级信息化管理者",
+  "domain": "学习/校园",
+  "platforms": [
+   "GitHub"
+  ],
+  "evidence": [
+   {
+    "url": "https://github.com/ClassIsland/ClassIsland",
+    "quote": "\"一款功能强、可定制、跨平台，适用于班级多媒体屏幕的课表信息显示工具\"",
+    "engagement": "2,828 stars"
+   },
+   {
+    "url": "https://github.com/ceilf6/Auto_courseGrabber",
+    "quote": "正方教务系统自动抢课脚本（多省市高校实测）：并发选课、课程名/课号检索、时间/教师筛选、换课…",
+    "engagement": "972 stars / 60 forks"
+   },
+   {
+    "url": "https://github.com/ShiGuangSchedule/shiguangschedule",
+    "quote": "\"一款开源、无广告、极简的课程表 APP，支持教务导入\"；\"面向中国高校师生的课程表管理工具…",
+    "engagement": "921 stars（一年）"
+   }
+  ],
+  "existing_solutions": "超级课程表/课程格子（广告、社交臃肿）；学校官方App（体验差）；拾光课程表/轻屿课表/ClassIsland（开源、需社区适配脚本）；正方Auto_courseGrabber/SUSTech_Tools/BUPTtakeCourse等抢课脚本（需浏览器控制台或Python…",
+  "why_unsolved": "高校教务系统数百种、无统一接口，每校单独适配；教务系统厂商不做用户体验、无候补/提醒功能，学校不鼓励自动化；学生付费能力低，商业公司只能靠广告变现，市场分散。",
+  "crowd_signal": "many",
+  "independent_source_count": 6,
+  "member_titles": [
+   "大学生一键导入教务课表配无广告桌面小组件",
+   "大学生监控选课余量、有空位即提醒捡漏"
+  ],
+  "merged_from": [
+   "B27",
+   "B28"
+  ]
+ },
+ {
+  "id": "C40",
+  "title": "家庭要自己掌握的全家病历与血压用药共享",
+  "description": "异地子女想让父母的血压/血糖/用药数据被家人远程查看、有吃药提醒并管理家庭药箱过期药；有慢病或多位家人就医的家庭想把分散在多家医院/诊所/化验所/保险公司的就诊、化验、处方记录汇成一本自己掌握的、私有的、离线的\"全家病历本\"。现状：血压计/血糖仪/手环数据锁在各硬件厂商App里，无家人视图，只能借滴答清单做吃药提醒（小红书7轮以上搜索均未找到专门App，提问集中在硬件选购——属产品缺位型信号）；医院各自App/小程序与Portal互不打通，现有EMR面向诊所（OpenEMR），面向个人/家庭的只有云端商业PHR隐私不可控；",
+  "audience": "为父母/长辈管理健康的异地子女、有慢病老人的家庭、有多位家人就医记录的家庭主要照护者、患者本人",
+  "domain": "家庭健康/慢病管理/个人医疗数据",
+  "platforms": [
+   "小红书",
+   "GitHub"
+  ],
+  "evidence": [
+   {
+    "url": "https://github.com/fastenhealth/fasten-onprem",
+    "quote": "my medical history (and the medical history of my…",
+    "engagement": "2.8k stars, 182 forks…"
+   },
+   {
+    "url": "https://github.com/search?q=in%3Areadme+%22couldn%27t+find+any%22+%22so+I+built%22&type=repositories&s=stars&o=desc",
+    "quote": "jwilleke/yourphr — yourphr is an open-source…",
+    "engagement": "11 stars, updated 39 minute…"
+   },
+   {
+    "url": "https://www.xiaohongshu.com/mobile/question/991418",
+    "quote": "问答聚合页标题：血压心率手表那个牌子好_小红书"
+   }
+  ],
+  "existing_solutions": "华为WATCH/小米手环/血压计/血糖仪配套App（个人记录、不跨品牌、无家人视图）；滴答清单等通用待办做吃药提醒；京东健康；医院App/小程序与Portal（互不打通）；Apple Health Records（仅美国部分医院、iOS）；",
+  "why_unsolved": "健康数据锁在各硬件厂商生态内，老人端操作复杂，需硬件互通或手动录入，商业上依赖硬件合作；医疗数据接口（FHIR/OAuth/各国医保系统）碎片化、注册与维护成本极高，只能由公司做且倾向商业化；隐私法规与自托管难兼得；开源项目靠单人维护、商业化困难导致归档；",
+  "crowd_signal": "many",
+  "independent_source_count": 6,
+  "member_titles": [
+   "异地子女要老人血压血糖用药的家庭共享与提醒",
+   "家庭要自托管的全家病历聚合本"
+  ],
+  "merged_from": [
+   "A29",
+   "D28"
+  ]
+ },
+ {
+  "id": "C41",
+  "title": "自我管理者要极简无广告能记耗时主动提醒的打卡",
+  "description": "学生、考研党、上班族、跳绳作业家长：小红书「时间管理app」问答（10次查询反复命中）汇总不满——时光序升级后'越做越复杂繁琐'、小日常只能按天打卡不能记耗时、Blink需打开app才有提醒、Flink没有子任务/计时/提醒、Dot Habit有广告UI粗糙；'一直没找到好用的'语境下称MarkTimes为'本命软件'（清新界面、照片日历、自建打卡事件）；跳绳打卡头部产品'开屏就有两三个广告'。诉求：功能精简、界面干净、能记耗时、不打开也能可靠推送提醒、无广告、可照片日历式记录的待办/习惯/运动打卡工具。",
+  "audience": "学生、考研党、上班族中的自我管理用户、中小学生家长（跳绳作业打卡）",
+  "domain": "效率工具/待办与习惯养成",
+  "platforms": [
+   "小红书"
+  ],
+  "evidence": [
+   {
+    "url": "https://www.xiaohongshu.com/mobile/question/395527",
+    "quote": "各款时间管理应用都有各自的缺点，如不能具体记录耗时、新添加待办不方便、缺少高阶清单功能…",
+    "engagement": "该线程在10次不同查询的结果中出现"
+   },
+   {
+    "url": "https://www.xiaohongshu.com/mobile/question/395530",
+    "quote": "时光序应用由于版本升级，越做越复杂和繁琐；小日常应用的缺点是功能太单一，只有打卡功能可以使用"
+   },
+   {
+    "url": "https://www.xiaohongshu.com/mobile/question/355248",
+    "quote": "Dot Habit has ads and a crude UI that lacks aesth…"
+   }
+  ],
+  "existing_solutions": "时光序、小日常、Blink、Flink、Pendo、探记、Dot Habit、滴答清单、番茄Todo、Forest、时间积木、MarkTimes；天天跳绳；海外Todoist/Things 3。",
+  "why_unsolved": "国内产品为留存不断堆功能或走极简但缺关键能力；提醒依赖打开App、广告变现拉低体验；'极简+耗时统计+可靠推送+无广告+好看'与会员/广告商业模式冲突，用户需在多款间拼凑。",
+  "crowd_signal": "many",
+  "independent_source_count": 5,
+  "member_titles": [
+   "自我管理者要极简无广告能记耗时主动提醒的打卡"
+  ],
+  "merged_from": [
+   "A20"
+  ]
+ },
+ {
+  "id": "C42",
+  "title": "普通用户要备份快、视频不锁会员的可靠云相册",
+  "description": "手机存储吃紧、要长期保存家庭照片视频的普通用户：百度一刻相册/百度网盘备份速度慢、视频要会员才能备份、担心数据能否恢复；QQ相册快但单次限200张。替代列表很长（腾讯相册管家、时光相册、夸克、坚果云、OneDrive、蓝奏云…）说明大家仍在'逃离并寻找'，没有胜出者。附带诉求：旅行结束后照片'别再躺相册里'，希望自动按行程/人物整理成可回看相册。",
+  "audience": "手机存储吃紧、需长期保存家庭照片视频的普通用户",
+  "domain": "云存储/相册备份",
+  "platforms": [
+   "小红书"
+  ],
+  "evidence": [
+   {
+    "url": "https://www.xiaohongshu.com/mobile/question/690698",
+    "quote": "关于百度网盘的一刻相册服务，用户反映备份速度慢、需要会员才能备份视频等问题；",
+    "engagement": "该线程在2次不同查询中出现"
+   },
+   {
+    "url": "https://www.xiaohongshu.com/mobile/question/328662",
+    "quote": "Many users have reported issues with 一刻相册 regardi…"
+   },
+   {
+    "url": "https://www.xiaohongshu.com/mobile/question/311738",
+    "quote": "文件存储（问答线程标题，出现在一刻相册替代品搜索结果中）"
+   }
+  ],
+  "existing_solutions": "一刻相册、百度网盘、QQ相册、腾讯相册管家、时光相册、夸克网盘、极简相册、Slidebox、坚果云、OneDrive、蓝奏云；系统相册按时间/地点聚合。",
+  "why_unsolved": "国内免费云存储普遍以限速/限视频/会员解锁作转化手段，速度与容量、免费与可靠性互相冲突；没有'速度快+视频不锁+免费或合理买断+可导出'的国产方案；自动整理输出成果的工具少。",
+  "crowd_signal": "many",
+  "independent_source_count": 5,
+  "member_titles": [
+   "普通用户要备份快、视频不锁会员的可靠云相册"
+  ],
+  "merged_from": [
+   "A21"
+  ]
+ },
+ {
+  "id": "C43",
+  "title": "外卖用户要下单前核验幽灵店/同址多店的工具",
+  "description": "外卖用户与家长：'你点的三家外卖可能出自同一口锅'、点到僵尸店骑手被罚、无堂食幽灵外卖、骑手集体劝'最不能点的外卖'（该主题至少4次上榜）；两会建议设立无堂食外卖举报平台，2026年2月监管发布整治幽灵外卖新规。下单前无法判断店铺是否真实存在、有无堂食、是否同址多店、后厨状况。诉求：按地址聚合查同址店铺数、证照核验、骑手/用户众包实拍。",
+  "audience": "外卖用户、家长",
+  "domain": "生活服务/食品安全",
+  "platforms": [
+   "微博"
+  ],
+  "evidence": [
+   {
+    "url": "https://s.weibo.com//weibo?q=%23%E4%BD%A0%E7%82%B9%E7%9A%84%E4%B8%89%E5%AE%B6%E5%A4%96%E5%8D%96%E5%8F%AF%E8%83%BD%E5%87%BA%E8%87%AA%E5%90%8C%E4%B8%80%E5%8F%A3%E9%94%85%23&t=31&band_rank=20&Refer=top",
+    "quote": "热搜话题：《你点的三家外卖可能出自同一口锅》",
+    "engagement": "微博热搜榜(快照排名#20，上榜1天)"
+   },
+   {
+    "url": "https://s.weibo.com//weibo?q=%23%E6%95%B4%E6%B2%BB%E5%B9%BD%E7%81%B5%E5%A4%96%E5%8D%96%E6%96%B0%E8%A7%84%E5%8F%91%E5%B8%83%23&t=31&band_rank=30&Refer=top",
+    "quote": "热搜话题：《整治幽灵外卖新规发布》(另有《女子点外卖点到僵尸店骑手被罚款》2026-02-11…",
+    "engagement": "微博热搜榜(快照排名#30，上榜1天)"
+   },
+   {
+    "url": "https://s.weibo.com//weibo?q=%23%E5%BB%BA%E8%AE%AE%E8%AE%BE%E7%AB%8B%E6%97%A0%E5%A0%82%E9%A3%9F%E5%A4%96%E5%8D%96%E4%B8%BE%E6%8A%A5%E5%B9%B3%E5%8F%B0%23&t=31&band_rank=37&Refer=top",
+    "quote": "热搜话题：《建议设立无堂食外卖举报平台》(两会建议)",
+    "engagement": "微博热搜榜(快照排名#37，上榜1天)"
+   }
+  ],
+  "existing_solutions": "平台'明厨亮灶'直播（覆盖率低、可造假）；监管新规靠抽查非实时；骑手口口相传的经验帖；用户只能看评分（可刷）。",
+  "why_unsolved": "平台不愿暴露商户真实经营状况（影响GMV）；需要证照/地址数据与众包实拍结合；同址多店在平台规则内合法，只能靠信息透明让用户自选。",
+  "crowd_signal": "many",
+  "independent_source_count": 4,
+  "member_titles": [
+   "外卖用户要下单前核验幽灵店/同址多店的工具"
+  ],
+  "merged_from": [
+   "A23"
+  ]
+ },
+ {
+  "id": "C44",
+  "title": "普通上镜者要AI盗脸盗声的监测取证与维权工具",
+  "description": "配音演员、主播、短视频博主及任何上过镜的普通人：普通人形象被AI短剧盗脸、配音师声音被AI克隆商用、演员被AI换脸做不雅视频，央视曝光AI克隆声音乱象；两会建议AI换脸立法、AI内容加不可去除水印。不知道自己何时被盗用、全网取证难、维权成本高；名人有工作室发声明，普通人没有渠道。诉求：以脸/声纹为索引的主动监测+一键取证+平台投诉模板。",
+  "audience": "配音/主播/博主/普通上镜者",
+  "domain": "AI/维权",
+  "platforms": [
+   "微博"
+  ],
+  "evidence": [
+   {
+    "url": "https://s.weibo.com//weibo?q=%23%E7%BA%A2%E6%9E%9C%E5%9B%9E%E5%BA%94%E6%99%AE%E9%80%9A%E4%BA%BA%E5%BD%A2%E8%B1%A1%E8%A2%ABAI%E7%9F%AD%E5%89%A7%E7%9B%97%E8%84%B8%23&t=31&band_rank=35&Refer=top",
+    "quote": "热搜话题：《红果回应普通人形象被AI短剧盗脸》",
+    "engagement": "微博热搜榜(快照排名#35，上榜1天)"
+   },
+   {
+    "url": "https://s.weibo.com//weibo?q=%23%E5%A4%AE%E8%A7%86%E6%9B%9DAI%E5%85%8B%E9%9A%86%E5%A3%B0%E9%9F%B3%E4%B9%B1%E8%B1%A1%23&t=31&band_rank=10&Refer=top",
+    "quote": "热搜话题：《央视曝AI克隆声音乱象》(同日《央视曝光AI仿冒名人乱象》)",
+    "engagement": "微博热搜榜(快照排名#10，上榜1天)"
+   },
+   {
+    "url": "https://s.weibo.com//weibo?q=%E5%8F%B2%E6%B3%BD%E9%B2%B2%E7%A7%B0%E5%A3%B0%E9%9F%B3%E8%A2%ABAI%E5%81%B7%E7%94%A8%E7%BB%B4%E6%9D%83&t=31&band_rank=50&Refer=top",
+    "quote": "热搜话题：《史泽鲲称声音被AI偷用维权》(另有《配音师声音遭AI商用成功维权》2025-05-28…",
+    "engagement": "微博热搜榜(快照排名#50，上榜1天)"
+   }
+  ],
+  "existing_solutions": "各平台举报入口（被动、需本人先发现）；律师维权（成本高，仅名人/配音师个案成功）；AI水印（提案阶段）；无面向普通人的主动监测服务。",
+  "why_unsolved": "全网检索需要算力和平台内容数据；人脸/声纹比对涉及生物信息合规；法律标准新、判例少；普通人付费意愿和单价难匹配成本。",
+  "crowd_signal": "many",
+  "independent_source_count": 4,
+  "member_titles": [
+   "普通上镜者要AI盗脸盗声的监测取证与维权工具"
+  ],
+  "merged_from": [
+   "A24"
+  ]
+ },
+ {
+  "id": "C45",
+  "title": "普通人发布长尾小需求并即时生成可用小应用",
+  "description": "有具体小需求却找不到对应 App 的不会编程的普通人：\"怎么没有一个能给猫做健康记录的工具\"\"为什么没有一个简单有趣的聚会抽奖器\"\"我就想背几组单词，非要下载一个臃肿的教育 APP 吗\"；知乎有人直接问\"为什么国内没有一个发布需求的 app 或网站\"。诉求是一个地方能把需求说出来就有人/AI 做出来。灵光上线两周用户自发造出 330 万个闪应用，36氪报道被多站转载，证明长尾需求规模巨大且被超级 App 长期忽视。",
+  "audience": "有个性化小需求、不会编程的普通用户",
+  "domain": "效率/开发者/AI",
+  "platforms": [
+   "36氪",
+   "知乎",
+   "人人都是产品经理",
+   "Quora"
+  ],
+  "evidence": [
+   {
+    "url": "https://36kr.com/p/3582110406376581",
+    "quote": "『怎么没有一个能给猫做健康记录的工具？』『为什么没有一个简单有趣的聚会抽奖器？』『我就想背几组单词…",
+    "engagement": "被人人都是产品经理、C114 等多站转载"
+   },
+   {
+    "url": "https://www.zhihu.com/question/668224936",
+    "quote": "为什么国内没有一个发布需求的app或网站呢？"
+   },
+   {
+    "url": "https://www.woshipm.com/it/6303136.html",
+    "quote": "被超级APP忽视的需求，用户自己来做了"
+   }
+  ],
+  "existing_solutions": "应用商店只有通用 App；外包/众包开发对个人成本过高；灵光等 AI 生成应用刚起步，生成的闪应用质量、数据持久化和分享能力有限。",
+  "why_unsolved": "单个微需求规模小，传统开发经济上不成立；AI 生成应用 2025 年才开始可用，需求发布-匹配-交付的闭环还没人做好。",
+  "crowd_signal": "many",
+  "independent_source_count": 4,
+  "member_titles": [
+   "普通人发布长尾小需求并即时生成可用小应用"
+  ],
+  "merged_from": [
+   "B19"
+  ]
+ },
+ {
+  "id": "C46",
+  "title": "视障者过验证码人脸识别弹窗的本地视觉辅助",
+  "description": "使用读屏软件的视障人士（中国约 1700 万）在登录、支付、抢票、领补贴时被图片验证码、滑块拼图、\"请眨眼\"的人脸识别、无法定位关闭按钮的弹窗直接卡死，只能找明眼人帮忙；微信里的图片、表情包、红包、复杂排版读屏也读不出来。诉求是一个能在读屏卡住时\"帮我看一眼并告诉我怎么点\"的视觉理解辅助（本地运行、不泄露屏幕内容）。中新网报道点名验证码/人脸识别/弹窗是显而易见的阻碍，视障者自发在互联网上\"修盲道\"，2026 年出现调用本地 Qwen3-VL 补足读屏缺口的开源尝试。",
+  "audience": "视障/盲人手机用户",
+  "domain": "无障碍",
+  "platforms": [
+   "中新网",
+   "深圳市信息无障碍研究会",
+   "GitHub",
+   "少数派"
+  ],
+  "evidence": [
+   {
+    "url": "https://www.chinanews.com.cn/sh/2023/12-06/10123190.shtml",
+    "quote": "App上的验证码、人脸识别和弹窗常常令人头疼，例如以图片形式呈现的验证码、需要移动滑块完成拼图…"
+   },
+   {
+    "url": "https://www.siaa.org.cn/news_content?id=878",
+    "quote": "一群视障者，在互联网上修'盲道'（视障者自发做无障碍适配的报道）"
+   },
+   {
+    "url": "https://github.com/laoyin/HearWeChat",
+    "quote": "在遇到图片、表情包、红包、复杂排版等传统读屏难以处理的内容时，调用本地运行的 Qwen3-VL 视…",
+    "engagement": "1 star, 1 fork"
+   }
+  ],
+  "existing_solutions": "争渡读屏、保益悦听（安卓付费）、TalkBack/VoiceOver 只能读有无障碍标签的控件，遇到图片验证码、滑块、人脸活体检测全部失效；鱼鱼读屏等 OCR 工具只能读文字不能理解图形和操作；大厂逐个做无障碍适配但覆盖有限、版本更新后经常回退。",
+  "why_unsolved": "验证码本质是反自动化，任何\"帮视障者过验证码\"的工具都与平台风控对立；人脸活体检测的动作提示只有视觉；视觉大模型+无障碍服务的方案 2025-2026 才在技术上可行，目前只有零星开源项目，没有成熟产品和商业模式。",
+  "crowd_signal": "many",
+  "independent_source_count": 4,
+  "member_titles": [
+   "视障者过验证码人脸识别弹窗的本地视觉辅助"
+  ],
+  "merged_from": [
+   "B22"
+  ]
+ },
+ {
+  "id": "C47",
+  "title": "听障者要免费离线不限机型的实时字幕与通话转写",
+  "description": "听障学生/上班族上课、开会、和家人打电话、去医院办事，需要把周围人说的话实时变成字幕；打电话时需要对方语音实时转文字、自己打字转语音。知乎有听障大学生直接求\"免费或者低费的实时字幕工具\"，B 站、结绳志等有听障者讨论\"字幕固话\"\"实时字幕与沟通劳动\"；现有方案要么付费按时长计费，要么必须换联通畅听王卡在微信内接打，要么仅限特定机型且需网络。诉求是免费或低价、不限机型、不依赖特定运营商卡、离线也能用的实时字幕+电话字幕工具。",
+  "audience": "听障/聋人群体（学生、职场人）",
+  "domain": "无障碍",
+  "platforms": [
+   "知乎",
+   "哔哩哔哩",
+   "结绳志"
+  ],
+  "evidence": [
+   {
+    "url": "https://www.zhihu.com/question/376800723",
+    "quote": "本人听障大学生。请问有免费或者低费的实时或者快速将声音转化为字幕的工具 软件吗 求推荐 呜呜呜 ?"
+   },
+   {
+    "url": "https://www.bilibili.com/opus/419185024225451761",
+    "quote": "听障人士不用免提—实时语音转文字（字幕固话）"
+   },
+   {
+    "url": "https://tyingknots.net/2021/02/access-and-subtitles/",
+    "quote": "'无障碍'之障 | 实时字幕、聋听空间与沟通劳动"
+   }
+  ],
+  "existing_solutions": "讯飞听见（付费/按时长计费）、音书（免费但依赖云端）、手之声（人工手语翻译，需预约）、联通畅听王卡（必须换联通卡且在微信内接打）、iPhone 实时字幕/华为通话 AI 字幕（仅特定机型，需网络）。",
+  "why_unsolved": "通话音频流被运营商和手机系统封闭，第三方 App 拿不到；免费方案靠公益或运营商合作，覆盖面小；离线中文 ASR 在手机端 2025 年后才够好，尚未有产品把\"免费+离线+全机型+通话\"同时做到。",
+  "crowd_signal": "many",
+  "independent_source_count": 4,
+  "member_titles": [
+   "听障者要免费离线不限机型的实时字幕与通话转写"
+  ],
+  "merged_from": [
+   "B23"
+  ]
+ },
+ {
+  "id": "C48",
+  "title": "家属要亲人去世后微信/游戏账号内容的托管保存",
+  "description": "失去亲人的家属、有规划意识的中老年人：父亲去世多年微信账号突然消失（上榜2天）、'人去世了微信朋友圈会消失吗'（上榜2天，微信客服被迫回应）、亡妻在游戏中的房子没了男子求助。平台条款账号不可继承、长期不登录被回收，家属想保存的聊天/朋友圈/游戏内容一夜清空；生前无托管机制。诉求：生前指定数字遗产联系人、内容定期导出归档、去世后纪念保存流程。",
+  "audience": "失去亲人的家属、中老年人",
+  "domain": "家庭/社交",
+  "platforms": [
+   "微博"
+  ],
+  "evidence": [
+   {
+    "url": "https://s.weibo.com//weibo?q=%23%E7%BD%91%E5%8F%8B%E7%88%B8%E7%88%B8%E5%8E%BB%E4%B8%96%E5%A4%9A%E5%B9%B4%E5%BE%AE%E4%BF%A1%E8%B4%A6%E5%8F%B7%E7%AA%81%E7%84%B6%E6%B6%88%E5%A4%B1%23&t=31&band_rank=9&Refer=top",
+    "quote": "热搜话题：《网友爸爸去世多年微信账号突然消失》",
+    "engagement": "微博热搜榜(快照排名#9，上榜2天)"
+   },
+   {
+    "url": "https://s.weibo.com//weibo?q=%E4%BA%BA%E5%8E%BB%E4%B8%96%E4%BA%86%E5%BE%AE%E4%BF%A1%E6%9C%8B%E5%8F%8B%E5%9C%88%E4%BC%9A%E6%B6%88%E5%A4%B1%E5%90%97&t=31&band_rank=22&Refer=top",
+    "quote": "热搜话题：《人去世了微信朋友圈会消失吗》(次日《微信客服回应人去世朋友圈消失》)",
+    "engagement": "微博热搜榜(快照排名#22，上榜2天)"
+   },
+   {
+    "url": "https://s.weibo.com//weibo?q=%23%E4%BA%A1%E5%A6%BB%E5%9C%A8%E6%B8%B8%E6%88%8F%E4%B8%AD%E7%9A%84%E6%88%BF%E5%AD%90%E6%B2%A1%E4%BA%86%E7%94%B7%E5%AD%90%E6%B1%82%E5%8A%A9%23&t=31&band_rank=21&Refer=top",
+    "quote": "热搜话题：《亡妻在游戏中的房子没了男子求助》",
+    "engagement": "微博热搜榜(快照排名#21，上榜1天)"
+   }
+  ],
+  "existing_solutions": "微博有'纪念账号'，微信/游戏无；家属自行保存密码定期登录（违反条款，仍可能被回收）；苹果'遗产联系人'仅覆盖iCloud。",
+  "why_unsolved": "平台用户协议规定账号不可继承；隐私保护与继承权冲突；用户生前不愿规划'身后事'；需要平台侧配合，第三方只能做导出归档与提醒。",
+  "crowd_signal": "many",
+  "independent_source_count": 3,
+  "member_titles": [
+   "家属要亲人去世后微信/游戏账号内容的托管保存"
+  ],
+  "merged_from": [
+   "A28"
+  ]
+ },
+ {
+  "id": "C49",
+  "title": "女性要无低俗广告、隐私可信、功能全的经期记录",
+  "description": "女性用户（含备孕/非备孕）指出美柚等头部经期App'功能一直没有提升'且'各种低俗小广告霸屏'，姨妈来了进App就有广告、页面一般。为了干净很多人转向苹果健康、小米运动健康或海外Flo/Clue（'简洁和无广告'），国产新品姨妈来咯正是打'无广告'牌切入。诉求：干净、隐私可信、功能不阉割（含备孕）、本地化的国产经期工具。",
+  "audience": "女性用户（含备孕/非备孕）",
+  "domain": "女性健康/经期记录",
+  "platforms": [
+   "小红书"
+  ],
+  "evidence": [
+   {
+    "url": "https://www.xiaohongshu.com/discovery/item/5b0bada1aac7cb3c66d93506",
+    "quote": "许多用户反映美柚等应用存在\"功能一直没有提升\"和\"各种低俗小广告霸屏\"的问题"
+   },
+   {
+    "url": "https://www.xiaohongshu.com/mobile/question/1067643",
+    "quote": "部分应用如\"姨妈来了\"在进入App时有广告，而且页面设计一般，不太推荐"
+   },
+   {
+    "url": "https://www.xiaohongshu.com/mobile/question/1066648",
+    "quote": "苹果自带的\"健康\"应用无广告、无付费，操作简单，无需下载，适合没有备孕需求的用户……姨妈来咯是国产…"
+   }
+  ],
+  "existing_solutions": "美柚、姨妈来了、姨妈来咯、Flo、Clue、苹果健康、小米运动健康、米橙（含经期模块）。",
+  "why_unsolved": "头部国产产品靠广告与电商变现且长期不迭代；系统自带工具无广告但功能少（不适合备孕）；海外App体验好但本地化与数据出境让部分用户犹豫，形成'干净'与'功能全+本土化'不能兼得的空档。",
+  "crowd_signal": "several",
+  "independent_source_count": 3,
+  "member_titles": [
+   "女性要无低俗广告、隐私可信、功能全的经期记录"
+  ],
+  "merged_from": [
+   "A30"
+  ]
+ },
+ {
+  "id": "C50",
+  "title": "报销职场人自动从邮箱微信收集发票并生成汇总",
+  "description": "经常出差报销的职场人、小微企业财务/行政、自由职业者报销时要从邮箱、微信、支付宝、短信里翻找 PDF/OFD/XML 发票，手动查重、分类、填 Excel。2026-03 出现的 Invoice-Downloader（从 QQ/163 邮箱批量下载发票、OCR 识别、分类归档并生成报销 Excel 汇总）半年 443 star；独立开发者清单里另有 4 款发票/报销类工具（离线开票模板、批量 PDF 生成）。GitHub 上\"发票\"检索噪声大，尚无高星通用方案。",
+  "audience": "需要频繁报销的职场人、财务/行政、小微企业主与自由职业者",
+  "domain": "效率/财务",
+  "platforms": [
+   "GitHub"
+  ],
+  "evidence": [
+   {
+    "url": "https://github.com/EthanYoQ/Invoice-Downloader",
+    "quote": "电子发票整理与报销准备工具：从邮箱批量收集 PDF/OFD/XML 发票…",
+    "engagement": "443 stars / 45 forks"
+   },
+   {
+    "url": "https://raw.githubusercontent.com/1c7/chinese-independent-developer/master/README.md",
+    "quote": "\"[Billcraft]：单 HTML 文件的发票生成工具，零依赖，支持离线使用\"；",
+    "engagement": "清单中发票/报销类产品 4 条"
+   }
+  ],
+  "existing_solutions": "微信卡包/支付宝发票管家只管各自渠道；企业 OA/费控 SaaS 面向企业采购，个人无法用；商业发票管理软件面向企业收费；手工整理仍是常态。",
+  "why_unsolved": "发票散落在邮箱/微信/支付宝/短信多个渠道，格式含 PDF/OFD/XML 且标准更迭快；个人端市场小而商业软件只做 B 端，面向个人的付费意愿被低估。",
+  "crowd_signal": "several",
+  "independent_source_count": 2,
+  "member_titles": [
+   "报销职场人自动从邮箱微信收集发票并生成汇总"
+  ],
+  "merged_from": [
+   "B30"
+  ]
+ }
+]

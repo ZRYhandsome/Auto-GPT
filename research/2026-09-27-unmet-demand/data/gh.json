@@ -1,0 +1,3562 @@
+[
+ {
+  "title": "自建相册的家庭共享与协作",
+  "description": "跨应用主题: 共享/家庭成员/协作。自托管照片库 (Immich) 用户想像 Google Photos/iCloud 那样把照片、相册、堆叠(stacks)、人物/标签元数据顺畅分享给伴侣和家人, 并清楚知道'这张图能不能分享、为什么不能'。现状是相册共享、伴侣共享、共享链接、外部库共享是四套互不一致的机制, 权限混乱、报错不明; 堆叠只在主时间线可见, 相册里无法选择堆叠中的哪一张。该 issue 是 Immich 仓库 👍 最多的 issue (749 👍, 总 reactions 1020), 是本次 25 个仓库中绝对最高。",
+  "audience": "自建 NAS/家庭服务器的家庭用户; 想脱离 Google Photos 的隐私用户",
+  "domain": "照片/家庭媒体",
+  "evidence": [
+   {
+    "url": "https://github.com/immich-app/immich/issues/12614",
+    "quote": "Sharing precious photos and videos is an important part of immich, but right now it is a bit confusing and limiting. ... albums, stacks, shared links, partner sharing, library sharing, asset data, web actions",
+    "platform": "GitHub issue (immich-app/immich #12614 'Better sharing in Immich (feature freeze)')",
+    "engagement": "👍 749, 总 reactions 1020 (❤95 👀66 🚀55 🎉55), 259 评论, label: sharing",
+    "date": "2024-09-12"
+   },
+   {
+    "url": "https://github.com/immich-app/immich/issues/16549",
+    "quote": "[META] Stacks on all views — 页面描述: For album sharing specifically, users cannot selectively choose which assets from a stack to include",
+    "platform": "GitHub issue (immich-app/immich #16549)",
+    "engagement": "👍 96, 14 评论, Backlog",
+    "date": "2025-03-03"
+   }
+  ],
+  "existing_solutions": "Google Photos 伴侣共享/家庭群组 (云端、隐私差、需付费扩容); Immich 现有 albums / partner sharing / shared links / external library sharing 四套机制; PhotoPrism 多用户能力弱",
+  "why_unsolved": "涉及访问控制与安全模型的整体重构, 维护者 2024-09 对 sharing 领域实施 feature freeze 以先做内部整体设计; 两年后 (2026-09) 仍开放且无 milestone",
+  "crowd_signal": "viral",
+  "confidence": 0.92,
+  "source_finder": "gh-consumer-apps-top-issues"
+ },
+ {
+  "title": "智能家居摆脱厂商云依赖",
+  "description": "跨应用主题: 离线/本地优先、摆脱大厂。Home Assistant 用户买的小米、涂鸦、Tado 等设备依赖厂商云登录; 厂商一改登录 API 或加风控, 成百上千家庭的灯、空调、温控器就集体掉线, 用户只能等志愿者逆向, 重设密码/换区域/等 24 小时都无效。用户真正想要的是不经厂商云的本地控制, 或至少是不会因厂商改动而失效的稳定接入。相关 issue 占据 home-assistant/core 👍 榜前 5 中的 4 席。",
+  "audience": "家庭智能家居用户, 尤其小米/涂鸦生态; 自建 Home Assistant 的普通家庭",
+  "domain": "智能家居/IoT",
+  "evidence": [
+   {
+    "url": "https://github.com/home-assistant/core/issues/147122",
+    "quote": "Xiaomi Miio: Could not login to Xiaomi Miio Cloud, check the credentials ... After restart of HA yesterday I lost connection to Xiaomi cloud...Xiaomi might have changed their login API.",
+    "platform": "GitHub issue (home-assistant/core #147122)",
+    "engagement": "👍 170, 348 评论, 3 位维护者被指派, label potential-duplicate",
+    "date": "2025-06-19"
+   },
+   {
+    "url": "https://github.com/home-assistant/core/issues/178281",
+    "quote": "Official Home Assistant Tuya integration randomly loses authentication with \"network error (-9999999) sign invalid\"",
+    "platform": "GitHub issue (home-assistant/core #178281)",
+    "engagement": "👍 41, 127 评论",
+    "date": "2026-08-05"
+   },
+   {
+    "url": "https://github.com/home-assistant/core/issues/148095",
+    "quote": "Tado Integration - OAuth Loop",
+    "platform": "GitHub issue (home-assistant/core #148095)",
+    "engagement": "👍 57, 26 评论",
+    "date": "2025-07-04"
+   },
+   {
+    "url": "https://github.com/home-assistant/core/issues/173402",
+    "quote": "Buienradar integration not working",
+    "platform": "GitHub issue (home-assistant/core #173402)",
+    "engagement": "👍 54, 100 评论",
+    "date": "2026-06-09"
+   }
+  ],
+  "existing_solutions": "社区本地集成 (Xiaomi Miot Auto、LocalTuya/Tuya Local)、刷 Zigbee2MQTT/ESPHome 固件; 但多数仍需先从厂商云提取 token, 且同样会被厂商改动打断",
+  "why_unsolved": "厂商无公开本地 API 且有动机封闭生态; HA 官方集成依赖社区逆向厂商云协议, 厂商单方面变更就失效, 无人能承诺修复时间",
+  "crowd_signal": "viral",
+  "confidence": 0.85,
+  "source_finder": "gh-consumer-apps-top-issues"
+ },
+ {
+  "title": "自建书库无线同步到 Kobo 阅读器",
+  "description": "跨应用主题: 硬件生态互操作、跨设备同步。用 Audiobookshelf 等自建服务管理电子书+有声书的用户, 想像 calibre-web 那样让 Kobo 阅读器直接无线同步书籍与阅读进度, 或通过 OPDS 让任何阅读器 App 直接浏览下载; 现在只能'邮件发送到阅读器', 而 Kobo 根本不支持邮件导入, 只能插数据线。#3504 是 Audiobookshelf 仓库 👍 最多 issue (256), 两年内超过所有老 issue。",
+  "audience": "Kobo/Kindle/开源阅读器用户; 自建家庭书库和有声书库的人",
+  "domain": "阅读/电子书",
+  "evidence": [
+   {
+    "url": "https://github.com/advplyr/audiobookshelf/issues/3504",
+    "quote": "Currently send to ereader only supports via email. However, Kobo ereaders don't support this option to import books.",
+    "platform": "GitHub issue (advplyr/audiobookshelf #3504 'Support kobo sync for ebooks')",
+    "engagement": "👍 256, ❤11, 14 评论, labels: enhancement, possible plugin",
+    "date": "2024-10-12"
+   },
+   {
+    "url": "https://github.com/advplyr/audiobookshelf/issues/1953",
+    "quote": "It would be fabulous if Audiobookself supported OPDS",
+    "platform": "GitHub issue (advplyr/audiobookshelf #1953 'Support OPDS to allow eReaders to directly download books')",
+    "engagement": "👍 72, 21 评论",
+    "date": "2023-07-22"
+   },
+   {
+    "url": "https://github.com/advplyr/audiobookshelf/issues/3084",
+    "quote": "Enable EPUB 3 Support in Audiobookshelf for Synced Audiobooks and Ebooks",
+    "platform": "GitHub issue (advplyr/audiobookshelf #3084)",
+    "engagement": "👍 55, 40 评论",
+    "date": "2024-06-17"
+   }
+  ],
+  "existing_solutions": "calibre-web 的 Kobo sync (要额外部署一套服务并维护两份书库); 手工 USB 拷贝; Send-to-Kindle 邮件 (Kobo 不支持)",
+  "why_unsolved": "单人主导的项目, 标记为 'possible plugin' 但插件系统尚未落地; Kobo 同步协议为逆向的私有协议, 实现与维护成本高",
+  "crowd_signal": "many",
+  "confidence": 0.85,
+  "source_finder": "gh-consumer-apps-top-issues"
+ },
+ {
+  "title": "隐私应用摆脱 Google 推送与商店依赖",
+  "description": "跨应用主题: 摆脱大厂/离线可用。用 GrapheneOS、LineageOS、无 Google 服务或只用 F-Droid 的用户, 希望 Signal、Joplin、AnkiDroid 等隐私应用在没有 Google 的环境下依然能可靠收消息、来电正常响铃、不耗电、能用付费备份, 并能从 F-Droid 安装。现状: Signal 无 FCM 时后台 websocket 耗电 40-50%, 来电常直接显示为'未接', 付费备份必须经 Play Store; Joplin 开源 9 年仍未上 F-Droid (仓库 👍 第一); AnkiDroid 被 Google Play 禁止放捐赠链接。",
+  "audience": "去 Google 化 Android 用户; 隐私敏感人群; 受审查/制裁地区用户",
+  "domain": "隐私通讯/移动应用分发",
+  "evidence": [
+   {
+    "url": "https://github.com/laurent22/joplin/issues/15",
+    "quote": "Would this app be suitable to be put in F-Droid's repos?",
+    "platform": "GitHub issue (laurent22/joplin #15 'F-Droid')",
+    "engagement": "👍 128, ❤45, 250 评论, labels: enhancement, backlog — Joplin 仓库 👍 第 1",
+    "date": "2017-11-30"
+   },
+   {
+    "url": "https://github.com/signalapp/Signal-Android/issues/7733",
+    "quote": "Calls always income as missed ones without ringing and Signal doesn't report the call failed — 维护者: the devices are not able to find a valid ICE candidate",
+    "platform": "GitHub issue (signalapp/Signal-Android #7733)",
+    "engagement": "👍 100, 386 评论, acknowledged — Signal-Android 仓库 👍 第 1",
+    "date": "2018-04-25"
+   },
+   {
+    "url": "https://github.com/signalapp/Signal-Android/issues/9729",
+    "quote": "Signal consumes half of my battery (no google services or microG) ... Signal takes between 40 and 50% of battery life",
+    "platform": "GitHub issue (signalapp/Signal-Android #9729)",
+    "engagement": "👍 56, 108 评论, acknowledged",
+    "date": "2020-06-11"
+   },
+   {
+    "url": "https://github.com/signalapp/Signal-Android/issues/13290",
+    "quote": "While we trust Signal for keeping the minimum metadata, how can we know what Google keeps if Signal needs to transmit data to their servers for each notification/message?",
+    "platform": "GitHub issue (signalapp/Signal-Android #13290 'Add another way to receive notifications')",
+    "engagement": "👍 41, 44 评论, acknowledged",
+    "date": "2023-11-27"
+   },
+   {
+    "url": "https://github.com/signalapp/Signal-Android/issues/14357",
+    "quote": "Secured Backup without Play Store ... An Option to used the Paid Backup Plan without Play Store Requirements was very Awesome!",
+    "platform": "GitHub issue (signalapp/Signal-Android #14357)",
+    "engagement": "👍 34, 22 评论",
+    "date": "2025-10-03"
+   },
+   {
+    "url": "https://github.com/ankidroid/Anki-Android/issues/13574",
+    "quote": "Don't force `full` (F-Droid/GitHub) releases users to grant the `All files access` permission",
+    "platform": "GitHub issue (ankidroid/Anki-Android #13574)",
+    "engagement": "👍 19, 16 评论",
+    "date": "2023-04-08"
+   },
+   {
+    "url": "https://github.com/ankidroid/Anki-Android/issues/21656",
+    "quote": "[Community Help Needed] Google Play: no longer allowing our Open Collective donation link",
+    "platform": "GitHub issue (ankidroid/Anki-Android #21656)",
+    "engagement": "👍 41, ❤58, 👀21, 16 评论 — AnkiDroid 仓库 👍 第 1",
+    "date": "2026-08-29"
+   }
+  ],
+  "existing_solutions": "microG; Molly (Signal 第三方分支, 支持 UnifiedPush); Signal 自带 websocket 降级模式 (耗电); Joplin/其他应用官方 APK 侧载或 Obtainium; Signal 备份只能用本地备份文件",
+  "why_unsolved": "官方项目优先保证 Play 版本一致性与安全模型, 拒绝第三方推送通道; F-Droid 可复现构建与 React Native/闭源依赖冲突; 无 Google 环境的常驻连接在 Android 后台限制下天然耗电",
+  "crowd_signal": "many",
+  "confidence": 0.8,
+  "source_finder": "gh-consumer-apps-top-issues"
+ },
+ {
+  "title": "安卓邮件客户端的标签与现代协议",
+  "description": "跨应用主题: 与主流生态互操作。Thunderbird Android (原 K-9 Mail) 用户想要与桌面 Thunderbird 一致的 IMAP/Gmail 标签、跨文件夹会话视图、S/MIME 加密, 以及 JMAP 现代协议支持; 这些请求 2015-2018 年提出, 至今仍是仓库 👍 前五, 用户被迫在'隐私差的 Gmail 官方 App'与'功能残缺的开源客户端'之间二选一。",
+  "audience": "Gmail/Fastmail 用户; 需要 S/MIME 的企业邮箱用户; 想脱离 Gmail App 的 Android 用户",
+  "domain": "邮件/通讯",
+  "evidence": [
+   {
+    "url": "https://github.com/thunderbird/thunderbird-android/issues/3272",
+    "quote": "JMAP Support ... JMAP is already implemented in few Mail servers, so wide adoption will probably follow soon.",
+    "platform": "GitHub issue (thunderbird/thunderbird-android #3272)",
+    "engagement": "👍 149, 27 评论, milestone JMAP (0/10 完成), Backlog — 仓库 👍 第 1",
+    "date": "2018-03-21"
+   },
+   {
+    "url": "https://github.com/thunderbird/thunderbird-android/issues/769",
+    "quote": "Plesse add support for IMAP Labels/flags/tags, just like Mozilla Thunderbird does.",
+    "platform": "GitHub issue (thunderbird/thunderbird-android #769)",
+    "engagement": "👍 108, 45 评论",
+    "date": "2015-09-02"
+   },
+   {
+    "url": "https://github.com/thunderbird/thunderbird-android/issues/1003",
+    "quote": "S/MIME support",
+    "platform": "GitHub issue (thunderbird/thunderbird-android #1003)",
+    "engagement": "👍 84, 41 评论",
+    "date": "2016-01-07"
+   },
+   {
+    "url": "https://github.com/thunderbird/thunderbird-android/issues/735",
+    "quote": "Threaded view across folders",
+    "platform": "GitHub issue (thunderbird/thunderbird-android #735)",
+    "engagement": "👍 54, 35 评论",
+    "date": "2015-08-04"
+   }
+  ],
+  "existing_solutions": "Gmail 官方 App (闭源、追踪); FairEmail (单人维护、Pro 付费解锁); Outlook (数据经微软云中转)",
+  "why_unsolved": "K-9 十年老架构以文件夹为中心, 标签模型需重写存储与同步层; JMAP 服务器生态仍小; Mozilla 移动团队人手有限, 近年精力在品牌迁移/遥测/UI",
+  "crowd_signal": "many",
+  "confidence": 0.8,
+  "source_finder": "gh-consumer-apps-top-issues"
+ },
+ {
+  "title": "个人文件同步的选择性与差量同步",
+  "description": "跨应用主题: 跨设备同步。用 Syncthing/Nextcloud 替代 Dropbox 的用户想要: Dropbox 式'树形勾选要同步的子目录'、同一台设备两个目录互同步、大文件 (加密容器/虚拟机镜像) 只传变化的字节。现状是 Syncthing 只能手写 .stignore 模式, Nextcloud 大文件每次全量上传; Syncthing 的'下一代忽略规则'需求 2015 年立项, 20 个子任务 0 完成。",
+  "audience": "家庭 NAS/多设备用户; 摄影、视频、加密容器重度用户; 想脱离 Dropbox/OneDrive 的人",
+  "domain": "文件同步/备份",
+  "evidence": [
+   {
+    "url": "https://github.com/syncthing/syncthing/issues/2491",
+    "quote": "Next Gen Ignores: Requirements — Simple tree-view interface with checkboxes (similar to Dropbox/OneDrive) ... Live updates when files are ignored/unignored ... Cross-device synchronization of ignore rules",
+    "platform": "GitHub issue (syncthing/syncthing #2491)",
+    "engagement": "👍 116, ❤21, 101 评论, 0/20 子任务完成 — 仓库 👍 第 1",
+    "date": "2015-11-19"
+   },
+   {
+    "url": "https://github.com/syncthing/syncthing/issues/4721",
+    "quote": "Local sync between directories",
+    "platform": "GitHub issue (syncthing/syncthing #4721)",
+    "engagement": "👍 98, 34 评论",
+    "date": "2018-01-29"
+   },
+   {
+    "url": "https://github.com/syncthing/syncthing/issues/9083",
+    "quote": "Selective File Synchronization and Deletion",
+    "platform": "GitHub issue (syncthing/syncthing #9083)",
+    "engagement": "👍 75, 5 评论",
+    "date": "2023-09-07"
+   },
+   {
+    "url": "https://github.com/nextcloud/server/issues/417",
+    "quote": "Delta Sync would be great for my truecrypt/veracrypt huge files (~30-100gb). Without delta sync I must stay absent from this product.",
+    "platform": "GitHub issue (nextcloud/server #417 'Delta-sync, or sync only changed bytes in a file')",
+    "engagement": "👍 100, 58 评论, label '1. to develop'",
+    "date": "2016-07-15"
+   },
+   {
+    "url": "https://github.com/syncthing/syncthing/issues/8113",
+    "quote": "Object Store (S3) backend",
+    "platform": "GitHub issue (syncthing/syncthing #8113)",
+    "engagement": "👍 84, 21 评论",
+    "date": "2022-01-15"
+   }
+  ],
+  "existing_solutions": "Dropbox/OneDrive 选择性同步与块级同步 (云端、付费); Syncthing 手写 .stignore; rsync/rclone 脚本; Resilio Sync (闭源)",
+  "why_unsolved": "需要重做 ignore 数据模型与块级差量协议, 核心维护者少且对复杂度极其谨慎; Nextcloud 服务端存储抽象不支持部分写入",
+  "crowd_signal": "many",
+  "confidence": 0.8,
+  "source_finder": "gh-consumer-apps-top-issues"
+ },
+ {
+  "title": "笔记与文档的层级标签/多维归档",
+  "description": "跨应用主题: 层级组织。从 Evernote 迁到 Joplin 的用户要嵌套标签 (仓库 👍 第 2, 标 high 优先级 8 年未做); Paperless 无纸化用户要多组档案编号 (ASN) 和一份文档多个通信方 (Discussions 票数第 1、第 4); Simplenote 用户要文件夹; KOReader 用户要扁平书库视图。共同痛点: 开源工具只有一维扁平分类, 无法表达'一份文件属于多个人/多个层级'的现实结构。",
+  "audience": "知识管理/笔记用户; 家庭无纸化归档用户; Evernote 迁移者",
+  "domain": "笔记/文档管理",
+  "evidence": [
+   {
+    "url": "https://github.com/laurent22/joplin/issues/375",
+    "quote": "[Feature request] Hierarchical tags (附 Evernote 层级标签截图)",
+    "platform": "GitHub issue (laurent22/joplin #375)",
+    "engagement": "👍 121, ❤43, 77 评论, labels: enhancement, high, mobile, desktop, cli",
+    "date": "2018-04-04"
+   },
+   {
+    "url": "https://github.com/paperless-ngx/paperless-ngx/discussions/1841",
+    "quote": "Multiple ASN-groups",
+    "platform": "GitHub Discussion (paperless-ngx feature-requests, 票数第 1)",
+    "engagement": "222 upvotes, 115 评论",
+    "date": "2022-10-21"
+   },
+   {
+    "url": "https://github.com/paperless-ngx/paperless-ngx/discussions/categories/feature-requests?discussions_q=is%3Aopen+sort%3Atop",
+    "quote": "Allow multiple correspondents for a given document",
+    "platform": "GitHub Discussion (paperless-ngx feature-requests, 票数第 4)",
+    "engagement": "139 upvotes, 31 评论",
+    "date": "2022-03-18"
+   },
+   {
+    "url": "https://github.com/koreader/koreader/issues/8472",
+    "quote": "FR: Flat/Library view",
+    "platform": "GitHub issue (koreader/koreader #8472)",
+    "engagement": "👍 76, 196 评论",
+    "date": "2021-11-22"
+   },
+   {
+    "url": "https://github.com/Automattic/simplenote-android/issues/1723",
+    "quote": "I'm hoping you can add a folder feature.",
+    "platform": "GitHub issue (Automattic/simplenote-android #1723)",
+    "engagement": "👍 unknown (未进入前 5, <2)",
+    "date": "2025-03-06"
+   }
+  ],
+  "existing_solutions": "Evernote/Obsidian/Bear 的嵌套标签 (闭源或非同类); Joplin 用 'parent/child' 命名约定或社区插件模拟; Paperless 用自定义字段/标签变通",
+  "why_unsolved": "涉及数据模型与同步格式的破坏性变更, Joplin 维护者标 high 但 8 年未动; Paperless 维护者认为 ASN 唯一性是设计基石",
+  "crowd_signal": "many",
+  "confidence": 0.75,
+  "source_finder": "gh-consumer-apps-top-issues"
+ },
+ {
+  "title": "密码管理器保存提示与弹窗速度",
+  "description": "跨应用主题: 基础体验可靠性。Bitwarden 浏览器扩展用户抱怨三件日常高频的事: 登录/注册后经常不弹'保存或更新密码'提示 (站点表单千差万别, 维护者只能用 Google 表单收集失效站点); 点击图标要等 3-10 秒弹窗才出来 (288 条评论); Windows 剪贴板历史会留存复制出的密码。三条分别是仓库 👍 前三。",
+  "audience": "普通 Bitwarden 免费/家庭版用户; 想脱离浏览器内置或 1Password 的人",
+  "domain": "密码管理/安全",
+  "evidence": [
+   {
+    "url": "https://github.com/bitwarden/clients/issues/12286",
+    "quote": "Delay in opening the Bitwarden popup after clicking the icon ... Around 3 seconds (up to 10 seconds) until Bitwarden reacts, usually 3 seconds",
+    "platform": "GitHub issue (bitwarden/clients #12286)",
+    "engagement": "👍 116, 288 评论, labels: bug, browser — 仓库 👍 第 1",
+    "date": "2024-12-08"
+   },
+   {
+    "url": "https://github.com/bitwarden/clients/issues/1620",
+    "quote": "Bitwarden does not prompt to save or update credentials ... This works sometimes, but not always and it can depend on many, many factors. ... we truly need to track this under a single item in aggregate fashion",
+    "platform": "GitHub issue (bitwarden/clients #1620)",
+    "engagement": "👍 75, 👀10, 109 评论",
+    "date": "2021-02-18"
+   },
+   {
+    "url": "https://github.com/bitwarden/clients/issues/2621",
+    "quote": "Windows 10 (and later): clipboard history keeps passwords after being copied from BW desktop app or browser addon",
+    "platform": "GitHub issue (bitwarden/clients #2621)",
+    "engagement": "👍 47, 96 评论",
+    "date": "2020-09-25"
+   },
+   {
+    "url": "https://github.com/bitwarden/clients/issues/21108",
+    "quote": "Bitwarden Password Manager is slowing down browser",
+    "platform": "GitHub issue (bitwarden/clients #21108)",
+    "engagement": "👍 41, 31 评论",
+    "date": "2026-06-07"
+   }
+  ],
+  "existing_solutions": "1Password/Dashlane (闭源订阅); 浏览器内置密码管理 (绑定浏览器与账号); KeePassXC + 浏览器扩展 (配置复杂)",
+  "why_unsolved": "表单识别是启发式问题, 长尾站点无穷; 扩展迁移到 MV3 后 service worker 冷启动导致弹窗延迟; 剪贴板行为受操作系统 API 限制",
+  "crowd_signal": "many",
+  "confidence": 0.8,
+  "source_finder": "gh-consumer-apps-top-issues"
+ },
+ {
+  "title": "播客多队列与自动保留策略",
+  "description": "跨应用主题: 层级组织/自动化。AntennaPod 用户想把订阅分到'新闻/娱乐/技术'多个队列而不是塞进一个大队列, 想按'每个节目只保留最新 N 集'自动清理下载, 想给节目设优先级, 想在手表上控制; 前两条分别开放 8 年和 10 年, 评论 87/70 条, 是仓库 👍 第 1、2。",
+  "audience": "播客重度听众 (Android/F-Droid 用户); 想脱离 Spotify/Pocket Casts 的人",
+  "domain": "播客/音频",
+  "evidence": [
+   {
+    "url": "https://github.com/AntennaPod/AntennaPod/issues/2648",
+    "quote": "Instead of having a single monolithic queue where all downloaded episodes are added, a user would be able to define a custom queue.",
+    "platform": "GitHub issue (AntennaPod/AntennaPod #2648 'Multiple / User Definable Queues')",
+    "engagement": "👍 112, ❤19, 87 评论 — 仓库 👍 第 1",
+    "date": "2018-04-20"
+   },
+   {
+    "url": "https://github.com/AntennaPod/AntennaPod/issues/2077",
+    "quote": "i want to be able to keep the newest N episodes of each subscribed Podcast. This is not configurable at the moment.",
+    "platform": "GitHub issue (AntennaPod/AntennaPod #2077)",
+    "engagement": "👍 48, ❤12, 70 评论",
+    "date": "2016-07-22"
+   },
+   {
+    "url": "https://github.com/AntennaPod/AntennaPod/issues/4264",
+    "quote": "Wear OS app",
+    "platform": "GitHub issue (AntennaPod/AntennaPod #4264)",
+    "engagement": "👍 43, 6 评论",
+    "date": "2020-06-27"
+   },
+   {
+    "url": "https://github.com/AntennaPod/AntennaPod/issues/1946",
+    "quote": "Custom chapter marks / Timed episode annotations",
+    "platform": "GitHub issue (AntennaPod/AntennaPod #1946)",
+    "engagement": "👍 38, 60 评论",
+    "date": "2016-05-17"
+   }
+  ],
+  "existing_solutions": "Pocket Casts 过滤器/自动归档 (闭源订阅); Podcast Addict (广告/付费); AntennaPod 单队列 + 手动删除",
+  "why_unsolved": "队列是应用核心数据模型, 志愿者项目缺乏能做大重构的人; 维护者担心 UI 复杂度",
+  "crowd_signal": "many",
+  "confidence": 0.75,
+  "source_finder": "gh-consumer-apps-top-issues"
+ },
+ {
+  "title": "本地优先应用的跨设备同步",
+  "description": "跨应用主题: 跨设备同步 (最普遍的横向主题)。NewPipe、Organic Maps、KOReader、Joplin 移动端这类'不需要账号'的应用, 用户在手机+平板+电子书间切换时, 订阅、播放列表、书签、高亮、设置、阅读历史都不能同步, 只能手工导入导出; Joplin 移动端不能后台同步。用户希望有可选的、自托管或端到端加密的同步 (WebDAV/Nextcloud/git 均可)。",
+  "audience": "多设备隐私用户; 手机+平板+电子书阅读器同时使用者",
+  "domain": "跨设备同步/本地优先软件",
+  "evidence": [
+   {
+    "url": "https://github.com/organicmaps/organicmaps/issues/622",
+    "quote": "Bookmark synchronization/online backup ... I'm thinking it would be nice to be able to send backups to external git repository",
+    "platform": "GitHub issue (organicmaps/organicmaps #622, Epic)",
+    "engagement": "👍 63, ❤11, 113 评论",
+    "date": "2021-06-18"
+   },
+   {
+    "url": "https://github.com/TeamNewPipe/NewPipe/issues/5325",
+    "quote": "Sync between devices ... I have two phones and a tablet and I have to add new subscriptions and videos manually...not too reliable.",
+    "platform": "GitHub issue (TeamNewPipe/NewPipe #5325)",
+    "engagement": "👍 46, ❤15, 27 评论",
+    "date": "2021-01-01"
+   },
+   {
+    "url": "https://github.com/TeamNewPipe/NewPipe/issues/1163",
+    "quote": "[Feature Request] save your playlists, subscriptions and settings in the cloud",
+    "platform": "GitHub issue (TeamNewPipe/NewPipe #1163)",
+    "engagement": "👍 34, 48 评论",
+    "date": "2018-03-05"
+   },
+   {
+    "url": "https://github.com/koreader/koreader/issues/4587",
+    "quote": "highlights don't sync across devices ... I'd need to export the noted passages three times (if I were reading on my PW, tablet/phone)",
+    "platform": "GitHub issue (koreader/koreader #4587 'Synchronize highlights across separate KOReader devices')",
+    "engagement": "👍 14, 18 评论",
+    "date": "2019-02-13"
+   },
+   {
+    "url": "https://github.com/laurent22/joplin/issues/3872",
+    "quote": "Background sync on mobile devices — 维护者旧回复: Cannot currently be fixed due a limitation of the underlying framework / we rely on existing libs, which for now don't exist on React Native",
+    "platform": "GitHub issue (laurent22/joplin #3872)",
+    "engagement": "👍 unknown (在 👍 排序第 8 位, <49), labels: backlog, enhancement",
+    "date": "2020-10-06"
+   }
+  ],
+  "existing_solutions": "手工导入导出 JSON/zip; 用 Syncthing 同步应用数据库文件 (易损坏); gpodder.net 仅覆盖播客; Organic Maps 曾有同步但依赖已关闭的私有服务器",
+  "why_unsolved": "无账号体系的应用没有服务器也不想承担运营; 端到端加密同步的冲突合并复杂; Android 后台执行限制与 React Native 生态限制",
+  "crowd_signal": "many",
+  "confidence": 0.75,
+  "source_finder": "gh-consumer-apps-top-issues"
+ },
+ {
+  "title": "自建影音库播放正确性",
+  "description": "跨应用主题: 基础体验可靠性。Jellyfin 用户在 Android/网页端续播或快进后, 字幕要 30 秒才加载且错位一两句话, 2020 年'已确认'至今未修 (仓库 👍 第 1); 多碟专辑被拆成多个专辑、多文件有声书被当成文件夹、播放时歌曲收藏丢失。用户想要的是'像 Plex/Spotify 一样理所当然正确'。",
+  "audience": "家庭媒体服务器用户 (替代 Plex/Netflix/Spotify); 古典音乐、有声书收藏者",
+  "domain": "家庭影音/媒体服务器",
+  "evidence": [
+   {
+    "url": "https://github.com/jellyfin/jellyfin/issues/2547",
+    "quote": "When i skip through a video or resume, the timing of the subtitles is off, this can be a minor difference, but i also had a few times where it was 2 sentences off. ... i have to quit and resume again to try and get the subtitles to line up correctly.",
+    "platform": "GitHub issue (jellyfin/jellyfin #2547)",
+    "engagement": "👍 103, 151 评论, labels: bug, confirmed — 仓库 👍 第 1",
+    "date": "2020-03-09"
+   },
+   {
+    "url": "https://github.com/jellyfin/jellyfin/issues/5605",
+    "quote": "Multi disc music albums are displayed as separate albums",
+    "platform": "GitHub issue (jellyfin/jellyfin #5605)",
+    "engagement": "👍 19, 71 评论, bug, confirmed",
+    "date": "2021-03-24"
+   },
+   {
+    "url": "https://github.com/jellyfin/jellyfin/issues/10668",
+    "quote": "Multi-Part Audiobook being treated as folder with indivdual files instead of one book",
+    "platform": "GitHub issue (jellyfin/jellyfin #10668)",
+    "engagement": "👍 19, 21 评论",
+    "date": "2023-12-03"
+   },
+   {
+    "url": "https://github.com/jellyfin/jellyfin/issues/14981",
+    "quote": "Song favorites get lost during playback",
+    "platform": "GitHub issue (jellyfin/jellyfin #14981)",
+    "engagement": "👍 25, 26 评论, confirmed",
+    "date": "2025-10-11"
+   }
+  ],
+  "existing_solutions": "Plex (闭源, Plex Pass 付费, 需在线账号); Emby (闭源); 手动把字幕烧进视频; 用 Navidrome/Audiobookshelf 分别管音乐和有声书",
+  "why_unsolved": "字幕问题涉及服务端转码管线与多个客户端播放器的时序, 跨仓库无人统筹; 音乐扫描器元数据模型改动大",
+  "crowd_signal": "many",
+  "confidence": 0.7,
+  "source_finder": "gh-consumer-apps-top-issues"
+ },
+ {
+  "title": "家庭日历共享粒度",
+  "description": "跨应用主题: 共享/家庭成员。自建 Nextcloud 的家庭和小团队想把订阅的外部日历 (学校、球队、节假日 webcal) 在内部共享给家人, 想把私人日历以'仅显示忙/闲'方式共享给同事, 想控制生日日历是否提醒; 前两条开放 8-10 年, 是 nextcloud/server 👍 前 5。",
+  "audience": "自托管 Nextcloud 的家庭与小型组织; 想脱离 Google Calendar 的人",
+  "domain": "日历/家庭协作",
+  "evidence": [
+   {
+    "url": "https://github.com/nextcloud/server/issues/1600",
+    "quote": "Allow (internal) sharing of subscribed webcal calendars",
+    "platform": "GitHub issue (nextcloud/server #1600)",
+    "engagement": "👍 102, 26 评论",
+    "date": "2016-10-01"
+   },
+   {
+    "url": "https://github.com/nextcloud/server/issues/11214",
+    "quote": "Share calendar to users or groups with \"show only as busy\".",
+    "platform": "GitHub issue (nextcloud/server #11214)",
+    "engagement": "👍 83, ❤21, 🚀11, 53 评论",
+    "date": "2018-09-14"
+   },
+   {
+    "url": "https://github.com/nextcloud/server/issues/1505",
+    "quote": "Users should be able to choose whether reminders are generated for events in the birthday calendar",
+    "platform": "GitHub issue (nextcloud/server #1505)",
+    "engagement": "👍 unknown (在 👍 排序列表第 13 位)",
+    "date": "2016-09-25"
+   },
+   {
+    "url": "https://github.com/grocy/grocy/issues/1651",
+    "quote": "Being able to mark chores as done via any caldav (tasks) client would be very useful for our setup - having an iPad as a central hub in our flat showing calendar, tasks and home-automation shortcuts.",
+    "platform": "GitHub issue (grocy/grocy #1651 'caldav sync for chores/tasks')",
+    "engagement": "👍 unknown (在 👍 排序列表第 10 位, <17)",
+    "date": "2021-10-14"
+   }
+  ],
+  "existing_solutions": "Google Calendar/Outlook 的 free-busy 共享 (云端); 用 Nextcloud 手动复制事件到共享日历",
+  "why_unsolved": "需要 CalDAV 服务端扩展 (只暴露忙闲的虚拟日历) 与权限模型改动; calendar 应用团队优先级低",
+  "crowd_signal": "many",
+  "confidence": 0.7,
+  "source_finder": "gh-consumer-apps-top-issues"
+ },
+ {
+  "title": "电子墨水阅读器手写批注",
+  "description": "跨应用主题: 硬件生态互操作。Onyx Boox 等带手写笔的 e-ink 设备用户想在开源阅读器 KOReader 里直接手写划线、在 PDF 上涂画笔记, 而不必切回厂商闭源阅读器; 两条请求分别开放 9 年和 5 年, 是仓库 👍 第 1、2, 且标记 help-wanted 无人接手。",
+  "audience": "学生、研究者; 带笔 e-ink 设备 (Boox、Kindle Scribe、reMarkable) 用户",
+  "domain": "阅读/电子墨水",
+  "evidence": [
+   {
+    "url": "https://github.com/koreader/koreader/issues/2633",
+    "quote": "If koreader support handwriting for markups/notes, that would have a great meaning.",
+    "platform": "GitHub issue (koreader/koreader #2633 'add handwriting/styluswriting support for markups/notes')",
+    "engagement": "👍 95, ❤22, 🚀16, 47 评论, labels: enhancement, help-wanted — 仓库 👍 第 1",
+    "date": "2017-03-12"
+   },
+   {
+    "url": "https://github.com/koreader/koreader/issues/8537",
+    "quote": "FR: Add stylus drawing annotation support to PDF files",
+    "platform": "GitHub issue (koreader/koreader #8537)",
+    "engagement": "👍 82, 🚀8, 29 评论",
+    "date": "2021-12-09"
+   },
+   {
+    "url": "https://github.com/koreader/koreader/issues/7423",
+    "quote": "FR: Native Android Keyboard Support",
+    "platform": "GitHub issue (koreader/koreader #7423)",
+    "engagement": "👍 39, 53 评论",
+    "date": "2021-03-18"
+   }
+  ],
+  "existing_solutions": "厂商自带 Neo Reader / Kindle Scribe / reMarkable (闭源、锁生态、不能跨设备); 桌面端 Xournal++ (非 e-ink)",
+  "why_unsolved": "需要笔迹渲染、压感输入与文档格式回写三层实现, KOReader 为 Lua 志愿者项目, 多年 help-wanted 无人接",
+  "crowd_signal": "many",
+  "confidence": 0.7,
+  "source_finder": "gh-consumer-apps-top-issues"
+ },
+ {
+  "title": "离线地图的公交换乘与轨迹导航",
+  "description": "跨应用主题: 离线可用。Organic Maps 用户想要完全离线的公交/地铁换乘规划 ('做出比 Google 更好的全球公交路线')、沿 GPX 轨迹的转向导航、以及各平台显示限速标志; 三条是仓库 👍 前三, 公交路线已开 Polar.sh 悬赏仍无人完成。",
+  "audience": "隐私向旅行者; 徒步骑行者; 出境无流量用户",
+  "domain": "地图/出行",
+  "evidence": [
+   {
+    "url": "https://github.com/organicmaps/organicmaps/issues/5331",
+    "quote": "Implement public transport routing ... a worldwide public transport routing better than Google",
+    "platform": "GitHub issue (organicmaps/organicmaps #5331, Epic, Polar.sh 悬赏)",
+    "engagement": "👍 82, ❤22, 82 评论 — 仓库 👍 第 1",
+    "date": "2023-06-13"
+   },
+   {
+    "url": "https://github.com/organicmaps/organicmaps/issues/1360",
+    "quote": "Track Follow / Navigation support",
+    "platform": "GitHub issue (organicmaps/organicmaps #1360)",
+    "engagement": "👍 77, 78 评论",
+    "date": "2021-09-29"
+   },
+   {
+    "url": "https://github.com/organicmaps/organicmaps/issues/952",
+    "quote": "[android][ios][carplay][android-auto] Show speed limit sign on all platforms",
+    "platform": "GitHub issue (organicmaps/organicmaps #952)",
+    "engagement": "👍 70, 40 评论",
+    "date": "2021-07-29"
+   }
+  ],
+  "existing_solutions": "Google Maps/Apple Maps/Transit/Moovit (在线、追踪); OsmAnd (功能多但复杂、部分付费); 城市官方 App",
+  "why_unsolved": "需要全球 GTFS 时刻表数据聚合与服务器基础设施, 数据许可碎片化, 超出志愿者项目能力",
+  "crowd_signal": "many",
+  "confidence": 0.7,
+  "source_finder": "gh-consumer-apps-top-issues"
+ },
+ {
+  "title": "视频客户端的频道/关键词屏蔽",
+  "description": "跨应用主题: 内容过滤/去算法。不登录看 YouTube 的 NewPipe 用户想屏蔽特定频道、视频和关键词以避免剧透和垃圾内容, 想按观看量/日期排序频道视频, 想批量下载播放列表, 想过滤订阅流; YouTube 只对登录用户提供'不感兴趣'。#1815 挂了 bounty 8 年仍在 discussion 阶段。",
+  "audience": "无账号看 YouTube 的隐私用户; 避剧透的游戏/影视观众; 家长",
+  "domain": "视频/内容消费",
+  "evidence": [
+   {
+    "url": "https://github.com/TeamNewPipe/NewPipe/issues/1815",
+    "quote": "I exclusively use this app to avoid spoilers on YouTube however even then it is possible to get the ending/spoilers video.",
+    "platform": "GitHub issue (TeamNewPipe/NewPipe #1815 'Blacklist videos, channels and keywords')",
+    "engagement": "👍 68, 57 评论, labels: feature request, bounty, discussion",
+    "date": "2018-10-14"
+   },
+   {
+    "url": "https://github.com/TeamNewPipe/NewPipe/issues/7729",
+    "quote": "Sort videos (inside channels and playlists) by views and dates",
+    "platform": "GitHub issue (TeamNewPipe/NewPipe #7729)",
+    "engagement": "👍 60, 12 评论",
+    "date": "2022-01-31"
+   },
+   {
+    "url": "https://github.com/TeamNewPipe/NewPipe/issues/5482",
+    "quote": "Quick downloads in bulk - download multiple videos, queue or playlist",
+    "platform": "GitHub issue (TeamNewPipe/NewPipe #5482)",
+    "engagement": "👍 60, 35 评论",
+    "date": "2021-01-23"
+   },
+   {
+    "url": "https://github.com/TeamNewPipe/NewPipe/issues/11139",
+    "quote": "[YouTube] \"Sign in to confirm...\"/\"Watch on the latest version...\"",
+    "platform": "GitHub issue (TeamNewPipe/NewPipe #11139) — 说明维护者精力被反爬消耗",
+    "engagement": "👍 48, 138 评论",
+    "date": "2024-06-07"
+   }
+  ],
+  "existing_solutions": "浏览器扩展 BlockTube/SponsorBlock (桌面为主); YouTube 登录后'不再推荐此频道' (需账号); NewPipe 无任何屏蔽功能",
+  "why_unsolved": "维护者精力被 YouTube 反爬 (登录墙、SABR 协议、直播 30 秒断流) 持续消耗, 功能类请求长期停在 discussion",
+  "crowd_signal": "many",
+  "confidence": 0.7,
+  "source_finder": "gh-consumer-apps-top-issues"
+ },
+ {
+  "title": "数据导出/迁移/清理 (数据主权)",
+  "description": "跨应用主题: 导出/数据所有权。用户想把自建应用里的数据以通用格式带走或打印: 食谱导出 PDF 或整本菜谱书、文档列表导出 CSV、备忘录一键导入导出以迁移实例、卸载应用后彻底清理残留数据、自定义备份位置。现状是靠 pg_dump/CLI 或手工, 非技术家庭管理员做不到。",
+  "audience": "自托管普通用户与家庭管理员; 想'随时能走'的隐私用户",
+  "domain": "数据可携带/备份",
+  "evidence": [
+   {
+    "url": "https://github.com/nextcloud/server/issues/5539",
+    "quote": "Detect / Delete App Data",
+    "platform": "GitHub issue (nextcloud/server #5539)",
+    "engagement": "👍 212, ❤17, 👀14, 48 评论, label '1. to develop' — nextcloud/server 👍 第 2",
+    "date": "2017-06-26"
+   },
+   {
+    "url": "https://github.com/paperless-ngx/paperless-ngx/discussions/1796",
+    "quote": "Export document list as CSV",
+    "platform": "GitHub Discussion (paperless-ngx feature-requests, 票数第 6)",
+    "engagement": "106 upvotes, 37 评论",
+    "date": "2022-10-14"
+   },
+   {
+    "url": "https://github.com/mealie-recipes/mealie/issues/1306",
+    "quote": "Some users want to export Recipes into a standard format and/or capture recipes into a printable format.",
+    "platform": "GitHub issue (mealie-recipes/mealie #1306 'Export Recipes and Cookbooks to PDF')",
+    "engagement": "👍 20, 20 评论, milestone Post v1.0.0 — mealie 仓库 👍 第 1",
+    "date": "2022-05-29"
+   },
+   {
+    "url": "https://github.com/usememos/memos/issues/6309",
+    "quote": "Adding UI-level export/import tools would greatly lower the friction for backup retention, data ownership, and instance migrations.",
+    "platform": "GitHub issue (usememos/memos #6309)",
+    "engagement": "👍 1, 0 评论 (新建)",
+    "date": "2026-09-09"
+   },
+   {
+    "url": "https://github.com/ankidroid/Anki-Android/issues/9762",
+    "quote": "Feature request: Backup and restore App settings",
+    "platform": "GitHub issue (ankidroid/Anki-Android #9762)",
+    "engagement": "👍 unknown (在 👍 排序列表第 8 位, <7)",
+    "date": "2021-11-02"
+   }
+  ],
+  "existing_solutions": "数据库 dump / 服务器归档 / 第三方脚本; Paperless 有文档导出器但无列表 CSV; Mealie 只有 JSON 备份",
+  "why_unsolved": "导出被视为'锦上添花', 维护者优先级低; PDF 排版库选型和多语言排版; 应用数据分散在文件系统与数据库多处",
+  "crowd_signal": "several",
+  "confidence": 0.65,
+  "source_finder": "gh-consumer-apps-top-issues"
+ },
+ {
+  "title": "AI 辅助自动录入 (收据 OCR/自然语言)",
+  "description": "跨应用主题: 智能化输入。家庭库存、任务、文档应用的用户希望'拍一张收据自动把商品和价格入库'、'输入 周五交房租 自动识别日期'、'扫描发票自动填字段'、'把有声书转文字与电子书对齐'; 这些 2019 年就提出, 如今 OCR/LLM 已能做, 但开源应用仍未集成 (Paperless 的 ML 填字段是 Discussions 票数第 3)。",
+  "audience": "管理家庭库存/账单的人; GTD 用户; 无纸化家庭",
+  "domain": "家庭管理/效率工具",
+  "evidence": [
+   {
+    "url": "https://github.com/paperless-ngx/paperless-ngx/discussions/categories/feature-requests?discussions_q=is%3Aopen+sort%3Atop",
+    "quote": "Fill custom fields from machine learning",
+    "platform": "GitHub Discussion (paperless-ngx feature-requests, 票数第 3)",
+    "engagement": "162 upvotes, 35 评论",
+    "date": "2024-06-07"
+   },
+   {
+    "url": "https://github.com/advplyr/audiobookshelf/issues/189",
+    "quote": "[enhancement] sync ebooks and audiobooks via processing audiobook to text (Pie in the sky idea)",
+    "platform": "GitHub issue (advplyr/audiobookshelf #189)",
+    "engagement": "👍 91, 36 评论",
+    "date": "2021-11-17"
+   },
+   {
+    "url": "https://github.com/tasks/tasks/issues/784",
+    "quote": "I really liked that feature in TickTick (Smart Date Parsing) and Todoist...it enables a more frictionless process.",
+    "platform": "GitHub issue (tasks/tasks #784 'Natural Language Processing')",
+    "engagement": "👍 32, 6 评论 — tasks 仓库 👍 第 1",
+    "date": "2019-02-27"
+   },
+   {
+    "url": "https://github.com/grocy/grocy/issues/404",
+    "quote": "Feature Request: OCR shopping receipts (自动提取商品与价格入库)",
+    "platform": "GitHub issue (grocy/grocy #404)",
+    "engagement": "👍 30, 17 评论 — grocy 仓库 👍 第 1",
+    "date": "2019-10-01"
+   },
+   {
+    "url": "https://github.com/paperless-ngx/paperless-ngx/discussions/categories/feature-requests?discussions_q=is%3Aopen+sort%3Atop",
+    "quote": "Add alternative LLM based OCR / Support a self-hostable remote OCR service",
+    "platform": "GitHub Discussion (paperless-ngx feature-requests)",
+    "engagement": "27 upvotes / 35 upvotes",
+    "date": "2026-02-06 / 2026-02-07"
+   }
+  ],
+  "existing_solutions": "Todoist/TickTick 智能日期解析 (闭源); 商业收据扫描 App (上传云端); Paperless 现有分类器只做标签/通信方匹配, 不填字段",
+  "why_unsolved": "小团队不愿引入重 ML 依赖; 隐私用户排斥云端 API; 可本地运行的模型直到近两年才成熟",
+  "crowd_signal": "several",
+  "confidence": 0.65,
+  "source_finder": "gh-consumer-apps-top-issues"
+ },
+ {
+  "title": "一台设备多身份/多配置文件",
+  "description": "跨应用主题: 工作/生活分离。Joplin 用户想像 Firefox/Thunderbird 那样同时运行工作和私人两个实例 (不同同步目标、不同加密), 开放 8 年、👍 92、77 条评论, 是仓库 👍 第 3。Joplin 后来加入了需重启切换的 profile, 但并行运行多实例仍未实现 (issue 仍开放)。",
+  "audience": "混用工作与私人笔记的知识工作者; 共用一台电脑的家庭成员",
+  "domain": "笔记/效率工具",
+  "evidence": [
+   {
+    "url": "https://github.com/laurent22/joplin/issues/591",
+    "quote": "[Feature Request] run multiple instances of Joplin — 维护者方案: profiles.ini 列出 profile, 每个 profile 独立目录与锁, 切换需重启",
+    "platform": "GitHub issue (laurent22/joplin #591)",
+    "engagement": "👍 92, ❤7, 77 评论, label enhancement",
+    "date": "2018-06-06"
+   }
+  ],
+  "existing_solutions": "Joplin 桌面命令行 --profile 参数手工启动; profile 切换需重启; Obsidian 多 vault (闭源)",
+  "why_unsolved": "数据库锁与同步冲突、Electron 单实例限制, 维护者优先级不高",
+  "crowd_signal": "many",
+  "confidence": 0.6,
+  "source_finder": "gh-consumer-apps-top-issues"
+ },
+ {
+  "title": "自托管相册的家庭共享与断点大文件上传",
+  "description": "场景：家庭/个人把手机照片从 Google Photos/iCloud 迁到自托管的 Immich，然后发现：(1) 手机上传几 GB 视频经常因网络中断失败，要求分块/断点续传（社区最高票需求，2022 年提出至今开放）；(2) 想和伴侣/家人共享但只能整库共享，不能按图库/相册挑选，也不能给伴侣照片点收藏、看人脸识别；(3) 相册不能嵌套、不能离线使用 App、锁定文件夹里不能建相册。官方在 #12614 直接宣布 sharing 相关功能冻结（feature freeze），承认「right now it is a bit confusing and limiting」。痛点：普通家庭用户最基本的“全家一个相册库、各自手机自动备份、彼此可见但可控”体验在开源自托管方案里仍不成立。",
+  "audience": "自托管照片备份的家庭用户 / 想替代 Google Photos、iCloud 共享相册的隐私敏感用户",
+  "domain": "照片备份与家庭共享 / 自托管消费级应用",
+  "evidence": [
+   {
+    "url": "https://github.com/immich-app/immich/discussions/categories/feature-request?discussions_q=is%3Aopen+sort%3Atop",
+    "quote": "[Feature]: Upload large files in chunks",
+    "engagement": "780 upvotes, 82 comments",
+    "date": "2022-09-03",
+    "platform": "GitHub Discussions"
+   },
+   {
+    "url": "https://github.com/immich-app/immich/discussions/categories/feature-request?discussions_q=is%3Aopen+sort%3Atop",
+    "quote": "[Feature]: Nested albums",
+    "engagement": "291 upvotes, 165 comments",
+    "date": "2022-11-23",
+    "platform": "GitHub Discussions"
+   },
+   {
+    "url": "https://github.com/immich-app/immich/discussions/categories/feature-request?discussions_q=is%3Aopen+sort%3Atop",
+    "quote": "[Feature] Choose Libraries for Partner Sharing",
+    "engagement": "261 upvotes, 45 comments",
+    "date": "2023-10-16",
+    "platform": "GitHub Discussions"
+   },
+   {
+    "url": "https://github.com/immich-app/immich/discussions/categories/feature-request?discussions_q=is%3Aopen+sort%3Atop",
+    "quote": "Being able to use the mobile app offline or standalone",
+    "engagement": "198 upvotes, 35 comments",
+    "date": "2023-10-13",
+    "platform": "GitHub Discussions"
+   },
+   {
+    "url": "https://github.com/immich-app/immich/discussions/categories/feature-request?discussions_q=is%3Aopen+sort%3Atop",
+    "quote": "Creating albums in a locked folder",
+    "engagement": "232 upvotes, 72 comments",
+    "date": "2025-05-22",
+    "platform": "GitHub Discussions"
+   },
+   {
+    "url": "https://github.com/immich-app/immich/issues/12614",
+    "quote": "Better sharing in Immich (feature freeze) — “sharing precious photos and videos is an important part of immich, but right now it is a bit confusing and limiting.”",
+    "engagement": "259 👍 (open issue, label: sharing)",
+    "date": "2024-09-12",
+    "platform": "GitHub Issues"
+   }
+  ],
+  "existing_solutions": "Google Photos / iCloud 共享相册（云端、隐私与订阅费问题）；Immich（共享模型混乱且官方冻结新功能，大文件上传无分块）；PhotoPrism / Nextcloud Memories（偏单用户，家庭共享更弱）；Synology Photos（绑定硬件）。",
+  "why_unsolved": "共享涉及权限/安全模型的整体重构，Immich 维护者选择冻结而不是打补丁；分块上传需要客户端+服务端协议改造；开源团队人力集中在 ML、稳定性和 API 变更上。需求横跨 3 年、数千票，说明仍是空白。",
+  "crowd_signal": "viral",
+  "confidence": 0.9,
+  "source_finder": "gh-global-top-issues-search"
+ },
+ {
+  "title": "去中心化社交换服务器时迁移帖子与关闭回复",
+  "description": "场景：Mastodon/联邦宇宙用户想换实例（服务器关停、管理员失联、社区不合），现有迁移只能带走粉丝，不能带走历史帖子，用户原话「My posts, however, are currently impossible to restore」；另一大痛点是发帖后无法关闭回复（防骚扰），2018 年提出 251 👍 至今开放；还有新关注账号看不到其历史帖子（backfill）、想订阅其他实例的本地时间线。这些都是普通社交用户的核心体验。",
+  "audience": "Mastodon / Fediverse 普通用户，尤其是被骚扰的少数群体、小型实例用户",
+  "domain": "去中心化社交网络",
+  "evidence": [
+   {
+    "url": "https://github.com/mastodon/mastodon/issues/12423",
+    "quote": "Support Post Migration — “My posts, however, are currently _impossible_ to restore”",
+    "engagement": "308 👍, 开放中, label: Suggestion",
+    "date": "2019-11-18",
+    "platform": "GitHub Issues"
+   },
+   {
+    "url": "https://github.com/search?q=repo%3Amastodon%2Fmastodon+is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc&type=issues",
+    "quote": "\"Disable replies\" feature (#8565)",
+    "engagement": "251 👍",
+    "date": "2018-09-02",
+    "platform": "GitHub Issues"
+   },
+   {
+    "url": "https://github.com/search?q=repo%3Amastodon%2Fmastodon+is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc&type=issues",
+    "quote": "Backfill statuses from remote accounts when first subscribed (#34)",
+    "engagement": "145 👍",
+    "date": "2016-09-10",
+    "platform": "GitHub Issues"
+   },
+   {
+    "url": "https://github.com/search?q=repo%3Amastodon%2Fmastodon+is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc&type=issues",
+    "quote": "[FEATURE] Follow public local timelines from other instances (#6942)",
+    "engagement": "108 👍",
+    "date": "2018-03-28",
+    "platform": "GitHub Issues"
+   }
+  ],
+  "existing_solutions": "Mastodon 官方只支持粉丝迁移 + 数据导出；第三方脚本可导入归档但帖子不联邦、链接全断；Bluesky 用 DID 解决了身份可移植但不是同一生态；回复控制只有 Bluesky/Threads 等中心化平台做了。",
+  "why_unsolved": "ActivityPub 中帖子 ID 与实例域名绑定，迁移需要协议层扩展（FEP）与全网实例配合；回复控制在联邦协议里无法强制其他实例遵守；Mastodon 核心团队小、优先级低。7-10 年未解。",
+  "crowd_signal": "many",
+  "confidence": 0.85,
+  "source_finder": "gh-global-top-issues-search"
+ },
+ {
+  "title": "无谷歌服务手机上的可靠消息推送",
+  "description": "场景：使用 GrapheneOS、/e/OS、国产无 GMS 手机或直接下载 APK 的 Signal 用户，来电总是变成“未接来电”不响铃、消息延迟成批到达、后台 websocket 长连接导致电量消耗一半。用户要求 Signal 提供 FCM 之外的推送方式（UnifiedPush/SSE），2018 年最高票 bug 386 👍 至今开放。痛点本质：Android 生态里除了 Google 推送没有普通用户可用的替代，隐私通讯软件反而最依赖 Google。",
+  "audience": "去谷歌化 Android 用户、中国大陆无 GMS 手机用户、隐私敏感人群",
+  "domain": "即时通讯 / 移动推送基础设施",
+  "evidence": [
+   {
+    "url": "https://github.com/search?q=repo%3Asignalapp%2FSignal-Android+is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc&type=issues",
+    "quote": "Calls always income as missed ones without ringing and Signal doesn't report the call failed (#7733)",
+    "engagement": "386 👍",
+    "date": "2018-04-25",
+    "platform": "GitHub Issues"
+   },
+   {
+    "url": "https://github.com/search?q=repo%3Asignalapp%2FSignal-Android+is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc&type=issues",
+    "quote": "Excessive battery drain (#12341)",
+    "engagement": "168 👍",
+    "date": "2022-07-08",
+    "platform": "GitHub Issues"
+   },
+   {
+    "url": "https://github.com/search?q=repo%3Asignalapp%2FSignal-Android+is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc&type=issues",
+    "quote": "Signal consumes half of my battery (no google services or microG) (#9729)",
+    "engagement": "108 👍",
+    "date": "2020-06-11",
+    "platform": "GitHub Issues"
+   },
+   {
+    "url": "https://github.com/signalapp/Signal-Android/issues/13290",
+    "quote": "Add another way to receive notifications — “how can we know what Google keeps if Signal needs to transmit data to their servers for each notification/message?”",
+    "engagement": "44 👍, label: acknowledged",
+    "date": "2023-11-27",
+    "platform": "GitHub Issues"
+   },
+   {
+    "url": "https://github.com/search?q=repo%3Asignalapp%2FSignal-Android+is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc&type=issues",
+    "quote": "Secured Backup without Play Store (#14357)",
+    "engagement": "22 👍",
+    "date": "2025-10-03",
+    "platform": "GitHub Issues"
+   }
+  ],
+  "existing_solutions": "Signal 官方 websocket 后备（耗电、延迟）；社区分支 Molly 支持 UnifiedPush（需自建 ntfy/mollysocket，门槛高）；microG（兼容性差）；Element/Threema 等有 UnifiedPush 但主流应用未跟进。",
+  "why_unsolved": "Android 系统级推送被 Google 垄断，任何替代都要应用逐个适配；Signal 官方坚持 FCM 且拒绝第三方分发（F-Droid）；UnifiedPush 缺乏面向普通用户的一键方案。",
+  "crowd_signal": "many",
+  "confidence": 0.85,
+  "source_finder": "gh-global-top-issues-search"
+ },
+ {
+  "title": "Windows 多显示器独立虚拟桌面与窗口管理",
+  "description": "场景：多显示器办公用户希望切换虚拟桌面时只切换某一块屏幕（「I always have Outlook on monitor 1, but want to switch between multiple sets of apps on monitor 2 and 3 without losing whats on monitor 1」），以及在 FancyZones 分区内“最大化到分区”、自动平铺、快捷键直达分区；同时 OLED 显示器用户要求改进亚像素文字渲染（354 👍，PowerToys 全仓最高票）。这些都是 Windows 系统本身多年不做、PowerToys 也挂起 5-7 年的需求。",
+  "audience": "Windows 多显示器办公/程序员/交易员用户，OLED 显示器用户",
+  "domain": "桌面效率工具 / 窗口管理",
+  "evidence": [
+   {
+    "url": "https://github.com/search?q=repo%3Amicrosoft%2FPowerToys+is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc&type=issues",
+    "quote": "Improved subpixel text rendering for OLED (WRGB stripe, RGB triangular) (#25595)",
+    "engagement": "354 👍",
+    "date": "2023-04-18",
+    "platform": "GitHub Issues"
+   },
+   {
+    "url": "https://github.com/search?q=repo%3Amicrosoft%2FPowerToys+is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc&type=issues",
+    "quote": "Maximize/Full Screen window within a zone (virtual monitor) (#279)",
+    "engagement": "189 👍",
+    "date": "2019-09-06",
+    "platform": "GitHub Issues"
+   },
+   {
+    "url": "https://github.com/microsoft/PowerToys/issues/58",
+    "quote": "Independent virtual desktops per monitor — “I always have Outlook on monitor 1, but want to switch between multiple sets of apps on monitor 2 and 3 without losing whats on monitor 1.”",
+    "engagement": "136 👍, labels: Idea-New PowerToy, Product-Virtual Desktop",
+    "date": "2019-05-09",
+    "platform": "GitHub Issues"
+   },
+   {
+    "url": "https://github.com/search?q=repo%3Amicrosoft%2FPowerToys+is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc&type=issues",
+    "quote": "[FancyZones] Map keyboard shortcuts to zones directly (#492) / Disable focus stealing (#65) / Text Replacement / expander (#5074)",
+    "engagement": "65 / 65 / 63 👍",
+    "date": "2019-2020",
+    "platform": "GitHub Issues"
+   }
+  ],
+  "existing_solutions": "Windows 内置虚拟桌面（所有显示器一起切）；DisplayFusion（付费，部分模拟）；Dexpot 已停更；Linux 平铺 WM 无法迁移到 Windows；OLED 文字渲染只有 MacType/ClearType 调节器。",
+  "why_unsolved": "Windows 虚拟桌面 API 未公开、Shell 限制大；微软自身不做，PowerToys 团队把它标为 Idea 长期不排期；OLED 亚像素渲染需要系统级 DirectWrite 改动。",
+  "crowd_signal": "many",
+  "confidence": 0.75,
+  "source_finder": "gh-global-top-issues-search"
+ },
+ {
+  "title": "跨平台一站式听歌与自定义音源",
+  "description": "场景：中国大陆听歌用户因版权分裂要在 QQ 音乐/网易云/酷狗/酷我之间来回切换、各买 VIP。LX Music 等聚合播放器很火但内置音源因法律风险被作者移除，用户只能在 issue 里互传“音源”脚本；#5「音乐无法加载的问题」265 👍、#1643「LX 以后的发展方向」220 👍、#2263「收集而来的音源」133 👍。这属于典型“平台不给、社区反复造轮子”信号，需求是合法可持续地跨平台搜索/播放/同步歌单。",
+  "audience": "中国大陆多平台音乐听众、不愿同时开多个 VIP 的学生/白领",
+  "domain": "音乐播放 / 多平台聚合",
+  "evidence": [
+   {
+    "url": "https://github.com/search?q=repo%3Alyswhut%2Flx-music-desktop+is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc&type=issues",
+    "quote": "音乐无法加载的问题 (#5)",
+    "engagement": "265 👍",
+    "date": "2019-08-28",
+    "platform": "GitHub Issues"
+   },
+   {
+    "url": "https://github.com/search?q=repo%3Alyswhut%2Flx-music-desktop+is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc&type=issues",
+    "quote": "LX 以后的发展方向 (#1643)",
+    "engagement": "220 👍",
+    "date": "2023-10-22",
+    "platform": "GitHub Issues"
+   },
+   {
+    "url": "https://github.com/search?q=repo%3Alyswhut%2Flx-music-desktop+is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc&type=issues",
+    "quote": "收集而来的音源。 (#2263) / 自己收集的几个可用源 (#1769) / [Bug]: 关于URL过期无法放歌的问题，大家不要开issue了，避免\"名气\"大了引起某方注意 (#1614)",
+    "engagement": "133 / 85 / 52 👍",
+    "date": "2023-2025",
+    "platform": "GitHub Issues"
+   },
+   {
+    "url": "https://github.com/search?q=is%3Aissue+is%3Aopen+%E5%B8%8C%E6%9C%9B+%E5%8A%9F%E8%83%BD+sort%3Areactions-%2B1-desc&type=issues",
+    "quote": "LX Music 项目发展调整与新项目计划 (#1912)",
+    "engagement": "88 👍；lx-music-desktop 仓库开放 issue 1.3k",
+    "date": "2024-05-26",
+    "platform": "GitHub Issues"
+   }
+  ],
+  "existing_solutions": "各平台 App + VIP；LX Music / listen1 / MusicFree 等聚合器（依赖灰色音源、频繁失效、作者承压）；Apple Music/Spotify 在大陆曲库不全。",
+  "why_unsolved": "版权分割是商业问题，聚合器抓取处于法律灰区，作者被迫抽掉内置源；合法路径需要版权授权或“只做歌单管理/跨平台跳转”的产品形态，没人系统做。",
+  "crowd_signal": "many",
+  "confidence": 0.7,
+  "source_finder": "gh-global-top-issues-search"
+ },
+ {
+  "title": "密码管理器浏览器自动填充可靠性",
+  "description": "场景：Bitwarden 用户点击扩展图标要等数秒才弹出（288 👍，2024 年提出至今最高票）、登录新网站时不提示保存/更新密码（109 👍，2021）、复制密码后留在 Windows 剪贴板历史里（96 👍，2020）、Windows Hello 解锁弹窗跑到后台（71+50 👍）。这些都是普通消费者每天碰到的体验断点，开源/免费密码管理器长期没修好。",
+  "audience": "使用 Bitwarden 等密码管理器浏览器扩展的普通用户、Windows 用户",
+  "domain": "密码管理 / 浏览器扩展",
+  "evidence": [
+   {
+    "url": "https://github.com/search?q=repo%3Abitwarden%2Fclients+is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc&type=issues",
+    "quote": "Delay in opening the Bitwarden popup after clicking the icon (#12286)",
+    "engagement": "288 👍",
+    "date": "2024-12-08",
+    "platform": "GitHub Issues"
+   },
+   {
+    "url": "https://github.com/search?q=repo%3Abitwarden%2Fclients+is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc&type=issues",
+    "quote": "Bitwarden does not prompt to save or update credentials (#1620)",
+    "engagement": "109 👍",
+    "date": "2021-02-18",
+    "platform": "GitHub Issues"
+   },
+   {
+    "url": "https://github.com/search?q=repo%3Abitwarden%2Fclients+is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc&type=issues",
+    "quote": "Windows 10 (and later): clipboard history keeps passwords after being copied from BW desktop app or browser addon (#2621)",
+    "engagement": "96 👍",
+    "date": "2020-09-25",
+    "platform": "GitHub Issues"
+   },
+   {
+    "url": "https://github.com/search?q=repo%3Abitwarden%2Fclients+is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc&type=issues",
+    "quote": "The Windows Hello dialogue appears in the background when attempting to unlock the Firefox extension (#13655)",
+    "engagement": "71 👍",
+    "date": "2025-03-02",
+    "platform": "GitHub Issues"
+   }
+  ],
+  "existing_solutions": "1Password（付费、闭源、体验好）；浏览器内置密码管理（跨浏览器不通）；KeePassXC + 浏览器插件（配置复杂）；Bitwarden 免费但上述问题多年未解。",
+  "why_unsolved": "浏览器扩展平台（MV3、Windows Hello、剪贴板 API）限制多，Bitwarden 团队精力在企业功能与架构迁移；表单检测启发式难做对。",
+  "crowd_signal": "many",
+  "confidence": 0.6,
+  "source_finder": "gh-global-top-issues-search"
+ },
+ {
+  "title": "Telegram 桌面端端到端加密密聊",
+  "description": "场景：Telegram 桌面用户希望在电脑上也能发起/使用 Secret Chat（端到端加密、自毁消息），2015 年提出的 #871 至今开放、220 👍，是 tdesktop 高票需求。痛点：Telegram 默认云聊天非端到端加密，桌面用户无法获得隐私聊天，只能回到手机。",
+  "audience": "Telegram 桌面（Windows/Linux/macOS tdesktop）用户、关注隐私的普通用户",
+  "domain": "即时通讯 / 隐私",
+  "evidence": [
+   {
+    "url": "https://github.com/telegramdesktop/tdesktop/issues/871",
+    "quote": "Secret chat — “I would be wonderful to create and send secret chats on telegram desktop.”",
+    "engagement": "220 👍, label: enhancement, 开放中",
+    "date": "2015-07-02",
+    "platform": "GitHub Issues"
+   },
+   {
+    "url": "https://github.com/search?q=is%3Aissue+is%3Aopen+%22sync%22+%22between+devices%22+sort%3Areactions-%2B1-desc&type=issues",
+    "quote": "telegramdesktop/tdesktop #871 Secret chat 在全站 \"sync\" \"between devices\" 高票搜索中排第 4",
+    "engagement": "220 👍",
+    "date": "2015-07-02",
+    "platform": "GitHub Search"
+   }
+  ],
+  "existing_solutions": "Telegram 手机端 Secret Chat（设备绑定，不同步）；Telegram macOS 原生客户端有限支持；Signal/Matrix 桌面端 E2EE 但需要换生态。",
+  "why_unsolved": "MTProto 密聊设计为单设备绑定、不能多端同步，Telegram 官方明确不在 tdesktop 实现；属于平台意愿问题，社区无法绕过。",
+  "crowd_signal": "many",
+  "confidence": 0.7,
+  "source_finder": "gh-global-top-issues-search"
+ },
+ {
+  "title": "Matrix 客户端多账户与通知定制",
+  "description": "场景：Element/Matrix 用户有工作和私人两个账号却不能同时登录（Android #26，2019 年提出，维护者承认「The SDK already support multi-account」但缺 UI/产品决策）；桌面端不能自定义来电/通知铃声（163 👍，2017）、通知“卡住”不消失（178 👍）、语音会议缺按键说话（197 👍）。这是开源聊天客户端在日常可用性上的长尾缺口。",
+  "audience": "Matrix/Element 普通用户、有工作+私人账号的人、开源社区成员",
+  "domain": "即时通讯客户端",
+  "evidence": [
+   {
+    "url": "https://github.com/element-hq/element-android/issues/26",
+    "quote": "multiple accounts — 维护者：“The SDK already support multi-account” 但需 UI/UX、通知、登出等决策",
+    "engagement": "75 👍, labels: O-Frequent, T-Enhancement, X-Needs-Design, X-Needs-Product",
+    "date": "2019-02-05",
+    "platform": "GitHub Issues"
+   },
+   {
+    "url": "https://github.com/search?q=repo%3Aelement-hq%2Felement-web+is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc&type=issues",
+    "quote": "Customize ringing/notification sound (#5891)",
+    "engagement": "163 👍",
+    "date": "2017-12-28",
+    "platform": "GitHub Issues"
+   },
+   {
+    "url": "https://github.com/search?q=repo%3Aelement-hq%2Felement-web+is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc&type=issues",
+    "quote": "Push-to-talk in video/voice conferencing (#5993) / Stuck notifications (#24392)",
+    "engagement": "197 / 178 👍",
+    "date": "2018-01-16 / 2023-02-01",
+    "platform": "GitHub Issues"
+   },
+   {
+    "url": "https://github.com/search?q=is%3Aissue+is%3Aopen+language%3Akotlin+sort%3Areactions-%2B1-desc&type=issues",
+    "quote": "element-hq/element-android #26 multiple accounts 在全站 language:kotlin 高票 issue 中排第 1",
+    "engagement": "75 👍",
+    "date": "2019-02-05",
+    "platform": "GitHub Search"
+   }
+  ],
+  "existing_solutions": "FluffyChat / SchildiChat 支持多账户但生态小；Element X 重写中仍未提供多账户；桌面通知声只能全局系统设置。",
+  "why_unsolved": "Element 商业公司精力放在 Element X 重写与企业客户；多账户涉及通知/加密密钥/登出的产品决策一直挂 Needs-Product。",
+  "crowd_signal": "many",
+  "confidence": 0.65,
+  "source_finder": "gh-global-top-issues-search"
+ },
+ {
+  "title": "视频平台关键词/频道屏蔽与多端订阅同步",
+  "description": "场景：NewPipe 等第三方 YouTube 客户端用户想屏蔽特定频道、视频和关键词以避免剧透与垃圾内容（#1815，2018，带 bounty 标签，「Is it possible to add a features which blocks videos that have a certain keyword(s)?」），想在手机/电脑之间同步订阅与播放列表（#5325），想批量下载整个播放列表（#5482），想把 NewPipe 移植到其他平台（#1051，135 👍）。YouTube 官方只有弱化的“不感兴趣”，无关键词屏蔽、无跨端第三方同步。",
+  "audience": "重度 YouTube/短视频观看者、不想被算法推荐打扰的用户、多设备用户",
+  "domain": "视频消费 / 内容过滤",
+  "evidence": [
+   {
+    "url": "https://github.com/TeamNewPipe/NewPipe/issues/1815",
+    "quote": "Blacklist videos, channels and keywords — “Is it possible to add a features which blocks videos that have a certain keyword(s)?”",
+    "engagement": "57 👍, labels: bounty, discussion, feature request",
+    "date": "2018-10-14",
+    "platform": "GitHub Issues"
+   },
+   {
+    "url": "https://github.com/search?q=repo%3ATeamNewPipe%2FNewPipe+is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc&type=issues",
+    "quote": "NewPipe ports on other platforms (#1051)",
+    "engagement": "135 👍",
+    "date": "2018-01-30",
+    "platform": "GitHub Issues"
+   },
+   {
+    "url": "https://github.com/search?q=repo%3ATeamNewPipe%2FNewPipe+is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc&type=issues",
+    "quote": "Quick downloads in bulk - download multiple videos, queue or playlist (#5482) / Sync between devices (#5325) / Unified player should be optional (#4460)",
+    "engagement": "35 / 27 / 49 👍",
+    "date": "2020-2021",
+    "platform": "GitHub Issues"
+   },
+   {
+    "url": "https://github.com/search?q=repo%3ATeamNewPipe%2FNewPipe+is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc&type=issues",
+    "quote": "[YouTube] \"Sign in to confirm...\"/\"Watch on the latest version...\" (#11139)",
+    "engagement": "138 👍（说明维护者精力全被平台反爬消耗）",
+    "date": "2024-06-07",
+    "platform": "GitHub Issues"
+   }
+  ],
+  "existing_solutions": "YouTube 内置“不推荐此频道”（无关键词）；桌面浏览器扩展 BlockTube/Unhook（仅桌面）；NewPipe/FreeTube/Grayjay 各自孤岛，无同步。",
+  "why_unsolved": "YouTube 频繁改动反爬，志愿者团队所有精力用于保活；跨端同步需要账号/服务端，与隐私定位冲突；平台方无动力提供屏蔽。",
+  "crowd_signal": "several",
+  "confidence": 0.7,
+  "source_finder": "gh-global-top-issues-search"
+ },
+ {
+  "title": "笔记应用层级标签与多资料库切换",
+  "description": "场景：Joplin 用户想要 Evernote 那样的嵌套/层级标签（#375，2018，77 👍，标记 high 优先级）；想在同一台电脑区分工作/私人两套笔记库并快速切换或同时打开（#591，2018，77 👍）；移动端要后台自动同步（#3872）；还有 250 👍 要求上架 F-Droid。反映的通用需求：本地优先笔记工具的组织能力与多身份隔离仍弱。",
+  "audience": "个人知识管理用户、从 Evernote 迁出的用户、公私分离的职场人",
+  "domain": "笔记 / 个人知识管理",
+  "evidence": [
+   {
+    "url": "https://github.com/laurent22/joplin/issues/375",
+    "quote": "[Feature request] Hierarchical tags — “Like a Evernote”",
+    "engagement": "77 👍, labels: cli, desktop, enhancement, high, mobile",
+    "date": "2018-04-04",
+    "platform": "GitHub Issues"
+   },
+   {
+    "url": "https://github.com/laurent22/joplin/issues/591",
+    "quote": "[Feature Request] run multiple instances of Joplin — “having the same app supports or load multiple profiles cannot be done without a massive refactoring”",
+    "engagement": "77 👍, label: enhancement",
+    "date": "2018-06-06",
+    "platform": "GitHub Issues"
+   },
+   {
+    "url": "https://github.com/search?q=repo%3Alaurent22%2Fjoplin+is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc&type=issues",
+    "quote": "F-Droid (#15) / background sync on mobile devices (#3872) / Add a \"Copy code\" button on code blocks (#2383)",
+    "engagement": "250 / 25 / 45 👍",
+    "date": "2017-2020",
+    "platform": "GitHub Issues"
+   }
+  ],
+  "existing_solutions": "Evernote（嵌套标签，闭源涨价）；Obsidian（嵌套标签靠 # 语法与插件，多库切换可但同步付费）；Joplin 后来加了 profiles 切换但需重启，层级标签仍无；Notion 无标签层级概念。",
+  "why_unsolved": "层级标签涉及数据模型与同步格式（Markdown/前端元数据）兼容性；多实例需要重构数据库锁与同步；维护者以单人为主，优先级排在稳定性之后。",
+  "crowd_signal": "many",
+  "confidence": 0.65,
+  "source_finder": "gh-global-top-issues-search"
+ },
+ {
+  "title": "开源密码库对硬件安全密钥与TOTP扫码支持",
+  "description": "场景：KeePassXC 用户想用 Nitrokey/PKCS#11 智能卡（#255，155 👍，2017）和 FIDO2 hmac-secret（#3560，116 👍，2019）解锁数据库、扫二维码直接添加 TOTP（#4825，52 👍，2020）、自定义条目字段布局（#863/#8228，87/71 👍）。安全意识用户想在本地开源方案里获得与商业密码管理器同等的硬件密钥体验，长期未落地。",
+  "audience": "自管密码库的安全敏感个人用户、使用 YubiKey/Nitrokey 的用户",
+  "domain": "密码管理 / 身份安全",
+  "evidence": [
+   {
+    "url": "https://github.com/search?q=repo%3Akeepassxreboot%2Fkeepassxc+is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc&type=issues",
+    "quote": "Add Nitrokey Pro and PKCS#11 support (#255)",
+    "engagement": "155 👍",
+    "date": "2017-02-04",
+    "platform": "GitHub Issues"
+   },
+   {
+    "url": "https://github.com/search?q=repo%3Akeepassxreboot%2Fkeepassxc+is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc&type=issues",
+    "quote": "Add support for hmac-secret FIDO2 extension (#3560)",
+    "engagement": "116 👍",
+    "date": "2019-09-20",
+    "platform": "GitHub Issues"
+   },
+   {
+    "url": "https://github.com/search?q=repo%3Akeepassxreboot%2Fkeepassxc+is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc&type=issues",
+    "quote": "Add support for customizable entry layouts (#863) / Add TOTP Entry via QR Code (#4825) / Option to not minimize after auto-type (#3457)",
+    "engagement": "87 / 52 / 56 👍",
+    "date": "2017-2020",
+    "platform": "GitHub Issues"
+   }
+  ],
+  "existing_solutions": "KeePassXC 仅支持 YubiKey HMAC-SHA1 challenge-response；Bitwarden/1Password 支持 FIDO2 但云端；KeePassDX（Android）扫码 TOTP 可用但桌面缺失。",
+  "why_unsolved": "FIDO2 hmac-secret 与 PKCS#11 跨平台集成（libfido2、驱动、KDBX 格式扩展）复杂且需与 KeePass 生态兼容；志愿者团队小。",
+  "crowd_signal": "many",
+  "confidence": 0.6,
+  "source_finder": "gh-global-top-issues-search"
+ },
+ {
+  "title": "自托管网盘的增量同步与账号改名",
+  "description": "场景：Nextcloud 个人/小团队用户同步大文件（加密容器、虚拟机镜像 30-100GB）时每次改动都要全量上传，要求 delta-sync（#417，2016，58 👍，标签 '1. to develop' 十年未做，「Delta Sync would also provide you a feature to distinguish from owncloud」）；用户改名/换邮箱后不能更改登录名（#5488，87 👍，2017）；日历共享“仅显示忙碌”（#11214，53 👍）；生日日历提醒可选（#1505，70 👍）。",
+  "audience": "自托管 Nextcloud 的个人、家庭与小商家",
+  "domain": "云盘同步 / 自托管协作",
+  "evidence": [
+   {
+    "url": "https://github.com/nextcloud/server/issues/417",
+    "quote": "Delta-sync, or sync only changed bytes in a file — “Delta Sync would also provide you a feature to distinguish from owncloud”",
+    "engagement": "58 👍, labels: 1. to develop, enhancement, feature: dav, performance",
+    "date": "2016-07-15",
+    "platform": "GitHub Issues"
+   },
+   {
+    "url": "https://github.com/search?q=repo%3Anextcloud%2Fserver+is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc&type=issues",
+    "quote": "Change/rename login name (#5488)",
+    "engagement": "87 👍",
+    "date": "2017-06-20",
+    "platform": "GitHub Issues"
+   },
+   {
+    "url": "https://github.com/search?q=repo%3Anextcloud%2Fserver+is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc&type=issues",
+    "quote": "Users should be able to choose whether reminders are generated for events in the birthday calendar (#1505) / Share calendar to users or groups with 'show only as busy' (#11214)",
+    "engagement": "70 / 53 👍",
+    "date": "2016-09-25 / 2018-09-14",
+    "platform": "GitHub Issues"
+   }
+  ],
+  "existing_solutions": "Dropbox/OneDrive 有块级增量同步（闭源云）；Syncthing 有块级同步但是 P2P 无服务端；Nextcloud/ownCloud 仍全量上传；Seafile 有增量但生态弱。",
+  "why_unsolved": "WebDAV 协议无分块差量语义，需要服务端存储层与所有客户端同时改造；Nextcloud GmbH 商业重心在企业协作而非个人同步性能；登录名与文件路径/共享绑定导致改名复杂。",
+  "crowd_signal": "several",
+  "confidence": 0.65,
+  "source_finder": "gh-global-top-issues-search"
+ },
+ {
+  "title": "开源导航的实时路况与地点评分",
+  "description": "场景：使用 OsmAnd/Organic Maps 等 OpenStreetMap 导航的用户，最想要实时路况绕行（#6878，102 👍，2019，「it would be an enormous relief, if it was possible to access traffic information databases, that include traffic jam, construction sites, road closings」，维护者仅标 Nice to Have），其次想要地点评分（#11111，49 👍）、开源街景（#4942，36 👍）、室内地图。开源导航在“信息鲜活度”上与 Google Maps 差距最大且无人填补。",
+  "audience": "隐私优先或离线导航的驾驶者、OSM 社区用户、不能用 Google 服务的地区用户",
+  "domain": "地图导航",
+  "evidence": [
+   {
+    "url": "https://github.com/osmandapp/OsmAnd/issues/6878",
+    "quote": "Possibility of avoiding traffic jam? — “it would be an enormous relief, if it was possible to access traffic information databases, that include traffic jam, construction sites, road closings, etc”",
+    "engagement": "102 👍, label: Nice to Have",
+    "date": "2019-04-27",
+    "platform": "GitHub Issues"
+   },
+   {
+    "url": "https://github.com/search?q=repo%3Aosmandapp%2FOsmAnd+is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc&type=issues",
+    "quote": "Adding a places rating system (#11111) / Support for WMS/WMTS (#4201) / [REQUEST] Mapillary FOSS alternative (#4942)",
+    "engagement": "49 / 41 / 36 👍",
+    "date": "2017-2021",
+    "platform": "GitHub Issues"
+   }
+  ],
+  "existing_solutions": "Google Maps / Waze / 高德（实时路况靠海量用户数据，隐私代价）；TomTom/HERE 路况 API 付费；OsmAnd/Organic Maps 完全无路况；开源评分只有零散的 OSM 标签。",
+  "why_unsolved": "实时路况需要大规模匿名探针数据或付费数据源，没有开放数据集；地点评分需要防刷与社区运营；OSM 生态缺乏商业化主体承担这类持续运营成本。",
+  "crowd_signal": "several",
+  "confidence": 0.6,
+  "source_finder": "gh-global-top-issues-search"
+ },
+ {
+  "title": "Android 移动浏览器扩展支持",
+  "description": "场景：安卓用户想在 Chromium 内核浏览器上装扩展（广告过滤、用户脚本、密码管理器、暗色模式），Brave #4493 从 2019 年挂到现在（105 👍，优先级 P3，「This is a placeholder for adding extension support for Android」），Brave 仓库还有 UI 高级自定义 106 👍、桌面主密码 56 👍。曾经能装扩展的 Kiwi Browser 已停更，需求重新无处安放。",
+  "audience": "Android 手机用户，尤其想在手机上用广告拦截/油猴脚本的人",
+  "domain": "移动浏览器",
+  "evidence": [
+   {
+    "url": "https://github.com/brave/brave-browser/issues/4493",
+    "quote": "[Android] Add support for extensions — “This is a placeholder for adding extension support for Android. This was already in progress”",
+    "engagement": "105 👍, labels: OS/Android, feature/extensions, priority/P3",
+    "date": "2019-05-18",
+    "platform": "GitHub Issues"
+   },
+   {
+    "url": "https://github.com/search?q=repo%3Abrave%2Fbrave-browser+is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc&type=issues",
+    "quote": "The UI should allow for advanced customization (#774) / [Feature Request] Master password for Brave desktop versions (#13350) / Implement \"tab groups\" feature on iOS (#42420)",
+    "engagement": "106 / 56 / 62 👍",
+    "date": "2018-2024",
+    "platform": "GitHub Issues"
+   },
+   {
+    "url": "https://github.com/search?q=is%3Aissue+is%3Aopen+language%3Aswift+sort%3Areactions-%2B1-desc&type=issues",
+    "quote": "mozilla-mobile/firefox-ios #19063 Use Gecko on iOS 17.4 and newer in EU/Japan",
+    "engagement": "38 👍（iOS 侧同类：想摆脱 WebKit 限制装完整扩展）",
+    "date": "2024-03-07",
+    "platform": "GitHub Issues"
+   }
+  ],
+  "existing_solutions": "Firefox Android（扩展白名单有限）；Kiwi Browser（2025 停更）；Edge Canary 实验性扩展；Via/X 浏览器脚本支持有限；iOS 受 WebKit 限制。",
+  "why_unsolved": "Chromium Android 构建根本没有扩展 UI 与运行时，需要巨量移植与持续维护；Google 无意开放；浏览器厂商担心性能/安全。",
+  "crowd_signal": "several",
+  "confidence": 0.6,
+  "source_finder": "gh-global-top-issues-search"
+ },
+ {
+  "title": "开源 Android 基础应用替代（录音/垃圾短信/任务）",
+  "description": "场景：Simple Mobile Tools 被卖给广告公司后，用户涌向 Fossify 分支，并在 2024 年集中提出：电话应用通话录音（#17，55 👍，「Google does NOT allow apps to use the Accessibility Service for call recording」）、短信垃圾箱/垃圾过滤（Messages #59，54 👍）、日历支持 CalDAV 任务（Calendar #36，54 👍，Kotlin 全站高票第 3）、键盘自动纠错（Keyboard #58，27 👍）、文件管理器回收站与远程存储。需求本质：无广告、无追踪的“系统级基础 App 全家桶”仍有明显功能缺口。",
+  "audience": "想用无广告开源应用替换 Google 电话/短信/日历/键盘的 Android 用户",
+  "domain": "Android 基础工具应用",
+  "evidence": [
+   {
+    "url": "https://github.com/FossifyOrg/Phone/issues/17",
+    "quote": "Call recording — “Google does NOT allow apps to use the Accessibility Service for call recording”",
+    "engagement": "55 👍, labels: feature request, needs triage",
+    "date": "2024-01-09",
+    "platform": "GitHub Issues"
+   },
+   {
+    "url": "https://github.com/search?q=org%3AFossifyOrg+is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc&type=issues",
+    "quote": "Spam folder for messages (FossifyOrg/Messages #59)",
+    "engagement": "54 👍",
+    "date": "2024-01-28",
+    "platform": "GitHub Issues"
+   },
+   {
+    "url": "https://github.com/search?q=org%3AFossifyOrg+is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc&type=issues",
+    "quote": "CalDAV Task support (FossifyOrg/Calendar #36)",
+    "engagement": "54 👍",
+    "date": "2024-01-07",
+    "platform": "GitHub Issues"
+   },
+   {
+    "url": "https://github.com/search?q=org%3AFossifyOrg+is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc&type=issues",
+    "quote": "Autocorrect / suggestion strip (Keyboard #58) / Support for remote storage via SAF (File-Manager #50) / Recycle Bin (File-Manager #89)",
+    "engagement": "27 / 21 / 19 👍；FossifyOrg 开放 issue 1.8k",
+    "date": "2024",
+    "platform": "GitHub Issues"
+   }
+  ],
+  "existing_solutions": "Google 电话（录音仅部分地区）、Google 短信垃圾过滤（云端）、Tasks.org（CalDAV 任务，独立 App）、Gboard/FUTO Keyboard；Fossify 全家桶功能缺口大。",
+  "why_unsolved": "Google Play 政策禁止无障碍方式录音，只能走 F-Droid/root；垃圾短信识别需要模型或规则库；Fossify 是刚起步的小型志愿者分支，需求积压大。",
+  "crowd_signal": "several",
+  "confidence": 0.6,
+  "source_finder": "gh-global-top-issues-search"
+ },
+ {
+  "title": "开源桌面播放器投屏到电视",
+  "description": "场景：Mac 用户用 IINA 播放本地视频想直接投到 Apple TV（AirPlay，#63，78 👍，2017，「play videos on your Apple TV without having to mirror your entire screen」）、Chromecast（#126，59 👍，2017）或 DLNA 电视（#2173，37 👍，2019）；Flutter 音频库 just_audio 也有 Casting 需求 43 👍。开源播放器在“客厅投屏”这一最普通消费场景上近十年空白。",
+  "audience": "有 Apple TV/Chromecast/智能电视、用电脑管理本地影音的家庭用户",
+  "domain": "本地影音播放 / 投屏",
+  "evidence": [
+   {
+    "url": "https://github.com/iina/iina/issues/63",
+    "quote": "Add Airplay functionality — “play videos on your Apple TV without having to mirror your entire screen”",
+    "engagement": "78 👍, label: type: feature request",
+    "date": "2017-01-06",
+    "platform": "GitHub Issues"
+   },
+   {
+    "url": "https://github.com/search?q=is%3Aissue+is%3Aopen+language%3Aswift+sort%3Areactions-%2B1-desc&type=issues",
+    "quote": "iina/iina #126 Add Chromecast support? / #2173 UPnP / DLNA support?",
+    "engagement": "59 / 37 👍（Swift 全站高票第 4、第 10）",
+    "date": "2017-01-10 / 2019-01-02",
+    "platform": "GitHub Issues"
+   },
+   {
+    "url": "https://github.com/search?q=is%3Aissue+is%3Aopen+language%3Adart+%22feature+request%22+sort%3Areactions-%2B1-desc&type=issues",
+    "quote": "ryanheise/just_audio #211 Casting support",
+    "engagement": "43 👍",
+    "date": "2020-10-18",
+    "platform": "GitHub Issues"
+   }
+  ],
+  "existing_solutions": "VLC（Chromecast 支持一般，无 AirPlay 视频推送）；Infuse（付费闭源）；系统屏幕镜像（画质/性能差）；Plex/Jellyfin 需搭服务器。",
+  "why_unsolved": "AirPlay 视频发送协议私有、mpv 内核绕开 AVFoundation 无法白嫖系统能力；Chromecast 需要 Google SDK 与注册；DLNA 需转码；志愿者播放器项目无人力。",
+  "crowd_signal": "several",
+  "confidence": 0.55,
+  "source_finder": "gh-global-top-issues-search"
+ },
+ {
+  "title": "本地时间追踪的多设备加密同步",
+  "description": "场景：ActivityWatch 这类本地优先的自动时间追踪工具用户有电脑+笔记本+手机多台设备，「If you use more than one device, you need to check every device individually」，要求 E2E 加密的中心化或 P2P 同步（#35，101 👍，2017，带 bounty、size: large 标签、里程碑 v1.0 仍未完成）。同类全站需求：imputnet/helium 浏览器 Sync 46 👍。反映的通用痛点：隐私类本地工具普遍缺少“不经第三方云的多端同步”。",
+  "audience": "自我量化/效率追踪用户、隐私优先的多设备用户",
+  "domain": "个人效率 / 时间追踪 / 本地优先同步",
+  "evidence": [
+   {
+    "url": "https://github.com/ActivityWatch/activitywatch/issues/35",
+    "quote": "Syncing — “If you use more than one device, you need to check every device individually.”",
+    "engagement": "101 👍, labels: bounty, improves: ux, size: large, type: enhancement; milestone v1.0",
+    "date": "2017-03-18",
+    "platform": "GitHub Issues"
+   },
+   {
+    "url": "https://github.com/search?q=is%3Aissue+is%3Aopen+%22sync%22+%22between+devices%22+sort%3Areactions-%2B1-desc&type=issues",
+    "quote": "imputnet/helium #90 [FR]: Sync",
+    "engagement": "46 👍",
+    "date": "2025-09-25",
+    "platform": "GitHub Issues"
+   },
+   {
+    "url": "https://github.com/search?q=repo%3Asyncthing%2Fsyncthing+is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc&type=issues",
+    "quote": "syncthing/syncthing #3388 Use decentralized discovery (DHT) / #2491 Next Gen Ignores: Requirements",
+    "engagement": "123 / 101 👍（底层同步工具自身也有 10 年未解的可用性需求）",
+    "date": "2016-07-05 / 2015-11-19",
+    "platform": "GitHub Issues"
+   }
+  ],
+  "existing_solutions": "RescueTime/Toggl（云端付费）；ActivityWatch 本地无同步；用 Syncthing 手工同步数据库易冲突。",
+  "why_unsolved": "E2E 同步需要冲突解决与设备身份体系，属于大工程；单人维护项目标了 bounty 但无人接；通用“本地优先同步层”仍缺成熟的开箱方案。",
+  "crowd_signal": "several",
+  "confidence": 0.55,
+  "source_finder": "gh-global-top-issues-search"
+ },
+ {
+  "title": "手机端闪卡所见即所得编辑器",
+  "description": "场景：AnkiDroid 用户在手机上编辑卡片时看到的是原始 HTML，要求 WYSIWYG 编辑器（#1377，85 👍，2015 年提出，标签 Accepted / Blocked by dependency / upstream-issue，用户称这会让 AnkiDroid「definitely independent...from Anki Desktop」）。同仓库还有自定义备份位置 24 👍、备份还原 App 设置 17 👍、TTS 标签 23 👍。学生群体在手机上完成全部记忆卡制作的需求 11 年未满足。",
+  "audience": "用 Anki/AnkiDroid 背单词、考医考法的学生与终身学习者",
+  "domain": "学习 / 间隔重复记忆",
+  "evidence": [
+   {
+    "url": "https://github.com/ankidroid/Anki-Android/issues/1377",
+    "quote": "'What-You-See-Is-What-You-Get' note editor (no HTML code visible to user) — 会让 AnkiDroid “definitely independent...from Anki Desktop”",
+    "engagement": "85 👍, labels: Accepted, Blocked by dependency, Enhancement, Keep Open, Priority-Medium, upstream-issue",
+    "date": "2015-07-28",
+    "platform": "GitHub Issues"
+   },
+   {
+    "url": "https://github.com/search?q=repo%3Aankidroid%2FAnki-Android+is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc&type=issues",
+    "quote": "Support for choosing a custom backup location (#15034) / Add support for TTS tags (#14358) / Feature request: Backup and restore App settings (#9762)",
+    "engagement": "24 / 23 / 17 👍",
+    "date": "2021-2023",
+    "platform": "GitHub Issues"
+   }
+  ],
+  "existing_solutions": "Anki 桌面版编辑器（需电脑）；AnkiDroid 原始 HTML 编辑；AnkiMobile（iOS 付费）；Quizlet/RemNote 等闭源替代但不兼容 Anki 卡组。",
+  "why_unsolved": "被上游 Anki 编辑器架构（桌面 Web 编辑器）依赖阻塞，AnkiDroid 团队等待上游复用；移动端富文本+LaTeX+媒体编辑实现复杂。",
+  "crowd_signal": "several",
+  "confidence": 0.55,
+  "source_finder": "gh-global-top-issues-search"
+ },
+ {
+  "title": "免费无广告、链接不失效的追剧入口",
+  "description": "用户是想追国内外剧集/电影/动漫的普通中文观众。场景：想看某部剧，正版平台要开 VIP 且仍有广告，第三方免费站广告多、经常跳转彩票/赌博广告、隔几天就失效或跑路，TVBox 类方案又要自己找配置源。痛点：没有一个稀定、干净、持续维护的『在哪能干净地看』的入口。社区用一个 10.4k star 的人工维护清单 + 每日自动检测有效性来顶替这个产品，清单里 117 条资源分 9 类（在线站 47、磁力 16、TVBox 配置源 15、TVBox 壳 7、网盘搜索 4…）。issue 里持续出现『某站植入彩票广告』『作者跑路停止维护』『某站改积分制应下架』等报告，说明免费资源的退化是常态。",
+  "audience": "中文影视观众 / 智能电视用户",
+  "domain": "娱乐/影音",
+  "evidence": [
+   {
+    "url": "https://github.com/laoma2053/awesome-zhuiju-free",
+    "quote": "免费无广告的追剧资源指南，人工精选资源、每天检测资源有效性；核心诉求『纯净追剧』，README 点名『广告、链接失效、体验变化』是常见痛点",
+    "platform": "GitHub",
+    "engagement": "10.4k stars, 687 forks, 13 open issues, 117 curated entries in 9 categories",
+    "date": "2026-09-27 (updated 8 hours ago)"
+   },
+   {
+    "url": "https://github.com/laoma2053/awesome-zhuiju-free/issues?q=is%3Aissue+sort%3Areactions-%2B1-desc",
+    "quote": "#28 [报告] ZIP0 有视频植入彩票广告；#26 [报告] 羊壳作者已跑路，停止维护；#32 [报告] IFN网站应该下架，他已经使用积分制",
+    "platform": "GitHub",
+    "engagement": "12 issues visible; reaction counts not rendered",
+    "date": "unknown"
+   },
+   {
+    "url": "https://github.com/search?q=repo%3Aopen-source-ideas%2Fideas+is%3Aissue+streaming+OR+netflix+OR+movie&type=issues&s=reactions&o=desc",
+    "quote": "#106 Turn any website into TV app w/ Raspberry Pi and Electron — 6 reactions; #21 Netflix.com Kodi plugin using Electron — 13 reactions",
+    "platform": "GitHub",
+    "engagement": "6 and 13 reactions",
+    "date": "2018-08-16 / 2016-10-20"
+   }
+  ],
+  "existing_solutions": "爱奇艺/腾讯/优酷等正版平台（VIP + 贴片广告 + 独播分散）；各类免费影视站（广告多、失效快、跑路）；TVBox/影视仓等开源播放壳（需自行寻找和更换配置源）；网盘搜索站（资源零散）。",
+  "why_unsolved": "版权决定了正版内容分散在多家付费平台，免费聚合站没有合法商业模式，只能靠广告或积分变现、最终退化或消失；因此需求只能靠社区人工清单 + 有效性巡检来暂时满足，无法做成产品化的稳定服务。",
+  "crowd_signal": "viral",
+  "confidence": 0.85,
+  "source_finder": "gh-ideas-and-awesome-lists"
+ },
+ {
+  "title": "健康/经期等敏感数据的无追踪 App",
+  "description": "用户是普通手机用户（尤其女性、健身人群）。场景：记录经期、体重、运动、睡眠等最私密的数据，但主流 App（Google/Fitbit/小米生态、各类经期 App）把这些数据接进广告和数据中介体系，权限过度、暗含遥测；中文用户还额外不想依赖国内应用商店或 Google Play。痛点：找不到『开源、无广告、免费、不上传』且体验不差的日常 App，只能靠 awesome-privacy（19.9k star）和中文 FOSS Android 列表（448 star）这类替代清单一个个筛。",
+  "audience": "注重隐私的普通用户 / 中文 Android 用户",
+  "domain": "健康/隐私",
+  "evidence": [
+   {
+    "url": "https://github.com/pluja/awesome-privacy",
+    "quote": "health related data is among the most coveted（提醒避开 Google、Fitbit、Xiaomi 的应用）；these cute pink apps are greedy for your menstrual cycle and intimate life data；部分 App 使用 hidden telemetry 及与功能无关的过度权限",
+    "platform": "GitHub",
+    "engagement": "19.9k stars; Fitness and Health 分 4 个子类, Dating Apps 仅 1 个替代",
+    "date": "2026"
+   },
+   {
+    "url": "https://github.com/ivon852/awesome-foss-android-apps",
+    "quote": "如果不想依賴Google Play或中國的應用程式商店，並且想尋找「開源、無廣告、免費」的APP，那麼以下列表值得您參考。",
+    "platform": "GitHub",
+    "engagement": "448 stars; Health 类仅 6 条, Finance 仅 4 条, 而 Games 45+、Tools 40+",
+    "date": "2026-07-29"
+   },
+   {
+    "url": "https://github.com/awesome-selfhosted/awesome-selfhosted",
+    "quote": "自托管替代品总清单（用户不信任/不愿付费的商业品类的集合）",
+    "platform": "GitHub",
+    "engagement": "322.1k stars",
+    "date": "2026"
+   }
+  ],
+  "existing_solutions": "主流商业 App（数据进广告体系）；Drip/openWorkout 等开源替代（数量少、功能与体验落后，中文列表里健康类仅 6 条）；自托管方案（门槛高）。",
+  "why_unsolved": "健康数据本身就是商业 App 的变现资产，主流厂商没有动机放弃；开源替代靠志愿者维护，在同步、可穿戴设备接入、UI 上难以追平；中文市场上应用商店与账号体系进一步绑定用户。",
+  "crowd_signal": "viral",
+  "confidence": 0.7,
+  "source_finder": "gh-ideas-and-awesome-lists"
+ },
+ {
+  "title": "家庭私有医疗记录聚合管理",
+  "description": "用户是患者及其家庭。场景：一个人的就诊、化验、保险、处方记录分散在多家医院/诊所/化验所/保险公司，想要一个自己掌握的、私有的、离线的『全家病历本』。痛点：现有 EMR 都是给诊所用的（如 OpenEMR），面向个人/家庭的只有云端商业服务，隐私不可控。fasten-onprem 的作者明确写『找不到任何符合我需要的软件所以自己做』，项目获 2.8k star、195 个 open issue，却在 2026-07-18 归档，社区随即出现 fork 续做（yourphr），说明需求仍在而供给再次断档。",
+  "audience": "患者 / 家庭主要照护者",
+  "domain": "医疗/健康",
+  "evidence": [
+   {
+    "url": "https://github.com/fastenhealth/fasten-onprem",
+    "quote": "I realized that my medical history is distributed across many healthcare providers. I wanted a single private location to store our medical records, and I just couldn't find any software that worked as I'd like",
+    "platform": "GitHub",
+    "engagement": "2.8k stars, 182 forks, 195 open issues, 1,078 commits; repository archived July 18, 2026",
+    "date": "2026-07-18"
+   },
+   {
+    "url": "https://github.com/search?q=in%3Areadme+%22couldn%27t+find+any%22+%22so+I+built%22&type=repositories&s=stars&o=desc",
+    "quote": "jwilleke/yourphr — yourphr is an open-source, self-hosted, personal/family electronic medical record manager（同一 README 描述的续作/衍生）",
+    "platform": "GitHub",
+    "engagement": "11 stars, updated 39 minutes ago",
+    "date": "2026-09-27"
+   }
+  ],
+  "existing_solutions": "医院各自的 App/小程序、Apple Health 记录（仅限部分地区和接入医院）、Fasten Connect 商业云版、OpenEMR（面向诊所）。",
+  "why_unsolved": "医疗数据接口（FHIR/各国医保系统）碎片化且授权复杂，个人版只能手动导入；开源项目靠单人维护，商业化困难导致归档；隐私敏感使用户不信任云端方案。",
+  "crowd_signal": "many",
+  "confidence": 0.75,
+  "source_finder": "gh-ideas-and-awesome-lists"
+ },
+ {
+  "title": "本地小店零佣金电商/配送网络",
+  "description": "用户是本地实体小商户及希望支持本地经济的消费者。场景：小店想线上卖货/送货，但只能进驻抽佣平台（电商/外卖/本地生活），利润被平台和定向广告吞掉。痛点：缺一个不抽佣、不做定向广告、按城市组网的去中心化本地电商与配送网络。这是 6.8k star 的 open-source-ideas 仓库里反应数最高的 idea（98 reactions），2018 年提出至今仍 open。",
+  "audience": "本地实体小商户 / 本地消费者",
+  "domain": "本地商业/电商",
+  "evidence": [
+   {
+    "url": "https://github.com/open-source-ideas/ideas/issues/78",
+    "quote": "Nile is a decentralized ecommerce that promotes local stores, and it's commission free: all the money you pay for a good goes directly to the seller. … The big companies that owns the online market don't pay taxes, they underpay their employees, and they are disrupting local economies.",
+    "platform": "GitHub",
+    "engagement": "98 reactions (repo 6.8k stars, 276 open ideas); labels: Advanced, Much work, Futuristic tech/Unique ideas",
+    "date": "2018-08-06"
+   }
+  ],
+  "existing_solutions": "亚马逊/淘宝/美团等抽佣平台；Shopify/微店等自建店（仍需自己解决流量和配送）；WooCommerce 等开源电商（单店、无本地网络与配送）。",
+  "why_unsolved": "网络效应与配送体系是平台护城河，去中心化方案需要同时解决支付、法律、物流与冷启动，issue 本身就在招募『developers, lawyers, and advertisers』，社区无法凭志愿者完成。",
+  "crowd_signal": "many",
+  "confidence": 0.6,
+  "source_finder": "gh-ideas-and-awesome-lists"
+ },
+ {
+  "title": "视障者步行避人导航 App",
+  "description": "用户是视障人士。场景：在人流密集的人行道上行走，需要知道人群从哪一侧过来并及时变向。痛点：现有辅助 App 多是物体/文字识别或远程人工帮助，缺少实时人流方向感知与语音引导。open-source-ideas 里该 idea 获 32 reactions，2019 年提出至今 open。",
+  "audience": "视障人士及其家属",
+  "domain": "无障碍",
+  "evidence": [
+   {
+    "url": "https://github.com/open-source-ideas/ideas/issues/188",
+    "quote": "We can use phone's camera to see from which side more people are coming on a footpath and give voice instructions to user to change their direction.",
+    "platform": "GitHub",
+    "engagement": "32 reactions; labels: AI/ML, Mobile app, Voice assistant, IoT",
+    "date": "2019-07-08"
+   }
+  ],
+  "existing_solutions": "Seeing AI / Google Lookout（识别物体与文字）、Be My Eyes（远程真人）、导航类 App（无近场人流感知）。",
+  "why_unsolved": "手机端实时人流检测与可靠语音引导涉及安全责任与算力限制，商业公司规避风险，开源项目缺乏可持续团队。",
+  "crowd_signal": "many",
+  "confidence": 0.5,
+  "source_finder": "gh-ideas-and-awesome-lists"
+ },
+ {
+  "title": "私人聚会邀请与 RSVP 管理",
+  "description": "用户是经常组织生日/派对/家庭聚会的普通人。场景：给一批熟人发邀请、收集回复、管理常客名单并复用到下一次活动。痛点：要么发邮件/群消息（没有邀请人和 RSVP 管理），要么用 Evite/Paperless Post 等广告驱动的商业服务；开源活动软件全是面向公开活动或学术会议，或只支持一次性单场活动。该需求在 open-source-ideas（20 reactions）和 captn3m0/ideas（『One-Page RSVP Platform』『One Page Event Hosting platform』）两个清单中重复出现。",
+  "audience": "普通个人 / 家庭活动组织者",
+  "domain": "社交/活动",
+  "evidence": [
+   {
+    "url": "https://github.com/open-source-ideas/ideas/issues/101",
+    "quote": "the choice is between sending an email to my friends (no easy invitee or RSVP management), or using an ad-driven business … the open source ones are all geared towards public events and/or academic conferences...or designed for a single one-time party",
+    "platform": "GitHub",
+    "engagement": "20 reactions; labels: Intermediate, Medium work",
+    "date": "2018-08-13"
+   },
+   {
+    "url": "https://github.com/captn3m0/ideas",
+    "quote": "One-Page RSVP Platform on Edge Compute — Serverless RSVP system deployable on Netlify/Cloudflare Workers; One Page Event Hosting platform — Minimal event page with weather integration, RSVP forms",
+    "platform": "GitHub",
+    "engagement": "531 stars",
+    "date": "2026-09-10"
+   }
+  ],
+  "existing_solutions": "Evite / Paperless Post / Facebook Events（广告驱动、需账号）；微信群/邮件（无 RSVP 管理）；Mobilizon、Pretix 等开源工具（面向公开活动/售票）。",
+  "why_unsolved": "私人聚会频次低、用户不愿付费，商业产品只能靠广告和通讯录变现；开源社区更愿做公开活动/会议系统，对『熟人小圈子 + 可复用名单』这种轻量场景缺乏兴趣。",
+  "crowd_signal": "several",
+  "confidence": 0.65,
+  "source_finder": "gh-ideas-and-awesome-lists"
+ },
+ {
+  "title": "跨设备统一音乐播放与音频推流",
+  "description": "用户是既有本地音乐库又用流媒体、且在电脑/手机/多音箱之间切换的普通听众。场景：想在 Linux/macOS/Android 上用同一个播放器管理本地音乐并同步歌单；想把电脑声音无线推到手机/多台设备同步播放。痛点：优秀的跨平台播放器（Tomahawk）已被放弃，SoundWire/SoundSeeder 等推流 App 只有闭源商业版。open-source-ideas 中三条相关 idea 共 44 reactions；Divide-By-0 清单也有多条围绕 Spotify 歌单的补丁式点子。",
+  "audience": "多设备普通听众",
+  "domain": "音乐/音频",
+  "evidence": [
+   {
+    "url": "https://github.com/open-source-ideas/ideas/issues/132",
+    "quote": "It is a elegant, feature rich cross platform open source music player that has been abandoned. … I prefer keeping my music local instead of constantly streaming and in theory, it would have allowed me to use one application whether I was on a Linux desktop, Android phone or Macbook.",
+    "platform": "GitHub",
+    "engagement": "15 reactions",
+    "date": "2019-01-11"
+   },
+   {
+    "url": "https://github.com/open-source-ideas/ideas/issues/27",
+    "quote": "Open Source version of SoundWire Android App — The App is super cool. And I want to learn how it works.",
+    "platform": "GitHub",
+    "engagement": "16 reactions",
+    "date": "2016-10-31"
+   },
+   {
+    "url": "https://github.com/search?q=repo%3Aopen-source-ideas%2Fideas+is%3Aissue+streaming+OR+netflix+OR+movie&type=issues&s=reactions&o=desc",
+    "quote": "#28 Open Source version of SoundSeeder App — Collaborative music sharing application",
+    "platform": "GitHub",
+    "engagement": "13 reactions",
+    "date": "2016-10-31"
+   },
+   {
+    "url": "https://github.com/Divide-By-0/ideas-for-projects-people-would-use",
+    "quote": "Spotify Match / Spotify Playlist Remixer / Spotify Parent-Friendly-ifier / Movie to Playlist Converter",
+    "platform": "GitHub",
+    "engagement": "2.2k stars",
+    "date": "2026-09-09"
+   }
+  ],
+  "existing_solutions": "Spotify/Apple Music 等平台客户端（锁定单一平台）；Tomahawk（已停更）、Strawberry/Navidrome（偏本地或服务端）；SoundWire/SoundSeeder（闭源、Android 限定）。",
+  "why_unsolved": "流媒体 DRM 与 API 限制使第三方统一播放器难以合法接入；跨平台桌面+移动的维护成本高，志愿者项目容易被放弃。",
+  "crowd_signal": "many",
+  "confidence": 0.6,
+  "source_finder": "gh-ideas-and-awesome-lists"
+ },
+ {
+  "title": "菜谱-食材-购物小票一体化管理",
+  "description": "用户是自己做饭的家庭和双职工父母。场景：按菜单生成购物清单，或扫描超市小票反推能做的菜；按过敏原筛菜谱；管理和版本化自己的菜谱；比价多家生鲜 App。痛点：菜谱网站充斥广告和 SEO 长文，菜谱、库存、购物、价格四件事分散在不同 App。该主题在 5 个清单中反复出现：open-source-ideas 三条 idea 共 30 reactions，tastejs、florinpop17、Divide-By-0、captn3m0 都有对应条目。",
+  "audience": "家庭做饭者 / 双职工父母",
+  "domain": "饮食/家庭",
+  "evidence": [
+   {
+    "url": "https://github.com/open-source-ideas/ideas/issues/103",
+    "quote": "An application where you can scan a grocery bill and it suggests you possible food menu you can make. Personalized to your preferences.",
+    "platform": "GitHub",
+    "engagement": "14 reactions",
+    "date": "2018-08-15"
+   },
+   {
+    "url": "https://github.com/search?q=repo%3Aopen-source-ideas%2Fideas+is%3Aissue+grocery+OR+recipe+OR+meal+OR+budget+OR+expense&type=issues&s=reactions&o=desc",
+    "quote": "#104 Git for recipes — 11 reactions; #229 Online recipes considered harmful — Project addressing inefficiencies in recipe publishing that waste resources and time — 5 reactions",
+    "platform": "GitHub",
+    "engagement": "11 + 5 reactions",
+    "date": "2018-08-15 / 2020-03-17"
+   },
+   {
+    "url": "https://github.com/tastejs/awesome-app-ideas",
+    "quote": "Recipes app — Cooking instructions and ingredient management; Working parents dinner app — Meal planning assistance",
+    "platform": "GitHub",
+    "engagement": "5.7k stars",
+    "date": "2024-06-06"
+   },
+   {
+    "url": "https://github.com/captn3m0/ideas",
+    "quote": "Price Index for Indian Grocery Websites — Tracking price trends for common items across BigBasket, Instamart, Blinkit; Nutri-score calculator; Indian Grocery Barcode Database",
+    "platform": "GitHub",
+    "engagement": "531 stars",
+    "date": "2026-09-10"
+   },
+   {
+    "url": "https://github.com/Divide-By-0/ideas-for-projects-people-would-use",
+    "quote": "Allergen Food Checker: Search dishes by cuisine to see allergen prevalence across recipes",
+    "platform": "GitHub",
+    "engagement": "2.2k stars",
+    "date": "2026-09-09"
+   }
+  ],
+  "existing_solutions": "下厨房/Paprika 等菜谱 App（无库存与小票）；Mealie/Tandoor/Grocy（自托管，需部署，不做小票识别与比价）；各生鲜平台自带比价缺失。",
+  "why_unsolved": "小票 OCR 与商品归一化在各国各超市差异极大，菜谱数据版权分散，商业公司更愿做单点（菜谱社区或生鲜电商）而非打通链路。",
+  "crowd_signal": "many",
+  "confidence": 0.65,
+  "source_finder": "gh-ideas-and-awesome-lists"
+ },
+ {
+  "title": "按知识依赖图规划的自学路径",
+  "description": "用户是自学者/学生。场景：想学某个目标知识，需要知道前置知识是什么、自己缺哪块、按依赖顺序学。痛点：MOOC 按课程/线性大纲组织，没有可导航的知识依赖图。open-source-ideas 该 idea 15 reactions（2018 至今 open）。",
+  "audience": "自学者 / 学生",
+  "domain": "教育",
+  "evidence": [
+   {
+    "url": "https://github.com/search?q=repo%3Aopen-source-ideas%2Fideas+is%3Aissue+sort%3Areactions-%2B1-desc&type=issues",
+    "quote": "#53 Dependency graph based online learning system — Educational platform modeling knowledge as interconnected concept dependencies",
+    "platform": "GitHub",
+    "engagement": "15 reactions; labels: Intermediate, Much work",
+    "date": "2018-02-11"
+   }
+  ],
+  "existing_solutions": "Coursera/edX/Khan Academy（线性课程；Khan 早年知识地图已下线）、roadmap.sh（仅开发者领域、静态图）。",
+  "why_unsolved": "构建并维护跨学科依赖图需要大量领域专家标注，缺乏商业变现路径。",
+  "crowd_signal": "several",
+  "confidence": 0.45,
+  "source_finder": "gh-ideas-and-awesome-lists"
+ },
+ {
+  "title": "影视『哪个平台能看』聚合与上线提醒",
+  "description": "用户是订阅了一个或多个流媒体的观众。场景：想看某部片，得逐个搜索/问 Google 它在哪个平台、何时上线。痛点：需要一个众包的中心目录并能设置上线通知。open-source-ideas 10 reactions；中文侧 awesome-zhuiju-free 的存在本身也是同类『在哪看』信息分散的体现。",
+  "audience": "流媒体订阅用户",
+  "domain": "娱乐/影音",
+  "evidence": [
+   {
+    "url": "https://github.com/open-source-ideas/ideas/issues/156",
+    "quote": "Many times, I want to watch a movie so I google whether the movie/season is available on my streaming service … a central directory where I could search it and maybe even set notification about when it will be available",
+    "platform": "GitHub",
+    "engagement": "10 reactions; labels: Web app, Intermediate",
+    "date": "2019-02-25"
+   }
+  ],
+  "existing_solutions": "JustWatch/Reelgood（商业、地区覆盖不均、数据延迟）、各平台内搜索。",
+  "why_unsolved": "版权授权按地区/时间频繁变动，权威数据源掌握在平台手里，众包方案冷启动难。",
+  "crowd_signal": "several",
+  "confidence": 0.5,
+  "source_finder": "gh-ideas-and-awesome-lists"
+ },
+ {
+  "title": "把无 RSS 的服务变成可订阅源",
+  "description": "用户是想主动掌控信息流、不想被推荐算法喂养的普通读者。场景：想订阅 Telegram 频道、Play 商店某 App 的版本更新、某商品的降价、本地活动站的日历，但这些服务都没有 RSS/iCal。痛点：只能反复手动查看。captn3m0/ideas 里同一作者列了 6 条 RSS/OPML 化点子，tastejs 与 Divide-By-0 也有 RSS 阅读器与自动存档需求。",
+  "audience": "RSS/信息自主控制型普通用户",
+  "domain": "信息订阅",
+  "evidence": [
+   {
+    "url": "https://github.com/captn3m0/ideas",
+    "quote": "Telegram To RSS; Playstore RSS Feed for Version Updates; Amazon Price Tracker with RSS — RSS feed generator for Amazon products with configurable minimum price thresholds; Calendar Feed for Event Websites; OPML Generator; OPML Sync",
+    "platform": "GitHub",
+    "engagement": "531 stars",
+    "date": "2026-09-10"
+   },
+   {
+    "url": "https://github.com/tastejs/awesome-app-ideas",
+    "quote": "News reader (RSS reader) — Feed aggregation",
+    "platform": "GitHub",
+    "engagement": "5.7k stars",
+    "date": "2024-06-06"
+   }
+  ],
+  "existing_solutions": "RSSHub（覆盖广但需自部署且路由常失效）、Feedbridge/Kill the Newsletter（单点）、各平台自带通知（推送式、不可聚合）。",
+  "why_unsolved": "平台有意不提供开放订阅接口以留住用户在 App 内；抓取类方案随页面改版持续失效，维护成本高。",
+  "crowd_signal": "several",
+  "confidence": 0.5,
+  "source_finder": "gh-ideas-and-awesome-lists"
+ },
+ {
+  "title": "自动聚合各平台消费记录记账",
+  "description": "用户是想了解自己线上花销的普通消费者。场景：在电商、打车、支付平台的订单分散，手动记账坚持不了。痛点：想要跨平台自动抓取订单历史生成账本，而不是依赖读取短信或银行接口。captn3m0/ideas 列出该需求并强调『without SMS interception』。",
+  "audience": "普通消费者",
+  "domain": "个人财务",
+  "evidence": [
+   {
+    "url": "https://github.com/captn3m0/ideas",
+    "quote": "Automated Personal Finance — cross-platform application automatically tracking online spending by scraping order history from services like Amazon, Uber, and Paytm without SMS interception",
+    "platform": "GitHub",
+    "engagement": "531 stars",
+    "date": "2026-09-10"
+   },
+   {
+    "url": "https://github.com/ivon852/awesome-foss-android-apps",
+    "quote": "Finance 类仅 4 个开源 App（对比 Games 45+、Tools 40+）",
+    "platform": "GitHub",
+    "engagement": "448 stars",
+    "date": "2026-07-29"
+   }
+  ],
+  "existing_solutions": "手动记账 App、读短信自动记账（隐私风险）、银行/支付平台自带账单（不跨平台）、Firefly III 等自托管记账（需手工导入）。",
+  "why_unsolved": "各平台订单数据无开放接口，抓取需要登录态并随时被封；隐私与合规风险让商业公司不愿碰。",
+  "crowd_signal": "several",
+  "confidence": 0.4,
+  "source_finder": "gh-ideas-and-awesome-lists"
+ },
+ {
+  "title": "多人空闲时间合并与跨时区提醒",
+  "description": "用户是需要和多人约时间的普通人/远程工作者。场景：几个人各自有 Calendly 链接或日历，想直接看重叠的空闲时段；跨时区协作时提醒应按对方时区触发。痛点：现有工具只做一对一预约。Divide-By-0（2.2k star）与 nemecek-filip 两份清单分别提出。",
+  "audience": "远程工作者 / 多方约会组织者",
+  "domain": "日程协作",
+  "evidence": [
+   {
+    "url": "https://github.com/Divide-By-0/ideas-for-projects-people-would-use",
+    "quote": "Calendly Combiner: Merge multiple calendar links to show only overlapping availability",
+    "platform": "GitHub",
+    "engagement": "2.2k stars",
+    "date": "2026-09-09"
+   },
+   {
+    "url": "https://github.com/nemecek-filip/App-ideas",
+    "quote": "Timezone-Based Reminders — Enhance remote work coordination across different time zones",
+    "platform": "GitHub",
+    "engagement": "59 stars",
+    "date": "2022-04-21"
+   },
+   {
+    "url": "https://github.com/search?q=repo%3Aopen-source-ideas%2Fideas+is%3Aissue+calendar+OR+invitation+OR+rsvp+OR+event+OR+scheduling&type=issues&s=reactions&o=desc",
+    "quote": "#142 App that scans calendar for important events — unified view of important events that month",
+    "platform": "GitHub",
+    "engagement": "2 reactions",
+    "date": "2019-01-27"
+   }
+  ],
+  "existing_solutions": "Calendly/Cal.com（一对一或团队内部）、Doodle/When2meet（手动填空闲）、日历 App 自带时区（不按对方时区提醒）。",
+  "why_unsolved": "跨日历服务的空闲数据需要各方授权，产品商业价值低于单人预约页；开源方案 Cal.com 聚焦企业场景。",
+  "crowd_signal": "several",
+  "confidence": 0.4,
+  "source_finder": "gh-ideas-and-awesome-lists"
+ },
+ {
+  "title": "单亲家长等细分群体约会 App",
+  "description": "用户是单亲父母等主流约会 App 服务不好的细分群体。场景：主流平台匹配逻辑不考虑育儿时间、地点与家庭状况。痛点：细分群体想要理解其处境的匹配产品。GitHub 上一个从 Reddit『求软件』帖筛出的 614 条需求数据集把它作为样本，原帖 171 赞 584 评论；awesome-privacy 的 Dating Apps 类也仅有 1 个替代品。",
+  "audience": "单亲父母等细分约会人群",
+  "domain": "社交/婚恋",
+  "evidence": [
+   {
+    "url": "https://github.com/theomarsoliman/app-ideas-from-reddit",
+    "quote": "614 app ideas taken from real Reddit requests, where someone asked for software that does not exist yet；样本：a dating app request for single parents from r/dating_advice with 171 upvotes and 584 comments；分类计数：IT and developer tools 32, Small business apps 19, Consumer apps 19, CRM 16",
+    "platform": "GitHub",
+    "engagement": "3 stars (dataset); source thread 171 upvotes / 584 comments",
+    "date": "2026-09-20"
+   },
+   {
+    "url": "https://github.com/pluja/awesome-privacy",
+    "quote": "Dating Apps — 1 alternative",
+    "platform": "GitHub",
+    "engagement": "19.9k stars",
+    "date": "2026"
+   }
+  ],
+  "existing_solutions": "Tinder/Bumble/Hinge 等泛人群平台；少数细分约会 App 用户基数小、匹配池薄。",
+  "why_unsolved": "约会产品依赖规模效应，细分人群冷启动难，大厂只在主产品里加筛选项；隐私顾虑又使用户不愿在小平台填写家庭信息。",
+  "crowd_signal": "several",
+  "confidence": 0.4,
+  "source_finder": "gh-ideas-and-awesome-lists"
+ },
+ {
+  "title": "微信聊天记录本地导出与备份",
+  "description": "用户想把自己电脑/手机上的微信聊天记录（含图片、语音、朋友圈）解密导出为 HTML/PDF/文本，用于备份、年度报告、法律取证、迁移。微信官方只提供整机迁移，不提供可读导出。社区反复造轮子（GitHub 搜索'微信 聊天记录 导出'共 198 个仓库：WeFlow 14.5k、WechatExporter 8.5k、echotrace 3.8k、WechatBakTool 3.7k、WeChatDataAnalysis 3.4k），但 2026 年 WeFlow 收到腾讯/MSK 律所 DMCA 通知后被迫阉割功能、发出'删库前最后一次 commit'，唯一'幸存'的替代 CipherTalk 已转收费且仓库现为 404。用户在 issue 里担心封号（#411 109 条评论）、四处寻找平替（#1159）。",
+  "audience": "普通微信用户；需要保存家人/工作记录的个人；律师、企业合规；做年度报告的年轻用户",
+  "domain": "个人数据主权 / 即时通讯备份",
+  "evidence": [
+   {
+    "url": "https://github.com/hicccc77/WeFlow/issues/1193",
+    "quote": "删库前最后一次commit，版本5.0.0 … 经测试可使用",
+    "platform": "GitHub",
+    "engagement": "👍18，2 评论；仓库 14.5k star，93 open issues",
+    "date": "2026-08-07"
+   },
+   {
+    "url": "https://github.com/hicccc77/WeFlow/blob/main/README.md",
+    "quote": "你确实拥有你的数据，但你不能看它。… 你和家人的聊天记录、你和老板的工作对接、你保存在本地电脑上的数据，是属于你自己的。（README 称收到 T 公司/MSK 律所 DMCA 通知，'绕过技术保护措施'）",
+    "platform": "GitHub",
+    "engagement": "14.5k star / 484 fork",
+    "date": "2026"
+   },
+   {
+    "url": "https://github.com/hicccc77/WeFlow/issues/411",
+    "quote": "使用此工具会被微信封禁吗 —— 维护者：首先 我寻茶个人承认实时模式确实存在风险 (经过确认 是获取密钥的时候被记录了 那天统一秋后算账…)",
+    "platform": "GitHub",
+    "engagement": "👍5，109 评论",
+    "date": "2026-03-11"
+   },
+   {
+    "url": "https://github.com/hicccc77/WeFlow/issues/1159",
+    "quote": "同志们我似乎找到平替了 … 这玩意儿长得跟WeFlow的孪生兄弟似的而且还活着 … 不知道还能活多久就是了",
+    "platform": "GitHub",
+    "engagement": "👍5，13 评论",
+    "date": "2026-07-12"
+   },
+   {
+    "url": "https://github.com/hicccc77/WeFlow/issues/1190",
+    "quote": "[已收费]还幸存的微信导出CipherTalk（链接 github.com/ILoveBingLu/CipherTalk 现返回 404）",
+    "platform": "GitHub",
+    "engagement": "👍5，3 评论",
+    "date": "2026-08-04"
+   },
+   {
+    "url": "https://github.com/search?q=%E5%BE%AE%E4%BF%A1+%E8%81%8A%E5%A4%A9%E8%AE%B0%E5%BD%95+%E5%AF%BC%E5%87%BA&type=repositories&s=stars&o=desc",
+    "quote": "198 repositories：WeFlow 14.5k / WechatExporter 8.5k / echotrace 3.8k / WechatBakTool 3.7k / WeChatDataAnalysis 3.4k / tsycnh/WeChatExporter 1.5k …",
+    "platform": "GitHub",
+    "engagement": "198 个仓库",
+    "date": "2026-09-27"
+   },
+   {
+    "url": "https://github.com/BlueMatthew/WechatExporter/issues/146",
+    "quote": "什么时候可以增加分页功能啊（WechatExporter 8.5k star，130 open issues，最近更新 2025-02）",
+    "platform": "GitHub",
+    "engagement": "👍3",
+    "date": "2023-04-28"
+   }
+  ],
+  "existing_solutions": "WeFlow（被 DMCA 阉割）、WechatExporter（仅 iTunes 备份、2025 后停更）、WechatBakTool/echotrace/WeChatDataAnalysis（需解密 key，微信 4.x 频繁改动即失效）、CipherTalk（收费且已下架）。微信官方仅有'迁移到另一台设备'，无可读导出。",
+  "why_unsolved": "腾讯将本地数据库加密并视解密为'绕过技术保护措施'，对开源作者发律师函/DMCA，作者纷纷删库；微信版本更新即打破解密方案；用户还担心账号被封。这是平台策略与用户数据主权的直接冲突，缺少合规的官方导出通道。",
+  "crowd_signal": "viral",
+  "confidence": 0.95,
+  "source_finder": "gh-zh-repos-top-issues"
+ },
+ {
+  "title": "免版权风险的多平台聚合听歌",
+  "description": "用户希望一个播放器能搜索并播放/下载 QQ音乐、网易云、酷狗、酷我等平台歌曲，不用同时开多个 App、不用买多家 VIP。落雪音乐 (lx-music-desktop, 54k star) 2023-10-18 收到腾讯警告信后宣布去掉所有内置音源，仅做本地播放器；用户在 issue 里以数百 👍 表态、并靠互相分享'自定义音源'脚本续命，但'免费无永久'，音源频繁失效且不敢公开讨论。MusicFree (27.1k) 走插件路线也只是把风险转移到插件作者。",
+  "audience": "中国大陆普通听歌用户（学生、不愿多平台付费的年轻人）",
+  "domain": "音乐 / 数字内容聚合",
+  "evidence": [
+   {
+    "url": "https://github.com/lyswhut/lx-music-desktop/issues/1912",
+    "quote": "LX Music 项目发展调整与新项目计划 —— 软件本身只是一个可以播放本地歌曲的播放器，没有第三方在线资源功能",
+    "platform": "GitHub",
+    "engagement": "👍558，❤173，88 评论；仓库 54k star",
+    "date": "2024-05-26"
+   },
+   {
+    "url": "https://github.com/lyswhut/lx-music-desktop/issues/1643",
+    "quote": "LX于2023年10月18日收到了腾讯的警告信，要求停止提供软件内置的连接到他们平台的在线播放及下载服务 … 以后不会有原来那种自带开箱即用的聚合各平台的功能 … 项目的本体将只是一个本地播放器",
+    "platform": "GitHub",
+    "engagement": "👍530，❤187，222 评论",
+    "date": "2023-10-22"
+   },
+   {
+    "url": "https://github.com/lyswhut/lx-music-desktop/issues/2263",
+    "quote": "收集而来的音源。… 收集音源不容易，请勿外传，万分感谢",
+    "platform": "GitHub",
+    "engagement": "👍222，133 评论",
+    "date": "2025-02-09"
+   },
+   {
+    "url": "https://github.com/lyswhut/lx-music-desktop/issues/1769",
+    "quote": "自己收集的几个可用源",
+    "platform": "GitHub",
+    "engagement": "👍164，85 评论",
+    "date": "2024-02-02"
+   },
+   {
+    "url": "https://github.com/lyswhut/lx-music-desktop/issues/1614",
+    "quote": "关于URL过期无法放歌的问题，大家不要开issue了，避免'名气'大了引起某方注意 … 免费无永久，这些方法不可能一直有效",
+    "platform": "GitHub",
+    "engagement": "👍39，52 评论",
+    "date": "2023-10-18"
+   },
+   {
+    "url": "https://github.com/maotoumao/MusicFree/issues/99",
+    "quote": "因为随着网络环境恶化，听歌本地化个人觉得非常重要。我想让MusicFree承担我所有音乐相关的需求，即收集，本地，管理，同步。",
+    "platform": "GitHub",
+    "engagement": "👍3，4 评论；仓库 27.1k star",
+    "date": "2023-10-18"
+   }
+  ],
+  "existing_solutions": "落雪音乐（已去内置源，靠第三方音源脚本）、MusicFree（插件制）、各平台官方 App（需分别付费、曲库割裂）、听歌 VIP 会员。",
+  "why_unsolved": "版权方（腾讯音乐等）对聚合工具发警告信，开源作者被迫退出；第三方音源来自灰色接口，周期性失效；合法解法需要跨平台曲库授权，个人开发者无法获得。",
+  "crowd_signal": "viral",
+  "confidence": 0.9,
+  "source_finder": "gh-zh-repos-top-issues"
+ },
+ {
+  "title": "微信公众号 RSS 订阅",
+  "description": "用户想在 RSS 阅读器里稳定订阅微信公众号文章，摆脱微信信息流。微信不提供 RSS 或公开 API，社区造了 112 个仓库（wewe-rss 9.7k、we-mp-rss 4.7k、feeddd 2.1k、Wechat2RSS 1.6k、wechat-feeds 已停止服务）。主流方案借道'微信读书'账号抓取，但每个账号只能稳定订阅约 10 个公众号，超出就被腾讯封控，用户频繁遇到账号不可用、需重新登录、更新失败。wewe-rss 于 2026-05-11 归档，RSSHub (46.3k) 也没有稳定的公众号路由。",
+  "audience": "重度阅读者、信息工作者、自建 RSS/NAS 用户、做行业情报的小团队",
+  "domain": "内容订阅 / RSS",
+  "evidence": [
+   {
+    "url": "https://github.com/cooderl/wewe-rss/issues/223",
+    "quote": "订阅更新失败问题汇总 —— 每个读书账号订阅10个左右公众号比较稳定，多了容易被腾讯封控",
+    "platform": "GitHub",
+    "engagement": "置顶汇总帖；仓库 9.7k star，270 open issues，2026-05-11 归档",
+    "date": "2024-08-08"
+   },
+   {
+    "url": "https://github.com/cooderl/wewe-rss/issues/417",
+    "quote": "经常性的出现账号不可用，就是要重新登陆 … 手动更新时候效果也是需要重复几次才能更完，甚至更新不出来",
+    "platform": "GitHub",
+    "engagement": "unknown",
+    "date": "2025-05-14"
+   },
+   {
+    "url": "https://github.com/search?q=%E5%85%AC%E4%BC%97%E5%8F%B7+RSS&type=repositories&s=stars&o=desc",
+    "quote": "112 repositories：wewe-rss 9.7k / we-mp-rss 4.7k / feeddd/feeds 2.1k / Wechat2RSS 1.6k / wechat-download-api 1.1k / hellodword/wechat-feeds 973 '[已停止服务]'",
+    "platform": "GitHub",
+    "engagement": "112 个仓库",
+    "date": "2026-09-27"
+   },
+   {
+    "url": "https://github.com/rachelos/we-mp-rss/issues/398",
+    "quote": "定时采集队列饥饿：固定入队顺序+串行处理导致大部分公众号永远不被更新",
+    "platform": "GitHub",
+    "engagement": "1 评论；仓库 4.7k star",
+    "date": "2026-06-04"
+   },
+   {
+    "url": "https://github.com/ourongxing/newsnow/issues/199",
+    "quote": "后续能否增加微信公众号和小红书版块（newsnow 21.8k star 热点聚合项目）",
+    "platform": "GitHub",
+    "engagement": "unknown",
+    "date": "2025-07-14"
+   }
+  ],
+  "existing_solutions": "wewe-rss（微信读书通道，已归档）、we-mp-rss、Wechat2RSS、RSSHub 部分路由、付费服务如 WeRSS。均依赖非公开接口与个人账号，易封控、需频繁扫码登录。",
+  "why_unsolved": "微信刻意封闭内容分发，无公开 API；抓取依赖微信读书等旁路，腾讯对账号限流封控；每次接口变动都要重写；开源维护者不堪重负陆续归档。",
+  "crowd_signal": "many",
+  "confidence": 0.9,
+  "source_finder": "gh-zh-repos-top-issues"
+ },
+ {
+  "title": "网盘聚合：大文件断点上传与安全分享",
+  "description": "AList/OpenList 用户把多个网盘挂成一个目录后，最常被卡住的是：(1) 经免费 Cloudflare 访问时 >100MB 文件上传直接 413，且失败要从头传，社区自 2023 年起反复要求前端分块/断点续传；(2) 想像网盘一样给别人分享单个文件/文件夹的短链，带密码、有效期、次数限制，现有 sign 链接暴露完整路径、过期时间全局固定；(3) 希望把聚合网盘挂载到本地、网盘之间自动同步。AList 作者 2025 年将部分 API 闭源/出售引发信任危机，社区 fork 出 OpenList（迁移公告 👍386），这些需求原样迁到新仓库仍未实现。",
+  "audience": "自建 NAS/网盘聚合的个人与小团队、家庭共享文件的用户、小工作室分发素材",
+  "domain": "云存储 / 文件分享",
+  "evidence": [
+   {
+    "url": "https://github.com/AlistGo/alist/issues/5480",
+    "quote": "由于cloudflare的免费版限制, 对于上传文件超过100M会直接在上传完后拦截, 直接报413错误 … 希望支持文件分块上传来解决问题",
+    "platform": "GitHub",
+    "engagement": "👍11，23 评论；仓库 50.2k star",
+    "date": "2023-11-06"
+   },
+   {
+    "url": "https://github.com/OpenListTeam/OpenList/issues/460",
+    "quote": "[Feature] 网页端/WebDaV分块上传 —— 目前如果使用免费版cloudflare作为cdn/防御的话则无法通过网页页面上传大于100MB的文件。",
+    "platform": "GitHub",
+    "engagement": "👍9，15 评论；仓库 24.8k star",
+    "date": "2025-06-28"
+   },
+   {
+    "url": "https://github.com/AlistGo/alist/issues/5915",
+    "quote": "对于单个文件/文件夹分享的具体建议 —— 如果我有多个网盘的文件要分享，就只能挂载根路径 … 虽然可以使用sign鉴权但并不优雅，而且不同sign过期时间是固定的（标签 accepted/enhancement，未实现）",
+    "platform": "GitHub",
+    "engagement": "👍4 👀3，9 评论",
+    "date": "2024-01-19"
+   },
+   {
+    "url": "https://github.com/AlistGo/alist/issues/7509",
+    "quote": "加密分享链接 —— 生成的外链包含了该文件在本地的所有信息，导致他人能够通过链接访问我的其他不愿意分享的文件",
+    "platform": "GitHub",
+    "engagement": "👍3，7 评论",
+    "date": "2024-11-17"
+   },
+   {
+    "url": "https://github.com/AlistGo/alist/issues/1747",
+    "quote": "希望能增加挂载网盘到本地",
+    "platform": "GitHub",
+    "engagement": "👍2，17 评论",
+    "date": "2022-09-22"
+   },
+   {
+    "url": "https://github.com/OpenListTeam/OpenList/issues/428",
+    "quote": "网盘间内容自动同步，支持单向同步、全同步 … 定时扫描配置的两个目录，单向同步时将a网盘的内容同步至b网盘",
+    "platform": "GitHub",
+    "engagement": "👍4，10 评论",
+    "date": "2025-06-27"
+   },
+   {
+    "url": "https://github.com/OpenListTeam/OpenList/issues/6",
+    "quote": "[Announcements] OpenList 迁移工作总结 —— AList 是一个极为优秀的开源项目, 我们已经见到太多太多作者为爱发电后面出售项目被奸商利用牟利的事情了",
+    "platform": "GitHub",
+    "engagement": "👍386，🚀40，123 评论",
+    "date": "2025-06-11"
+   }
+  ],
+  "existing_solutions": "AList/OpenList（sign 链接、无分块）、rclone mount（命令行、无分享）、FileBrowser（有短链分享但不聚合网盘）、各网盘官方分享（互不打通）。",
+  "why_unsolved": "分块上传需对每种网盘驱动分别适配且要在服务器临时落盘；分享系统需要新增权限模型与管理页，维护者精力被信任危机与迁移消耗；需求横跨 2022-2025 仍标 accepted 未做。",
+  "crowd_signal": "many",
+  "confidence": 0.8,
+  "source_finder": "gh-zh-repos-top-issues"
+ },
+ {
+  "title": "安卓开屏广告与弹窗自动跳过",
+  "description": "国内 App 普遍有 3-5 秒开屏广告、青少年模式弹窗、'跳过'按钮故意做小或错位。系统/厂商不提供关闭途径，用户依赖无障碍点击工具：GKD 42.3k star、SKIP 3.7k，'开屏广告 跳过'搜索 39 个仓库。但 GKD '默认不提供规则'，全靠社区订阅维护；小米 15 等新机型规则失效被标 not planned；F-Droid 上架请求 (👍21) 被拒；已有 338 个 issue 被关闭为 not planned，说明需求量大而维护者刻意收缩范围。",
+  "audience": "所有中国大陆安卓用户，尤其老人/家长（被弹窗困扰）与效率党",
+  "domain": "移动端体验 / 广告屏蔽",
+  "evidence": [
+   {
+    "url": "https://github.com/gkd-kit/gkd/blob/main/README.md",
+    "quote": "基于 高级选择器 + 订阅规则 + 快照审查 的自定义屏幕点击 Android 应用 … GKD 默认不提供规则",
+    "platform": "GitHub",
+    "engagement": "42.3k star；13 open / 338 closed-not-planned issues",
+    "date": "2026-09-27"
+   },
+   {
+    "url": "https://github.com/gkd-kit/gkd/issues/243",
+    "quote": "感谢制作这么优秀的应用，请问是否考虑上架 F-Droid?（closed as not planned）",
+    "platform": "GitHub",
+    "engagement": "👍21 🚀2，10 评论",
+    "date": "2023-11-03"
+   },
+   {
+    "url": "https://github.com/gkd-kit/gkd/issues/847",
+    "quote": "[BUG] 小米15部分app开屏广告无法跳过（closed as not planned）",
+    "platform": "GitHub",
+    "engagement": "👍1，5 评论",
+    "date": "2025-01-06"
+   },
+   {
+    "url": "https://github.com/gkd-kit/gkd/issues/743",
+    "quote": "[Feature] action 能不能添加向上滑动的操作，刷短剧的广告，有向上滑动的操作（closed as not planned）",
+    "platform": "GitHub",
+    "engagement": "👍2",
+    "date": "2024-10-06"
+   },
+   {
+    "url": "https://github.com/GuoXiCheng/SKIP",
+    "quote": "SKIP 是一款免费开源的安卓应用，旨在利用安卓无障碍服务帮助用户快速点击 APP 开屏广告的跳过按钮",
+    "platform": "GitHub",
+    "engagement": "3.7k star，64 open issues",
+    "date": "2026-09-27"
+   },
+   {
+    "url": "https://github.com/search?q=%E5%BC%80%E5%B1%8F%E5%B9%BF%E5%91%8A+%E8%B7%B3%E8%BF%87&type=repositories&s=stars&o=desc",
+    "quote": "39 repositories（SKIP 3.7k、ADSkip、SkipAD 等多次重复造轮子）",
+    "platform": "GitHub",
+    "engagement": "39 个仓库",
+    "date": "2026-09-27"
+   }
+  ],
+  "existing_solutions": "GKD（需订阅第三方规则、需无障碍权限、厂商系统常杀后台）、SKIP、李跳跳（已下架）、各厂商'纯净模式'（不覆盖第三方 App）。",
+  "why_unsolved": "广告是 App 收入来源，厂商与 App 方都无动力提供开关；无障碍方案依赖逐 App 维护规则，新机型/新版本即失效；工具一出名就面临下架压力（李跳跳先例），维护者主动收缩、拒绝上架分发渠道。",
+  "crowd_signal": "many",
+  "confidence": 0.8,
+  "source_finder": "gh-zh-repos-top-issues"
+ },
+ {
+  "title": "B站视频下载备份与开放接口",
+  "description": "用户想把自己收藏/购买/上传的 B 站视频（含 4K、字幕、弹幕）下载到本地长期保存，或用第三方客户端/脚本访问自己的数据。B 站官方缓存加密且不可导出。社区两大基石在 2026 年相继关停：bilibili-API-collect（20.2k star，非官方 API 文档）2026-01-28 收到 B 站律师函后归档删除全部文档；BBDown（13.9k star 命令行下载器）2026-05-14 归档停止维护。依赖它们的大量下载器/第三方客户端随之失去基础。",
+  "audience": "B 站普通用户、UP 主备份自己作品、学习者离线看课程、第三方客户端开发者",
+  "domain": "视频 / 数字内容备份",
+  "evidence": [
+   {
+    "url": "https://github.com/SocialSisterYi/bilibili-API-collect",
+    "quote": "The repository has been archived … On January 28, 2026, the maintainer received a cease-and-desist notice from Bilibili's legal representatives（被指'系统性收集整理非公开 API 接口''向公众传播技术文档与代码示例'）",
+    "platform": "GitHub",
+    "engagement": "20.2k star / 2.9k fork，0 open issues（已归档）",
+    "date": "2026-01-28"
+   },
+   {
+    "url": "https://github.com/nilaoda/BBDown",
+    "quote": "本仓库已归档，不再继续维护。后续亦不再提供更新或技术支持。",
+    "platform": "GitHub",
+    "engagement": "13.9k star / 1.7k fork，2026-05-14 归档",
+    "date": "2026-05-14"
+   }
+  ],
+  "existing_solutions": "BBDown（已归档）、bilibili-API-collect（已归档）、you-get/yt-dlp（依赖接口，时常失效）、B站客户端缓存（加密、无法导出、会员限制）。",
+  "why_unsolved": "平台以法律手段清除非官方接口文档与下载器；下载/导出与平台会员收入及版权协议冲突；没有官方'导出我的数据'功能。",
+  "crowd_signal": "many",
+  "confidence": 0.75,
+  "source_finder": "gh-zh-repos-top-issues"
+ },
+ {
+  "title": "结构化可检索的家常菜谱库",
+  "description": "HowToCook（102.4k star）用 Markdown 写'程序员做饭指南'，但用户 2020 年起就反复要求：每道菜有成品图/步骤图、有标签与菜系分类、用 YAML/JSON 等机器可读格式定义菜谱以便生成购物清单、按人数换算、做 App。三条需求分别 👍105/81/33，讨论 59/42/14 条，四到六年未落地，说明消费者想要的是'可搜索、可筛选、有图、可计算'的菜谱数据库，而不是一堆文档。",
+  "audience": "自己做饭的年轻人/新手、想按食材/忌口筛菜的家庭、做菜谱 App 的开发者",
+  "domain": "生活 / 饮食工具",
+  "evidence": [
+   {
+    "url": "https://github.com/Anduin2017/HowToCook/issues/60",
+    "quote": "使用规范定义的标记语言、JSON 或 yaml 来定义每一个菜谱。… 有利于使用程序进行深加工，挖掘菜谱更多价值。",
+    "platform": "GitHub",
+    "engagement": "👍105 😄15，59 评论；仓库 102.4k star",
+    "date": "2022-02-18"
+   },
+   {
+    "url": "https://github.com/Anduin2017/HowToCook/issues/65",
+    "quote": "建议之后的大厨们添加步骤图片甚至是视频教学，并且上传一个最终成品图。",
+    "platform": "GitHub",
+    "engagement": "👍81，42 评论",
+    "date": "2022-02-18"
+   },
+   {
+    "url": "https://github.com/Anduin2017/HowToCook/issues/3",
+    "quote": "为每个菜增加标签和菜系 —— 如 `素菜` `主菜` `鱼类` `炸物`",
+    "platform": "GitHub",
+    "engagement": "👍33，14 评论",
+    "date": "2020-03-03"
+   }
+  ],
+  "existing_solutions": "下厨房/豆果等商业 App（广告多、内容 UGC 质量不均、不开放数据）、HowToCook（纯 Markdown，无图无结构）、Notion 模板。",
+  "why_unsolved": "把上千篇自由文本菜谱迁移为结构化 schema 需要大规模重写与社区约定，维护者只标 open discussion；成品图需要真实拍摄难以众包保证质量；没有人做出把开放菜谱数据 + 结构化 + 图片结合的产品。",
+  "crowd_signal": "many",
+  "confidence": 0.75,
+  "source_finder": "gh-zh-repos-top-issues"
+ },
+ {
+  "title": "家庭/情侣共享账本",
+  "description": "自托管记账软件 ezbookkeeping 支持多用户，但用户最想要的是多个用户共同拥有、共同记录一个账户/账本（家庭开支、情侣合租、合伙小店），并能各自看到自己的部分。该请求是仓库 👍 最高的 open issue（29 个，是第二名的近 6 倍），2025-02 提出至今无维护者回应。国内主流记账 App 的'家庭账本'多为付费或云端同步，隐私敏感用户无自托管选择。",
+  "audience": "家庭主妇/夫、情侣、合租室友、夫妻小店主；注重隐私的自托管用户",
+  "domain": "个人财务 / 记账",
+  "evidence": [
+   {
+    "url": "https://github.com/mayswind/ezbookkeeping/issues/53",
+    "quote": "Feature Request: Add shared/co-owned accounts —— This software supports multiple users which is great. I think having an account type that can be shared/co-owned between multiple users would be a logical next step.",
+    "platform": "GitHub",
+    "engagement": "👍29，14 评论，无维护者回复；仓库 5.7k star，13 open issues",
+    "date": "2025-02-06"
+   },
+   {
+    "url": "https://github.com/mayswind/ezbookkeeping/issues/343",
+    "quote": "Add new category / sub-category on the fly while adding a record",
+    "platform": "GitHub",
+    "engagement": "👍5，2 评论",
+    "date": "2025-11-10"
+   }
+  ],
+  "existing_solutions": "ezbookkeeping（单用户账本）、Firefly III（有分组但学习成本高）、随手记/鲨鱼记账等商业 App（家庭账本需会员、数据在云）、共享 Excel。",
+  "why_unsolved": "多主体共享涉及权限、拆分、结算等数据模型重构，个人维护者未排期；商业 App 用共享功能做付费点，缺少开源/自托管替代。",
+  "crowd_signal": "several",
+  "confidence": 0.7,
+  "source_finder": "gh-zh-repos-top-issues"
+ },
+ {
+  "title": "代理内核的抗封锁与可用性增强",
+  "description": "mihomo（Clash Meta 内核，34.4k star）用户最高票的需求集中在'能连上、能自动选好节点'：TLS Hello 分片(fragment)绕过 SNI 阻断（伊朗与 GFW 用户）、proxy-group 中引入 proxy-provider 后的测速与选优、TUN 模式支持 ICMP 以增强伪装、redir-host 与 fake-ip 混合 DNS 模式。均为多年 open、👍 10-19。",
+  "audience": "需要稳定跨境网络的个人用户（留学生、外贸、开发者），以及伊朗等强审查地区用户",
+  "domain": "网络工具 / 代理",
+  "evidence": [
+   {
+    "url": "https://github.com/MetaCubeX/mihomo/issues/1046",
+    "quote": "[Feature] functionality to edit/add fragment to configs —— This feature effectively solves ping, speed and blocking SNI issues in Iran.",
+    "platform": "GitHub",
+    "engagement": "👍19 🚀3，18 评论；仓库 34.4k star，477 open issues",
+    "date": "2024-02-18"
+   },
+   {
+    "url": "https://github.com/MetaCubeX/mihomo/issues/1862",
+    "quote": "[Feature] 关于 proxy-group 中引入 proxy-provider 的测速问题",
+    "platform": "GitHub",
+    "engagement": "👍15，24 评论",
+    "date": "2025-02-25"
+   },
+   {
+    "url": "https://github.com/MetaCubeX/mihomo/issues/2085",
+    "quote": "[Feature] 增加伪装性：让TUN支持ICMP",
+    "platform": "GitHub",
+    "engagement": "👍12 👀3，1 评论",
+    "date": "2025-06-02"
+   },
+   {
+    "url": "https://github.com/MetaCubeX/mihomo/issues/916",
+    "quote": "[Feature] 可否考虑在DNS部分中加入redir-host与fake-ip混合模式",
+    "platform": "GitHub",
+    "engagement": "👍11，29 评论",
+    "date": "2023-12-14"
+   }
+  ],
+  "existing_solutions": "Xray-core（有 fragment）、sing-box、mihomo 自身；用户被迫在多个内核间切换或叠加多层工具。",
+  "why_unsolved": "对抗性领域，封锁手段持续演进；每项功能都涉及底层网络栈改动与跨平台适配；维护者人力有限、需求排队。",
+  "crowd_signal": "several",
+  "confidence": 0.6,
+  "source_finder": "gh-zh-repos-top-issues"
+ },
+ {
+  "title": "Magisk 模块更新提醒与自动更新",
+  "description": "Root 用户安装的 Magisk 模块（去广告、系统美化、性能调度）没有统一更新通道，用户'一年没检查发现好几个模块都过期了'，希望像应用商店一样收到更新通知或自动更新。该需求 2021 年提出，是 Magisk（63k star）👍 最高的 open issue，五年未实现。",
+  "audience": "安卓 Root 玩机用户、给家人刷去广告模块的技术型用户",
+  "domain": "安卓系统工具",
+  "evidence": [
+   {
+    "url": "https://github.com/topjohnwu/Magisk/issues/3656",
+    "quote": "Is it possible to get notified or automatically update modules when updates are released? —— I noticed that several of my modules were outdated by a year because I hadn't checked in so long.",
+    "platform": "GitHub",
+    "engagement": "👍15，16 评论；仓库 63k star，32 open issues",
+    "date": "2021-01-10"
+   }
+  ],
+  "existing_solutions": "Magisk 官方已移除模块仓库，仅支持模块自带 updateJson 手动检查；第三方 MMRL/Fox's Mmm 等模块管理器，覆盖不全、需要额外安装。",
+  "why_unsolved": "Magisk 作者在 v24 移除中心化模块仓库以规避审核责任，不愿再承担分发/更新基础设施；模块来源分散无标准元数据。",
+  "crowd_signal": "several",
+  "confidence": 0.6,
+  "source_finder": "gh-zh-repos-top-issues"
+ },
+ {
+  "title": "离线 OCR 表格提取与 macOS 版",
+  "description": "Umi-OCR（47.5k star，免费离线批量 OCR）用户长期要求：把图片中的表格（含手写）识别为保持行列结构的表格数据（Excel），以及提供 macOS 版本（当前仅 Windows/Linux）。表格/公式识别请求 2023-2024 提出，仍靠社区插件零散补足。",
+  "audience": "财务/行政/教师等需把纸质表格数码化的办公人群、Mac 用户",
+  "domain": "办公效率 / OCR",
+  "evidence": [
+   {
+    "url": "https://github.com/hiroi-sora/Umi-OCR/issues/445",
+    "quote": "提取图片中的表格数据。… 提取数据行/列与图片表格保持一致（手写数据）",
+    "platform": "GitHub",
+    "engagement": "👍5，10 评论；仓库 47.5k star，356 open issues",
+    "date": "2024-03-28"
+   },
+   {
+    "url": "https://github.com/hiroi-sora/Umi-OCR/issues/263",
+    "quote": "有没有支持 macOS 的计划？",
+    "platform": "GitHub",
+    "engagement": "👍3，2 评论",
+    "date": "2023-12-10"
+   },
+   {
+    "url": "https://github.com/hiroi-sora/Umi-OCR/issues/254",
+    "quote": "【测试】Umi-OCR 支持数学公式识别啦（测试版，32 条评论持续反馈）",
+    "platform": "GitHub",
+    "engagement": "👍13，32 评论",
+    "date": "2023-11-30"
+   }
+  ],
+  "existing_solutions": "Umi-OCR（无表格结构化输出、无 Mac 版）、WPS/微信提取文字（在线、按次收费或会员）、PaddleOCR 表格模型（需自行部署）、各类 AI OCR 插件（需 API key、非离线）。",
+  "why_unsolved": "表格结构还原需要版面分析模型且资源占用大，离线端侧难以兼顾精度与体积；macOS 打包与 Qt/PaddleOCR 依赖适配工作量大，单人维护者未排期。",
+  "crowd_signal": "several",
+  "confidence": 0.55,
+  "source_finder": "gh-zh-repos-top-issues"
+ },
+ {
+  "title": "开源播放器的无障碍、本地库管理与个性化推荐",
+  "description": "MusicFree（27.1k star）用户票数最高的 open 需求集中在：视障用户要求控件加无障碍标签（盲人无法使用）、本地音乐文件夹映射与元数据/WebDAV 同步管理、以及类似网易云'私人漫游/私人雷达'的个性化推荐。反映脱离商业平台后，用户在开源播放器上最缺的是'商业 App 才有'的推荐与管理体验以及被忽视的可访问性。",
+  "audience": "视障用户、把音乐迁到本地/NAS 的用户、习惯网易云推荐的年轻听众",
+  "domain": "音乐播放器 / 无障碍",
+  "evidence": [
+   {
+    "url": "https://github.com/maotoumao/MusicFree/issues/66",
+    "quote": "希望给软件增加无障碍功能（盲人用户请求为控件添加描述标签）",
+    "platform": "GitHub",
+    "engagement": "👍3，3 评论；仓库 27.1k star",
+    "date": "2023-07-25"
+   },
+   {
+    "url": "https://github.com/maotoumao/MusicFree/issues/545",
+    "quote": "APP很不错，希望开发一个像网易云音乐类似的私人漫游，私人雷达的功能",
+    "platform": "GitHub",
+    "engagement": "👍3，2 评论",
+    "date": "2025-11-18"
+   },
+   {
+    "url": "https://github.com/maotoumao/MusicFree/issues/187",
+    "quote": "[FEATURE] B站改编歌曲，二创歌曲没有匹配的歌词，希望能让用户自己导入本地或webdav上面的歌词",
+    "platform": "GitHub",
+    "engagement": "👍3，1 评论",
+    "date": "2024-02-20"
+   },
+   {
+    "url": "https://github.com/maotoumao/MusicFree/issues/10",
+    "quote": "是否有加入smb或者webdav等协议的支持",
+    "platform": "GitHub",
+    "engagement": "👍2，1 评论",
+    "date": "2022-10-26"
+   }
+  ],
+  "existing_solutions": "网易云/QQ音乐（有推荐但需会员且曲库割裂）、MusicFree/落雪（无推荐、无障碍差）、Navidrome/Jellyfin（自建库但无国内曲库推荐）。",
+  "why_unsolved": "个性化推荐需要大规模听歌数据与算法，个人开源项目无法获得；无障碍在 React Native 上需逐控件补标签、优先级低；本地库管理与 WebDAV 同步涉及大量文件系统适配。",
+  "crowd_signal": "several",
+  "confidence": 0.5,
+  "source_finder": "gh-zh-repos-top-issues"
+ },
+ {
+  "title": "跨平台热点聚合覆盖公众号与小红书",
+  "description": "newsnow（21.8k star，实时热榜聚合）用户最常提的需求是把微信公众号、小红书、推特/Reddit/Instagram/YouTube、路透/彭博/美联社等纳入一个页面。国内两大封闭内容源（公众号、小红书）没有公开接口，聚合类产品普遍缺失，用户只能在多个 App 间切换。",
+  "audience": "信息焦虑的普通读者、自媒体运营者、投资者",
+  "domain": "信息聚合 / 阅读",
+  "evidence": [
+   {
+    "url": "https://github.com/ourongxing/newsnow/issues/164",
+    "quote": "希望可以增加推特、reddit、ins、youtube 这些每日热点",
+    "platform": "GitHub",
+    "engagement": "unknown；仓库 21.8k star，142 open issues",
+    "date": "2025-05-01"
+   },
+   {
+    "url": "https://github.com/ourongxing/newsnow/issues/58",
+    "quote": "提议添加小红书的数据吗？",
+    "platform": "GitHub",
+    "engagement": "unknown",
+    "date": "2025-02-10"
+   },
+   {
+    "url": "https://github.com/ourongxing/newsnow/issues/199",
+    "quote": "后续能否增加微信公众号和小红书版块",
+    "platform": "GitHub",
+    "engagement": "unknown",
+    "date": "2025-07-14"
+   }
+  ],
+  "existing_solutions": "newsnow、今日热榜等聚合站（无公众号/小红书）、RSSHub（小红书/公众号路由极不稳定）、各平台官方 App。",
+  "why_unsolved": "公众号与小红书无公开接口且反爬严厉；境外平台需代理；聚合站作者担心法律风险。",
+  "crowd_signal": "several",
+  "confidence": 0.45,
+  "source_finder": "gh-zh-repos-top-issues"
+ },
+ {
+  "title": "一键移除 Windows 捆绑软件",
+  "description": "阮一峰周刊读者投稿中 👍 最高的'工具推荐'之一是删除 Windows 10/11 自带 Edge 浏览器的方法：微软仅允许欧元区用户卸载 Edge，其他地区用户需要 ViVeTool + 改注册表 + 改 System32 下 JSON 共 19 步。高 👍 反映用户对系统捆绑软件（Edge、Bing、Copilot、推广弹窗）不可卸载的普遍反感，缺一个安全、一键、可回退的工具。",
+  "audience": "Windows 普通用户、装机/IT 支持人员",
+  "domain": "桌面系统 / 去捆绑",
+  "evidence": [
+   {
+    "url": "https://github.com/ruanyf/weekly/issues/3804",
+    "quote": "【工具推荐】在Windows 10、11里删除微软Edge浏览器 —— 为了遵守欧元区的监管规定，微软允许该区域的用户卸载 Edge 并移除 Bing。（其他地区需 19 步手工操作）",
+    "platform": "GitHub",
+    "engagement": "👍24，4 评论；仓库 104.8k star",
+    "date": "2023-12-26"
+   }
+  ],
+  "existing_solutions": "ViVeTool + 手改注册表/JSON（19 步、易出错）、第三方脚本 Remove-Edge（易被 Windows 更新回滚、被杀软拦截）、Win11Debloat。",
+  "why_unsolved": "微软以系统更新持续恢复 Edge/捆绑组件，区域化策略使非欧盟用户无官方路径；第三方方案脆弱且有安全顾虑。",
+  "crowd_signal": "several",
+  "confidence": 0.4,
+  "source_finder": "gh-zh-repos-top-issues"
+ },
+ {
+  "title": "国内直接检索下载 YouTube 学习视频",
+  "description": "阮一峰周刊读者自荐一个'不用翻墙、国内直接搜 YouTube'并下载视频的微信小程序，起因是给孩子学打鼓需要反复看演奏片段。👍17 表明国内家长/学习者对获取 YouTube 上教学视频并离线反复观看有真实需求，但现有途径要么需要代理，要么灰色小程序随时下架。",
+  "audience": "有孩子学乐器/健身/技能的家长与学习者",
+  "domain": "教育 / 视频获取",
+  "evidence": [
+   {
+    "url": "https://github.com/ruanyf/weekly/issues/3287",
+    "quote": "需要将视频下载回来，这样可以自己选择部分段落，反复观看手法节奏等 … 不用翻墙，国内直接搜 Youtube",
+    "platform": "GitHub",
+    "engagement": "👍17，0 评论",
+    "date": "2023-07-21"
+   }
+  ],
+  "existing_solutions": "代理 + yt-dlp（技术门槛高）、B 站搬运（不全、画质差、随时下架）、灰色小程序/网站（不稳定）。",
+  "why_unsolved": "跨境网络政策限制；版权与合规风险使正规产品无法提供；个人方案易被封。",
+  "crowd_signal": "several",
+  "confidence": 0.35,
+  "source_finder": "gh-zh-repos-top-issues"
+ },
+ {
+  "title": "微信聊天记录本地导出与备份",
+  "description": "普通微信用户想把自己的聊天记录（含图片/语音/朋友圈）导出为可读文件或做年度报告、迁移设备、法律取证。微信 PC/手机端只提供整机迁移，不提供任意格式导出，数据库还加密。社区反复造轮子：WeFlow 14.5k★、WechatExporter 8.5k★、echotrace 3.8k★、WechatBakTool 3.7k★、WeChatDataAnalysis 3.4k★、pc_wechat_exp 566★（2026-09-25 仍在更新）。2026 年 7 月 WeFlow 收到 DMCA 后被迫移除密钥提取与解密功能，README 自嘲只剩'纯意念聊天记录导出功能'/'薛定谔的数据浏览器'；用户在 issue 里到处找平替，替代品 CipherTalk 先'[已收费]'后 404 消失。",
+  "audience": "所有想保留/迁移/分析自己微信聊天记录的普通用户（家庭记录、法律证据、年度总结、换机）",
+  "domain": "个人数据/即时通讯",
+  "evidence": [
+   {
+    "url": "https://github.com/hicccc77/WeFlow",
+    "quote": "WeFlow - 一个本地的微信聊天记录导出和年度报告应用；README 合规整改段落：不再提取密钥 / 不再解密数据库 / 不再干扰软件运行，新增'纯意念聊天记录导出功能'与'薛定谔的数据浏览器'",
+    "engagement": "14.5k stars, 484 forks, 93 open issues",
+    "platform": "GitHub",
+    "date": "2026-09"
+   },
+   {
+    "url": "https://github.com/hicccc77/WeFlow/issues/1147",
+    "quote": "刚起床就看到github发的dmca邮件，我还没上车呢！……希望WeFlow能打赢复活赛",
+    "engagement": "issue, 👍 unknown, 0 comments",
+    "platform": "GitHub",
+    "date": "2026-07-08"
+   },
+   {
+    "url": "https://github.com/hicccc77/WeFlow/issues/1193",
+    "quote": "删库前最后一次commit，版本5.0.0（经测试可使用）",
+    "engagement": "issue",
+    "platform": "GitHub",
+    "date": "2026-08-07"
+   },
+   {
+    "url": "https://github.com/hicccc77/WeFlow/issues/1159",
+    "quote": "同志们我似乎找到平替了……这玩意儿长得跟WeFlow的孪生兄弟似的而且还活着昨天还更新过，自测了一下也能用，不知道还能活多久",
+    "engagement": "issue",
+    "platform": "GitHub",
+    "date": "2026-07-12"
+   },
+   {
+    "url": "https://github.com/hicccc77/WeFlow/issues/1190",
+    "quote": "[已收费]还幸存的微信导出CipherTalk（链接 github.com/ILoveBingLu/CipherTalk 现已 404）",
+    "engagement": "issue",
+    "platform": "GitHub",
+    "date": "2026-08-04"
+   },
+   {
+    "url": "https://github.com/hicccc77/WeFlow/issues/411",
+    "quote": "使用此工具会被微信封禁吗——用户收到微信警告；维护者回复实时模式确有风险",
+    "engagement": "issue, 1 pinned comment",
+    "platform": "GitHub",
+    "date": "2026-03-11"
+   },
+   {
+    "url": "https://github.com/search?q=%E5%BE%AE%E4%BF%A1+%E8%81%8A%E5%A4%A9%E8%AE%B0%E5%BD%95+%E5%AF%BC%E5%87%BA&type=repositories&s=stars&o=desc",
+    "quote": "WeFlow 14.5k / WechatExporter 8.5k / echotrace 3.8k / WechatBakTool 3.7k / WeChatDataAnalysis 3.4k / tsycnh WeChatExporter 1.5k / wx4py 749 / pc_wechat_exp 566",
+    "engagement": "top-8 repos 合计约 37k stars",
+    "platform": "GitHub",
+    "date": "2026-09-27"
+   }
+  ],
+  "existing_solutions": "微信官方仅有整机聊天记录迁移/备份到电脑（不可读、不可检索）；第三方开源工具需提取内存密钥解密 SQLite，Windows 版微信 4.x 改版后频繁失效；WeFlow 被 DMCA 后阉割，CipherTalk 转收费后消失，WechatExporter（iOS 备份路线）2025-02 后停更。",
+  "why_unsolved": "腾讯不提供导出 API 且数据库加密，工具必须绕过技术保护措施 → 法律/DMCA 风险与封号风险，维护者随时被迫下架；微信每次大版本更新都要重新逆向。",
+  "crowd_signal": "viral",
+  "confidence": 0.95,
+  "source_finder": "gh-zh-platform-gaps"
+ },
+ {
+  "title": "微信公众号 RSS 订阅",
+  "description": "想用 RSS 阅读器统一阅读公众号文章、不被信息流算法打断、可全文检索归档的用户。微信不提供任何 RSS/开放订阅接口。社区方案 wewe-rss 9.7k★ 借用微信读书接口，长期'账号不可用/小黑屋'，2026-05-11 归档停更留下 270 个 open issues；早期方案 wechat-feeds 973★ 已'[已停止服务]'、feeds 2.1k★ 2023 停更；接棒的 we-mp-rss 4.7k★ 同样在跟会话失效、重新授权后订阅丢失、队列饥饿等问题缠斗。",
+  "audience": "RSS/知识管理用户、需要跟踪多个公众号的研究者、自媒体运营、小团队舆情监控",
+  "domain": "内容订阅/信息获取",
+  "evidence": [
+   {
+    "url": "https://github.com/cooderl/wewe-rss",
+    "quote": "更优雅的微信公众号订阅方式，支持私有化部署、微信公众号RSS生成（基于微信读书）；This repository was archived by the owner on May 11, 2026. It is now read-only. README: 添加频率过高容易被封号，等待24小时解锁（小黑屋）",
+    "engagement": "9.7k stars, 1.8k forks, 270 open issues, archived",
+    "platform": "GitHub",
+    "date": "2026-05-11"
+   },
+   {
+    "url": "https://github.com/cooderl/wewe-rss/issues/417",
+    "quote": "2025.5.14 经常性的出现账号不可用，就是要重新登陆，手动更新时候效果也是需要重复几次才能更完，甚至更新不出来",
+    "engagement": "issue, 0 comments",
+    "platform": "GitHub",
+    "date": "2025-05-14"
+   },
+   {
+    "url": "https://github.com/cooderl/wewe-rss/issues/398",
+    "quote": "希望生成的的微信公众号RSS源内能够包含链接全文信息……目前生成的微信公众号的RSS链接中没有Content的内容为空",
+    "engagement": "issue",
+    "platform": "GitHub",
+    "date": "2025-04-21"
+   },
+   {
+    "url": "https://github.com/rachelos/we-mp-rss/issues?q=is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc",
+    "quote": "#398 定时采集队列饥饿：固定入队顺序+串行处理导致大部分公众号永远不被更新；#411 重新授权后，订阅的公众号丢失；#420 Session-expiry failure storm",
+    "engagement": "22 open issues; repo 4.7k stars, 3 天前更新",
+    "platform": "GitHub",
+    "date": "2026-06~09"
+   },
+   {
+    "url": "https://github.com/search?q=%E5%85%AC%E4%BC%97%E5%8F%B7+RSS&type=repositories&s=stars&o=desc",
+    "quote": "wewe-rss 9.7k / we-mp-rss 4.7k / feeds 2.1k（2023 停更）/ Wechat2RSS 1.6k / wechat-download-api 1.1k / wechat-feeds 973 '[已停止服务]'",
+    "engagement": "6 个同类项目合计 ~20k stars，其中 3 个已停服",
+    "platform": "GitHub",
+    "date": "2026-09-27"
+   }
+  ],
+  "existing_solutions": "wewe-rss（已归档）、we-mp-rss（活跃但依赖登录态，频繁掉线）、Wechat2RSS 与 feeds 等公共源（受限于封号与维护者热情）、RSSHub 公众号路由（长期失效）、付费服务如 Inoreader 不支持公众号。",
+  "why_unsolved": "微信公众平台不开放订阅接口，所有方案都在灰色地带爬微信读书/搜狗/公众号后台，触发风控就封号；维护成本高导致项目一个个停服；全文抓取还要再爬正文页。",
+  "crowd_signal": "viral",
+  "confidence": 0.9,
+  "source_finder": "gh-zh-platform-gaps"
+ },
+ {
+  "title": "多网盘聚合挂载与本地盘化",
+  "description": "用户在百度/阿里/夸克/115/OneDrive 等多个网盘之间被割裂，想在一个界面里管理、互传，并把网盘当本地磁盘/WebDAV 挂载给 Emby、Jellyfin、播放器使用。国内网盘官方客户端互不兼容、限速、无 WebDAV。alist 50.2k★ 是事实标准但 524 个 open issue，'挂载网盘到本地'的需求 2022 年提出至今仍 open（pr-welcome）；2025 年 alist 归属变更引发信任危机，社区 fork 出 OpenList 24.8k★（'A new AList Fork to Anti Trust Crisis'）；LitePan 1.3k★、CloudPaste 2.7k★ 等继续造轮子。",
+  "audience": "NAS/家庭影音用户、多网盘囤资料的普通用户、小团队文件共享",
+  "domain": "云存储/文件管理",
+  "evidence": [
+   {
+    "url": "https://github.com/AlistGo/alist",
+    "quote": "A file list/WebDAV program that supports multiple storages, powered by Gin and Solidjs",
+    "engagement": "50.2k stars, 7.9k forks, 524 open issues",
+    "platform": "GitHub",
+    "date": "2026-09-27"
+   },
+   {
+    "url": "https://github.com/OpenListTeam/OpenList",
+    "quote": "A new AList Fork to Anti Trust Crisis —— a resilient, long-term governance, community-driven fork of AList, built to defend open source against trust-based attacks",
+    "engagement": "24.8k stars, 2.3k forks, 198 open issues",
+    "platform": "GitHub",
+    "date": "2026-09-27"
+   },
+   {
+    "url": "https://github.com/AlistGo/alist/issues/1747",
+    "quote": "希望能增加挂载网盘到本地——通过alist把各种网盘挂载到本地",
+    "engagement": "open since 2022-09-22, labels enhancement + pr-welcome",
+    "platform": "GitHub",
+    "date": "2022-09-22"
+   },
+   {
+    "url": "https://github.com/AlistGo/alist/issues/5480",
+    "quote": "文件上传对于超大文件启用分块上传, 避免413错误以及失败时无需从头开始",
+    "engagement": "open since 2023-11-06, enhancement, assigned but no PR",
+    "platform": "GitHub",
+    "date": "2023-11-06"
+   },
+   {
+    "url": "https://github.com/search?q=%E7%BD%91%E7%9B%98+%E6%8C%82%E8%BD%BD&type=repositories&s=stars&o=desc",
+    "quote": "CloudPaste 2.7k（多存储聚合管理和WebDAV 服务挂载）/ LitePan 1.3k（多网盘聚合挂载，支持 WebDAV、STRM、媒体整理、本地挂载）/ library_strm 196",
+    "engagement": "同类项目持续新增，LitePan 7 天前更新",
+    "platform": "GitHub",
+    "date": "2026-09-27"
+   }
+  ],
+  "existing_solutions": "alist/OpenList（Web 列表 + WebDAV，本地挂载要额外配 rclone/RaiDrive），CloudDrive2（闭源付费），各网盘官方客户端（不互通、限速、非会员无 WebDAV）。",
+  "why_unsolved": "国内网盘没有公开稳定 API，靠逆向私有接口，随时被封/限速；网盘商业模式依赖会员限速，天然排斥第三方挂载；开源维护者商业化后引发信任危机。",
+  "crowd_signal": "viral",
+  "confidence": 0.85,
+  "source_finder": "gh-zh-platform-gaps"
+ },
+ {
+  "title": "安卓开屏广告自动跳过",
+  "description": "国产安卓 APP 普遍有 3-5 秒开屏广告、摇一摇跳转、弹窗，系统和 APP 均不提供关闭选项。用户靠无障碍自动点击工具 GKD 42.3k★、SKIP 3.7k★ 及订阅规则。痛点：小米 HyperOS 4 等新系统限制无障碍/后台导致'对微信无效'、'自动删除快照和规则'、'后台保不住'；规则订阅需要志愿者持续维护，用户在问'现在还有什么好用的订阅'；SKIP 有 64 个 open issue 多为某 APP 跳不过、'时好时坏'。",
+  "audience": "所有国产安卓手机用户，尤其中老年与不愿被广告打扰的用户",
+  "domain": "移动端体验/广告屏蔽",
+  "evidence": [
+   {
+    "url": "https://github.com/gkd-kit/gkd",
+    "quote": "基于无障碍，高级选择器，订阅规则的自定义屏幕点击安卓应用",
+    "engagement": "42.3k stars, 2.0k forks, 13 open issues",
+    "platform": "GitHub",
+    "date": "2026-09-27"
+   },
+   {
+    "url": "https://github.com/gkd-kit/gkd/issues/1449",
+    "quote": "小米 Xiaomi HyperOS 4 对微信无效——对微信不起任何作用（Closed as not planned）",
+    "engagement": "11 👍",
+    "platform": "GitHub",
+    "date": "2026-09-05"
+   },
+   {
+    "url": "https://github.com/gkd-kit/gkd/issues/1458",
+    "quote": "某些设备上概率出现全部数据丢失——打开APP显示隐私政策，点击完之后APP数据重置",
+    "engagement": "7 👍, open",
+    "platform": "GitHub",
+    "date": "2026-09-17"
+   },
+   {
+    "url": "https://github.com/gkd-kit/gkd/discussions",
+    "quote": "突然对微信无效，不起作用了（2 upvotes）；澎湃 os4 会被云闪付检测到模拟点击；小米手机HyperOS会自动删除快照和规则；有人遇到过小米hyperos3后台保不住吗（2 upvotes）；触发变慢了，以前跳过很快几乎无感，现在都要 2 秒左右才能跳过；现在还有什么好用的订阅啊？哪个好一点……（2 upvotes）",
+    "engagement": "Q&A discussions 2026-06~09",
+    "platform": "GitHub",
+    "date": "2026-09"
+   },
+   {
+    "url": "https://github.com/GuoXiCheng/SKIP/issues?q=is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc",
+    "quote": "#162 豆瓣开启广告也跳不过去；#165 酷狗，网易云音乐软件无法跳过；#170 需要修复了，时好时坏；#337 能否限定使用软件（黑名单模式）",
+    "engagement": "64 open issues; repo 3.7k stars",
+    "platform": "GitHub",
+    "date": "2024-2025"
+   }
+  ],
+  "existing_solutions": "GKD/SKIP/李跳跳（无障碍点击，依赖规则订阅与系统权限），去广告版 ROM/Root 方案（门槛高），厂商'纯净模式'不覆盖第三方 APP 开屏。",
+  "why_unsolved": "厂商与 APP 靠开屏广告变现，系统层不会提供开关；HyperOS/ColorOS 不断收紧无障碍与后台权限使方案失效；APP 更换控件 ID 使规则需人肉维护。",
+  "crowd_signal": "viral",
+  "confidence": 0.85,
+  "source_finder": "gh-zh-platform-gaps"
+ },
+ {
+  "title": "多平台音源聚合免费听歌与换源",
+  "description": "歌曲版权分散在网易云/QQ/酷狗/汽水等平台，用户想在一个播放器里听全并把歌单迁过来。MusicFree 27.1k★ 明确'软件内部不提供任何音源'，全靠社区插件，而插件源持续失效：置顶最高票讨论是'求插件（有没有Spotify源的插件？）'16 票无人回答；'现在不开魔法的话，只有B站的插件可用'、'为啥插件只有 b 站能用？'；自动/手动换源功能 2024 年提出仍 open；SMB/WebDAV 播放 2022 年提出仍 open。2026 年仍在冒出 TuneFree、HollyMusic、星海音源等聚合音源项目。",
+  "audience": "不想为多个音乐 APP 分别付费的普通听歌用户、想听下架/独家歌曲的用户",
+  "domain": "音乐/内容消费",
+  "evidence": [
+   {
+    "url": "https://github.com/maotoumao/MusicFree",
+    "quote": "一个插件化、定制化、无广告的免费音乐播放器；本软件仅仅是一个播放器，本身并不集成任何平台的任何音源",
+    "engagement": "27.1k stars, 2.0k forks, 273 open issues",
+    "platform": "GitHub",
+    "date": "2026-09-27"
+   },
+   {
+    "url": "https://github.com/maotoumao/MusicFree/discussions/572",
+    "quote": "求插件——有没有Spotify源的插件？",
+    "engagement": "16 upvotes, 0 comments, unanswered（该仓库 top 讨论）",
+    "platform": "GitHub",
+    "date": "2026-01-21"
+   },
+   {
+    "url": "https://github.com/maotoumao/MusicFree/discussions/202",
+    "quote": "关于播放音乐插件部分源 失效或者无法使用……可能是版权或会员歌曲过滤，但搜索不到就很难受",
+    "engagement": "3 upvotes",
+    "platform": "GitHub",
+    "date": "2024-04-05"
+   },
+   {
+    "url": "https://github.com/maotoumao/MusicFree/discussions",
+    "quote": "现在不开魔法的话，只有B站的插件可用（2026-05-31）；为啥插件只有 b 站能用？（2026-09-22）；歌单导入目前只支持500首以内的（2026-01-23）",
+    "engagement": "多条 Q&A 讨论",
+    "platform": "GitHub",
+    "date": "2026"
+   },
+   {
+    "url": "https://github.com/maotoumao/MusicFree/issues/238",
+    "quote": "导入网易云歌单后，歌曲的源就是网易云，但有些歌曲无法播放，在设置里勾选了自动换源也无效，希望能增加手动更改为其他插件的音源的功能",
+    "engagement": "open since 2024-06-19",
+    "platform": "GitHub",
+    "date": "2024-06-19"
+   },
+   {
+    "url": "https://github.com/search?q=%E9%9F%B3%E4%B9%90+%E8%81%9A%E5%90%88+%E9%9F%B3%E6%BA%90&type=repositories&s=stars&o=desc",
+    "quote": "lx-music-xinghai-source 164（LX Music 自定义音源插件，聚合 GDAPI/ChKSz API）/ TuneFree 76（多音源聚合，8 小时前更新）/ HollyMusic 38（自部署聚合全网音源）",
+    "engagement": "2026 年仍持续新增",
+    "platform": "GitHub",
+    "date": "2026-09-27"
+   }
+  ],
+  "existing_solutions": "MusicFree/LX Music 等插件化播放器（音源靠第三方 API，频繁失效），各平台官方 APP（版权割裂需多份会员），Spotify/Apple Music（曲库缺国内歌、需外区）。",
+  "why_unsolved": "版权独占是平台核心商业模式，任何聚合都是灰色地带；第三方音源 API 被封后需要重新寻找；开源作者为规避风险刻意不内置音源。",
+  "crowd_signal": "viral",
+  "confidence": 0.8,
+  "source_finder": "gh-zh-platform-gaps"
+ },
+ {
+  "title": "微信视频号视频下载",
+  "description": "微信视频号没有下载/保存按钮，普通用户想保存自己或他人的视频、直播回放做备份或二次剪辑。社区用抓包+解密的方式造了一批工具：res-downloader 20.2k★（含'视频解密（视频号）'）、wx_channels_download 9.5k★、wechatVideoDownload 5.8k★、WeChatVideoDownloader 4.7k★、wx_channel 2.7k★。用户 issue 里直接贴 weixin.qq.com/sph 链接求下载，且反复反馈只能拿到非高清版本。",
+  "audience": "想保存视频号内容的普通用户、自媒体/小商家（备份自己作品、二创）",
+  "domain": "短视频/内容保存",
+  "evidence": [
+   {
+    "url": "https://github.com/search?q=%E8%A7%86%E9%A2%91%E5%8F%B7+%E4%B8%8B%E8%BD%BD&type=repositories&s=stars&o=desc",
+    "quote": "res-downloader 20.2k / wx_channels_download 9.5k（微信视频号下载器）/ wechatVideoDownload 5.8k（支持视频号视频、直播回放、直播、图片下载）/ WeChatVideoDownloader 4.7k / wx_channel 2.7k / WechatVideoSniffer2.0 881",
+    "engagement": "6 个专用工具合计 ~44k stars，前 3 个近 1 月内均有更新",
+    "platform": "GitHub",
+    "date": "2026-09-27"
+   },
+   {
+    "url": "https://github.com/putyy/res-downloader",
+    "quote": "视频号、小程序、抖音、快手、小红书、直播流、m3u8、酷狗、QQ音乐等常见网络资源下载! 含'视频解密（视频号）'操作",
+    "engagement": "20.2k stars, 2.5k forks, 11 open issues",
+    "platform": "GitHub",
+    "date": "2026-09-27"
+   },
+   {
+    "url": "https://github.com/putyy/res-downloader/issues?q=is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc",
+    "quote": "#378 4.0.0-beta.5微视频无法下载超清视频；#383 下载的不是高清版视频；#381/#382 标题直接是 https://weixin.qq.com/sph/AZdfmV5ZxC",
+    "engagement": "11 open issues，其中 5 条为 2026-09 新增",
+    "platform": "GitHub",
+    "date": "2026-09"
+   }
+  ],
+  "existing_solutions": "抓包+解密类桌面工具（需装证书/驱动，微信升级即失效），手机录屏（画质差），无官方途径。",
+  "why_unsolved": "微信视频号刻意不提供下载并对视频流加密；每次微信更新即需重新逆向；工具作者面临版权与合规风险只能声明'仅供学习'。",
+  "crowd_signal": "viral",
+  "confidence": 0.8,
+  "source_finder": "gh-zh-platform-gaps"
+ },
+ {
+  "title": "抖音/小红书作品无水印批量下载",
+  "description": "用户想批量备份自己/关注博主的抖音、小红书作品（无水印、含图集/实况/评论/收藏夹），平台仅提供带水印单条保存且部分作者禁止下载。社区项目极多：Douyin_TikTok_Download_API 20.4k★、TikTokDownloader 16.3k★、douyin-downloader 12.1k★、TikTokDownload 8.9k★、videodl 2.9k★、XHS-Downloader；但平台反爬使工具持续失效——TikTokDownloader 明言'为确保项目合法合规，本项目的加密参数算法不再维护'，XHS-Downloader 用户要求'调整抓取速度和间隔避免触发小红书防御机制'、'Cannot login, nor extract anything'。",
+  "audience": "内容创作者、素材收集者、想备份收藏夹的普通用户、小商家",
+  "domain": "短视频/内容保存",
+  "evidence": [
+   {
+    "url": "https://github.com/search?q=%E6%8A%96%E9%9F%B3+%E4%B8%8B%E8%BD%BD&type=repositories&s=stars&o=desc",
+    "quote": "Douyin_TikTok_Download_API 20.4k（无水印视频下载 API）/ res-downloader 20.2k / TikTokDownloader 16.3k / douyin-downloader 12.1k / TikTokDownload 8.9k（抖音去水印批量下载用户主页作品、喜欢、收藏、图文、音频）/ videodl 2.9k",
+    "engagement": "top-6 合计 ~80k stars",
+    "platform": "GitHub",
+    "date": "2026-09-27"
+   },
+   {
+    "url": "https://github.com/JoeanAmier/TikTokDownloader",
+    "quote": "为确保项目合法合规，本项目的加密参数算法不再维护（用户须自行提供加密代码）",
+    "engagement": "16.3k stars, 2.8k forks, 37 open issues",
+    "platform": "GitHub",
+    "date": "2026-09-27"
+   },
+   {
+    "url": "https://github.com/JoeanAmier/TikTokDownloader/issues?q=is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc",
+    "quote": "#783 建议增加只下载音频；#551 建议开放更多web api，例如：获取收藏夹列表，批量下载指定收藏夹的所有视频等；#585 小白的快速批量下载方法",
+    "engagement": "37 open issues",
+    "platform": "GitHub",
+    "date": "2025-2026"
+   },
+   {
+    "url": "https://github.com/JoeanAmier/XHS-Downloader/issues?q=is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc",
+    "quote": "#479 申请加入可以调整抓取速度和间隔的功能避免触发小红书防御机制；#462 Cannot login, nor extract anything from xhs.；#339 添加评论内容采集功能",
+    "engagement": "19 open issues",
+    "platform": "GitHub",
+    "date": "2026-09"
+   },
+   {
+    "url": "https://github.com/search?q=%E5%B0%8F%E7%BA%A2%E4%B9%A6+%E5%8E%BB%E6%B0%B4%E5%8D%B0&type=repositories&s=stars&o=desc",
+    "quote": "short_videos 728 / video-analyse 627 / media-parser 319 / wxxcx 306 / images_spider 290 等十余个'多平台去水印'解析服务",
+    "engagement": "长尾项目众多但均 <1k",
+    "platform": "GitHub",
+    "date": "2026-09-27"
+   }
+  ],
+  "existing_solutions": "开源下载器（需 Cookie、随反爬更新失效、作者停维护加密算法）、各类去水印小程序/网站（广告多、常挂）、平台自带保存（带水印、单条、可被作者禁用）。",
+  "why_unsolved": "平台把内容锁定在站内是商业策略，持续升级签名算法与风控；开源作者因法律合规压力主动放弃核心破解模块。",
+  "crowd_signal": "viral",
+  "confidence": 0.75,
+  "source_finder": "gh-zh-platform-gaps"
+ },
+ {
+  "title": "大麦/演唱会抢票",
+  "description": "演唱会门票秒空、黄牛横行，普通人想要能公平抢到票的辅助工具。GitHub 上大麦抢票脚本非常多（ticket-purchase 7.3k★、Automatic_ticket_purchase 5.7k★、damaihelper 4.2k★、tickets 3.4k★、ticket-grabbing 1.9k★、DaMaiHelper 1.8k★）但用户普遍反馈'试了好几个github上的大麦抢票脚本，好像都没有能用的'、'有用这个成功抢到的嘛？'（0 回复）、'web端 很多场次都无法抢 只能在app上'。需求极强但至今没有一个可靠、合法的解法。",
+  "audience": "演唱会/话剧/体育赛事观众（大量年轻人）",
+  "domain": "票务/消费",
+  "evidence": [
+   {
+    "url": "https://github.com/search?q=%E5%A4%A7%E9%BA%A6+%E6%8A%A2%E7%A5%A8&type=repositories&s=stars&o=desc",
+    "quote": "ticket-purchase 7.3k / Automatic_ticket_purchase 5.7k / damaihelper 4.2k / tickets 3.4k（大麦网、bilibili会员购 调用接口的抢票软件，余票监控）/ ticket-grabbing 1.9k / DaMaiHelper 1.8k / Autoticket 1.5k",
+    "engagement": "top-7 合计 ~26k stars",
+    "platform": "GitHub",
+    "date": "2026-09-27"
+   },
+   {
+    "url": "https://github.com/WECENG/ticket-purchase/issues/84",
+    "quote": "不建议部署使用这个脚本……Web端，无法使用。进入抢票界面后，即使已经开票了，也还是不断刷新界面不开始抢票……搞了一晚上结果巫师音乐会还是抢票失败了，很难开，不明白为什么这么多人star。试了好几个github上的大麦抢票脚本，好像都没有能用的。",
+    "engagement": "issue, open",
+    "platform": "GitHub",
+    "date": "2025-10-30"
+   },
+   {
+    "url": "https://github.com/WECENG/ticket-purchase/issues/23",
+    "quote": "有用这个成功抢到的嘛？",
+    "engagement": "open since 2023-11-18, 0 comments",
+    "platform": "GitHub",
+    "date": "2023-11-18"
+   },
+   {
+    "url": "https://github.com/WECENG/ticket-purchase/issues?q=is%3Aissue+sort%3Areactions-%2B1-desc",
+    "quote": "#1 网页端 很多场次都无法抢 只能在app上；#90 屎山代码放出来干什么呢；#99 rubbish；#97 web端一直显示还没开票怎么解决 只能手动点击购票",
+    "engagement": "9 open / 3 closed",
+    "platform": "GitHub",
+    "date": "2024-2026"
+   },
+   {
+    "url": "https://github.com/shiyutim/tickets/issues?q=is%3Aissue+sort%3Areactions-%2B1-desc",
+    "quote": "#11 提醒楼主注意保护自己；#63 老板们，有没有app的下单呀",
+    "engagement": "6 open / 6 closed; repo 3.4k stars 14 天前更新",
+    "platform": "GitHub",
+    "date": "2026-04-23"
+   }
+  ],
+  "existing_solutions": "Selenium/Appium 模拟点击脚本（大麦风控升级后基本失效、web 端不放票）、接口级脚本（需逆向签名，作者有法律风险）、黄牛/代抢（高价且违法）。",
+  "why_unsolved": "票务平台风控与实名制持续升级，脚本无法稳定绕过；抢票脚本本身涉及法律灰色地带，维护者不敢深入；根源是供需失衡而非技术问题。",
+  "crowd_signal": "viral",
+  "confidence": 0.7,
+  "source_finder": "gh-zh-platform-gaps"
+ },
+ {
+  "title": "备用机短信/验证码转发到主力机",
+  "description": "双卡/多机用户、老人代管、海外用户需要把备用安卓机收到的短信、验证码、来电、APP 通知转发到主力手机或微信/钉钉/飞书。运营商与手机系统都不提供跨设备转发。SmsForwarder 28.1k★ 是唯一主流方案，但长期被厂商后台管控折磨：'小米手机无人值守支持'（锁屏后无法自启）、'一加手机对这个app锁不住，会掉线'、'升级到小米的澎湃os4 beta 后，bark通道失效'、鸿蒙接收端需另寻方案；甚至出现硬件路线 sms_forwarding 1.5k★、sms-bridge 431★ 用 4G 模块自己造转发器。",
+  "audience": "双卡/多机用户、跨境/留学用户、代管父母手机的子女、需要接收验证码的小商家",
+  "domain": "通讯/移动端",
+  "evidence": [
+   {
+    "url": "https://github.com/pppscn/SmsForwarder",
+    "quote": "短信转发器——监控Android手机短信、来电、APP通知，并根据指定规则转发到其他手机……备用机必备神器",
+    "engagement": "28.1k stars, 3.4k forks, 13 open issues, 8 小时前更新",
+    "platform": "GitHub",
+    "date": "2026-09-27"
+   },
+   {
+    "url": "https://github.com/pppscn/SmsForwarder/issues/760",
+    "quote": "希望增加对小米手机（HyperOS / 澎湃OS）无人值守运行的支持——开启锁屏密码后首次开机无法自启（FBE 加密）",
+    "engagement": "open, label help wanted, assignee pppscn",
+    "platform": "GitHub",
+    "date": "2026-07-12"
+   },
+   {
+    "url": "https://github.com/pppscn/SmsForwarder/issues?q=is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc",
+    "quote": "#727 一加手机对这个app锁不住，会掉线；#772 升级到小米的澎湃os4 beta 后，bark通道失效；#765 建议在 Bark / Gotify 渠道说明中补充「鸿蒙设备接收」方案；#726 支持用Telegram Bot API发短信（TG->短信转发）",
+    "engagement": "13 open issues，2026-03~09",
+    "platform": "GitHub",
+    "date": "2026-09-24"
+   },
+   {
+    "url": "https://github.com/search?q=%E7%9F%AD%E4%BF%A1+%E8%BD%AC%E5%8F%91&type=repositories&s=stars&o=desc",
+    "quote": "sms_forwarding 1.5k（超低成本硬件短信转发器，ML307R+ESP32C3）/ sms-bridge 431（把几十块钱的USB上网卡插到玩客云/树莓派，让它变成云手机）/ uart_sms_forwarder 369（Air780）",
+    "engagement": "硬件替代方案兴起",
+    "platform": "GitHub",
+    "date": "2026-09-27"
+   }
+  ],
+  "existing_solutions": "SmsForwarder（依赖无障碍/通知权限与后台保活，被 HyperOS/ColorOS 杀）；硬件 4G 模块自建（有门槛）；运营商'和多号'等付费业务不覆盖验证码转发；iOS 仅苹果生态内互通。",
+  "why_unsolved": "厂商激进的后台管控与 FBE 加密让常驻服务不可靠；鸿蒙 NEXT 不能装安卓 APK；运营商没有动力开放短信转发。",
+  "crowd_signal": "many",
+  "confidence": 0.8,
+  "source_finder": "gh-zh-platform-gaps"
+ },
+ {
+  "title": "微信读书全本与笔记导出",
+  "description": "付费读者想把在微信读书里读过的书、划线笔记导出到本地/Obsidian/Notion/Kindle 长期保存。微信读书只允许导出有限笔记且网页版用 Canvas 渲染防复制。社区工具 weread-exporter 2.1k★ 有 82 个 open issue 多为'无法下载/卡死/地址格式改了'，2025-2026 年又冒出 lbq110/weread-exporter 321★（Playwright + Canvas Hook）、weread-toolbox 353★、readneo 183★、WeReadToolbox 56★ 等新轮子，说明旧方案随平台改版失效、需求持续。",
+  "audience": "微信读书付费/会员读者、做读书笔记与知识管理的用户",
+  "domain": "阅读/个人数据",
+  "evidence": [
+   {
+    "url": "https://github.com/search?q=%E5%BE%AE%E4%BF%A1%E8%AF%BB%E4%B9%A6+%E5%AF%BC%E5%87%BA&type=repositories&s=stars&o=desc",
+    "quote": "drunkdream/weread-exporter 2.1k / weread-toolbox 353（导出图文 Markdown 笔记，同步 Notion）/ lbq110/weread-exporter 321（Playwright + Canvas Hook 提取完整书籍内容）/ readneo 183 / wxread-export 79 / WeReadToolbox 56",
+    "engagement": "10 个同类项目，5 个在 2025-2026 新建/更新",
+    "platform": "GitHub",
+    "date": "2026-09-27"
+   },
+   {
+    "url": "https://github.com/drunkdream/weread-exporter",
+    "quote": "将微信读书中的书籍导出成epub、pdf、mobi等格式——通过 hook Canvas 函数提取文本；本工具仅作技术研究之用",
+    "engagement": "2.1k stars, 334 forks, 82 open issues",
+    "platform": "GitHub",
+    "date": "2026-09-27"
+   },
+   {
+    "url": "https://github.com/drunkdream/weread-exporter/issues/80",
+    "quote": "微信读书网页版的地址格式改了",
+    "engagement": "open since 2024-05-13, 0 comments",
+    "platform": "GitHub",
+    "date": "2024-05-13"
+   },
+   {
+    "url": "https://github.com/drunkdream/weread-exporter/issues?q=is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc",
+    "quote": "#119 无法下载；#37 有的书运行到一半就卡住了；#41 部分书抓取时会卡死报错；#11 安装成功但无法获取书籍",
+    "engagement": "82 open issues",
+    "platform": "GitHub",
+    "date": "2023-2025"
+   },
+   {
+    "url": "https://github.com/lbq110/weread-exporter",
+    "quote": "微信读书网页版用 Canvas 渲染书籍文字（而非 DOM 文本节点），插图则是 DOM <img> 元素……文字与插图按阅读顺序精确交错",
+    "engagement": "321 stars, 68 forks",
+    "platform": "GitHub",
+    "date": "2026-07-01"
+   }
+  ],
+  "existing_solutions": "微信读书官方笔记导出（仅划线/想法，格式受限、有数量限制）；Canvas Hook 类爬虫（每次改版失效、有版权与账号风险）；Notion/Obsidian 同步插件（只同步笔记不含正文）。",
+  "why_unsolved": "微信读书以 Canvas 渲染+加密接口刻意防复制，版权方限制导出；工具依赖网页结构，微信读书频繁改版；作者只能声明'技术研究'。",
+  "crowd_signal": "many",
+  "confidence": 0.7,
+  "source_finder": "gh-zh-platform-gaps"
+ },
+ {
+  "title": "跨平台歌单迁移",
+  "description": "用户在网易云/QQ音乐/汽水/Apple Music/Spotify 之间切换时想一键搬歌单，各平台互不开放导出。GoMusic 2.5k★ 是主要方案，但 issue 显示解析持续失效：'汽水音乐解析失败'、'QQ音乐歌单出现无法解析……仅出现30首歌曲'、'请问支持网易云转汽水吗'；MusicFree 用户也在问'歌单导入目前只支持500首以内的'。另有 Netease-to-Youtube-or-Spotify 755★、LocalMusicHelper 405★、SaltPlayerConverter 130★ 反复造轮子。",
+  "audience": "更换音乐平台或多平台并用的普通听歌用户",
+  "domain": "音乐/数据可携",
+  "evidence": [
+   {
+    "url": "https://github.com/Bistutu/GoMusic",
+    "quote": "迁移网易云/汽水/QQ音乐歌单至 Apple/Youtube/Spotify Music",
+    "engagement": "2.5k stars, 81 forks, 4 open issues",
+    "platform": "GitHub",
+    "date": "2026-09-27"
+   },
+   {
+    "url": "https://github.com/Bistutu/GoMusic/issues?q=is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc",
+    "quote": "#30 汽水音乐解析失败；#41 请问支持网易云转汽水吗；#42 QQ音乐歌单出现无法解析，使用 使用未经处理的原始歌曲名 时仅出现30首歌曲",
+    "engagement": "4 open issues 2025-07~2026-04",
+    "platform": "GitHub",
+    "date": "2026-04-04"
+   },
+   {
+    "url": "https://github.com/search?q=%E6%AD%8C%E5%8D%95+%E8%BF%81%E7%A7%BB&type=repositories&s=stars&o=desc",
+    "quote": "GoMusic 2.5k / Netease-to-Youtube-or-Spotify 755 / LocalMusicHelper 405（在线平台歌单转本地播放器）/ SaltPlayerConverter 130",
+    "engagement": "4 个同类项目",
+    "platform": "GitHub",
+    "date": "2026-09-27"
+   },
+   {
+    "url": "https://github.com/maotoumao/MusicFree/discussions",
+    "quote": "歌单导入目前只支持500首以内的，这个地方能优化一下吗？；如何导入其他平台的歌单，已网易云举例",
+    "engagement": "Q&A discussions",
+    "platform": "GitHub",
+    "date": "2026-01-23"
+   }
+  ],
+  "existing_solutions": "GoMusic（靠爬平台网页，接口一变就挂，只能输出歌名列表再借 TuneMyMusic 匹配）；TuneMyMusic/Soundiiz（国外服务不支持国内平台）；手动搜索重建。",
+  "why_unsolved": "国内音乐平台不提供歌单导出 API 且反爬；歌名/歌手/版本匹配跨平台天然不准；平台把用户歌单当锁定资产。",
+  "crowd_signal": "many",
+  "confidence": 0.65,
+  "source_finder": "gh-zh-platform-gaps"
+ },
+ {
+  "title": "12306 抢票辅助",
+  "description": "春运/节假日火车票秒空，用户想要自动刷票/候补辅助。历史上 GitHub 出现大量 12306 抢票工具（testerSunshine/12306 34.1k★、EasyTrain 647★、12306Python 552★ 等），如今几乎全部停更或归档（12306 于 2023-12-19 归档且留下 223 个 open issue），最新的 12306-client 仅 103★。需求仍在（每年春运），但官方候补机制与风控让第三方工具集体死亡，用户回到手动刷/付费加速包。",
+  "audience": "春运返乡、节假日出行的普通乘客",
+  "domain": "出行/票务",
+  "evidence": [
+   {
+    "url": "https://github.com/testerSunshine/12306",
+    "quote": "12306智能刷票，订票（自动打码、自动登录、智能候补）——This repository was archived by the owner on Dec 19, 2023. It is now read-only.",
+    "engagement": "34.1k stars, 9.6k forks, 223 open issues, archived",
+    "platform": "GitHub",
+    "date": "2023-12-19"
+   },
+   {
+    "url": "https://github.com/search?q=12306+%E6%8A%A2%E7%A5%A8&type=repositories&s=stars&o=desc",
+    "quote": "gxcuizy/Python 5.5k（含 12306抢票，2023 停更）/ EasyTrain 647（2023-09）/ 12306Python 552（2019）/ python_12306 300（2019）/ Chrome_12306 181（2018）/ 12306-client 103（2025-01）",
+    "engagement": "排名靠前项目全部 2019-2023 停更",
+    "platform": "GitHub",
+    "date": "2026-09-27"
+   }
+  ],
+  "existing_solutions": "12306 官方候补（成功率不透明）、携程/智行加速包（付费、效果存疑）、已停更的开源脚本（登录/验证码机制变更后失效）。",
+  "why_unsolved": "12306 持续升级风控（验证码、设备指纹、实名限购）并把'候补'收归官方；第三方抢票涉法律风险，维护者陆续退出；供需失衡非技术可解。",
+  "crowd_signal": "many",
+  "confidence": 0.6,
+  "source_finder": "gh-zh-platform-gaps"
+ },
+ {
+  "title": "电子发票自动收集与报销整理",
+  "description": "个人、自由职业者与小团队每月要从邮箱/微信/各 APP 里手工收集 PDF/OFD/XML 发票，去重、重命名、归类、汇总成 Excel 报销。税务平台与邮箱都不提供聚合。GitHub 上出现一批小工具：Invoice-Downloader 443★（昨天仍更新，'面向每月需要手工收集多张电子发票的个人、自由职业者和小团队'）、invoice-organizer-skill 33★、autoEmail 21★、fapiaodashi 21★、baoxiao 13★、tidoc 8★——项目多、星少、同质化，典型'找不到满意的所以自己写'。",
+  "audience": "需要报销的上班族、自由职业者、小微企业财务/老板",
+  "domain": "财务/办公效率",
+  "evidence": [
+   {
+    "url": "https://github.com/EthanYoQ/Invoice-Downloader",
+    "quote": "电子发票整理与报销准备工具：从邮箱批量收集 PDF/OFD/XML 发票，OCR 识别、分类归档并生成 Excel 汇总——面向每月需要手工收集多张电子发票的个人、自由职业者和小团队",
+    "engagement": "443 stars, 45 forks, 137 commits, updated yesterday",
+    "platform": "GitHub",
+    "date": "2026-09-26"
+   },
+   {
+    "url": "https://github.com/search?q=%E5%8F%91%E7%A5%A8+%E6%95%B4%E7%90%86&type=repositories&s=stars&o=desc",
+    "quote": "invoice-organizer-skill 33（中文电子发票本地整理 Skill：23 类费用指引、PDF 字段提取、归类复核、重命名与去重）/ autoEmail 21（自动从QQ邮箱下载发票并分析整理）/ fapiaodashi 21 / InvoiceTool 14 / baoxiao 13（整理发票→规范命名归档→生成合规报销单）/ fapiao_bot 8 / tidoc 8（报账发票、付款截图、查验单整理与打印导出）",
+    "engagement": "10 个同类项目，均 <500 stars，2025-2026 多个新建",
+    "platform": "GitHub",
+    "date": "2026-09-27"
+   }
+  ],
+  "existing_solutions": "手工下载+改名；微信'发票夹'/支付宝'发票管家'（仅收自家渠道、不导出汇总）；企业报销 SaaS（面向企业、个人用不上）；OFD 格式需专用阅读器。",
+  "why_unsolved": "发票分散在邮箱、微信、各 APP 且格式（PDF/OFD/XML）不统一；税务局全电发票平台不提供个人聚合/导出 API；市场小而碎，商业公司没动力做 C 端。",
+  "crowd_signal": "several",
+  "confidence": 0.6,
+  "source_finder": "gh-zh-platform-gaps"
+ },
+ {
+  "title": "微信支付宝账单导入自动记账",
+  "description": "用户想把微信/支付宝/银行账单一键导入记账软件并自动分类，而两大支付平台不开放账单 API，只能手动申请导出 CSV。GitHub 上同类小项目极多且全在 100★ 以下：WeChatPay_to_Notion 57★、Bookkeeping 32★（AI Agent 记账 Skill，导入支付宝、微信、各类银行账单并自动去重）、Narymax_AutoAccount 21★、autocoin 5★、MoneyMate-android 2★、BetterMiLedger 1★、beancount-import-auto 1★、ledgermind-os 1★——2026 年仍不断有人重写，说明没有一个被公认好用的方案。",
+  "audience": "想做个人/家庭财务管理的普通用户、小商家对账",
+  "domain": "个人财务",
+  "evidence": [
+   {
+    "url": "https://github.com/search?q=%E8%B4%A6%E5%8D%95+%E8%AE%B0%E8%B4%A6+%E5%BE%AE%E4%BF%A1+%E6%94%AF%E4%BB%98%E5%AE%9D+%E5%AF%BC%E5%85%A5&type=repositories&s=stars&o=desc",
+    "quote": "WeChatPay_to_Notion 57（将导出的微信支付宝付款账单再次导入至Notion）/ Bookkeeping 32（可导入支付宝、微信、各类银行账单并自动去重）/ Narymax_AutoAccount 21（根据自定义关键字匹配商家、商品名称，进行分类，导入记账软件）/ autocoin 5 / MoneyMate-android 2（微信/支付宝通知自动记账）/ BetterMiLedger 1 / beancount-import-auto 1 / ledgermind-os 1",
+    "engagement": "10 个项目均 <60 stars，其中 6 个在 2026 年更新",
+    "platform": "GitHub",
+    "date": "2026-09-27"
+   }
+  ],
+  "existing_solutions": "微信/支付宝手动申请账单导出 CSV（有等待期、字段不一致）→ 导入随手记/钱迹/Beancount（需手工映射分类）；自动记账 APP 靠读通知（被系统限制、易漏）。",
+  "why_unsolved": "支付平台不开放账单 API 也不推送结构化数据；商户名称不规范导致自动分类需人工规则；市场碎片化，每个人按自己的记账工具写脚本。",
+  "crowd_signal": "several",
+  "confidence": 0.55,
+  "source_finder": "gh-zh-platform-gaps"
+ },
+ {
+  "title": "B站收藏夹失效视频找回与备份",
+  "description": "B站用户收藏的视频被下架后只显示'已失效视频'，标题/UP主信息全部丢失，B站不提供收藏夹导出或失效提醒。GitHub 上出现一串小工具专门'拯救以已失效视频为标题的视频'：BiliBili-favorites-list-saver 18★、bilibili-fav-restore 6★（27 天前更新）、Bilibili-Favorite-Sync 5★（自动同步收藏夹到本地以防失效）、BiliBackup 67★（收藏夹视频自动备份到 OneDrive）、crawling-bilibili-personal-collect 73★——需求清晰但没有一个成规模的方案。",
+  "audience": "B站重度用户、收藏教程/纪录片/音乐的学习型用户",
+  "domain": "内容保存/个人数据",
+  "evidence": [
+   {
+    "url": "https://github.com/search?q=%E6%94%B6%E8%97%8F%E5%A4%B9+%E5%A4%B1%E6%95%88+bilibili&type=repositories&s=stars&o=desc",
+    "quote": "BiliBili-favorites-list-saver 18（用于拯救以'已失效视频'为标题的视频）/ bilibili-fav-restore 6（自动还原失效视频的原始信息）/ Bilibili-Favorite-Sync 5（自动同步你的b站收藏夹到本地以防失效）/ Dowerinne-Tampermonkey-Bilibili-Fix 2（找回B站收藏夹已失效视频）/ bilibili-favorites-cleaner 0",
+    "engagement": "9 个项目，均 <100 stars，2022-2026 持续新建",
+    "platform": "GitHub",
+    "date": "2026-09-27"
+   },
+   {
+    "url": "https://github.com/Privilege-privacy/BiliBackup",
+    "quote": "自动将 BiliBili (B站) 收藏夹内的视频备份到 OneDrive 或其他云存储",
+    "engagement": "67 stars",
+    "platform": "GitHub",
+    "date": "2023-05-18"
+   },
+   {
+    "url": "https://github.com/search?q=B%E7%AB%99+%E6%94%B6%E8%97%8F%E5%A4%B9+%E5%A4%87%E4%BB%BD&type=repositories&s=stars&o=desc",
+    "quote": "bilibili-favlist 3（收藏夹内容导出为CSV）/ bilibili-fav-export 0（一键导出 B站/小红书个人收藏夹到 Excel）",
+    "engagement": "长尾",
+    "platform": "GitHub",
+    "date": "2026-09-27"
+   }
+  ],
+  "existing_solutions": "油猴脚本借第三方缓存（biliplus 等）还原标题（覆盖率低）；手动定期用 API 导出 CSV；下载工具全量备份（占空间、需登录 Cookie）。",
+  "why_unsolved": "B站删除视频时同步抹掉元数据且不提供收藏夹导出；第三方只能靠提前快照，没有平台配合就无法事后找回。",
+  "crowd_signal": "several",
+  "confidence": 0.5,
+  "source_finder": "gh-zh-platform-gaps"
+ },
+ {
+  "title": "高校抢课/选课辅助",
+  "description": "大学生在教务系统选课时面对秒空、系统崩溃，想要自动重试/余课提醒。教务系统（正方、强智、tis 等）每校配置不同，GitHub 上几乎每所学校都有一个抢课脚本：Auto_courseGrabber 972★（正方，多省市高校实测，README 专门维护'正方高校覆盖与兼容性记录'）、HDU-KillCourse 289★、SUSTech_Tools 264★、BUPTtakeCourse 205★、sysu-course-selector 87★、SEU 83★、YNU-xk_spider 71★（余课提醒）……高度碎片化，没有跨校通用方案。",
+  "audience": "在校大学生",
+  "domain": "教育/校园",
+  "evidence": [
+   {
+    "url": "https://github.com/search?q=%E9%80%89%E8%AF%BE+%E6%8A%A2%E8%AF%BE&type=repositories&s=stars&o=desc",
+    "quote": "Auto_courseGrabber 972（正方教务系统自动抢课脚本（多省市高校实测））/ HDU-KillCourse 289 / SUSTech_Tools 264 / BUPTtakeCourse 205 / sysu-course-selector 87 / SEU-NewCourseElection-Helper 83 / YNU-xk_spider 71（选课爬虫，提供余课提醒服务）/ SUSTech-tis-cheater 64 / WHUT 52 / SUSTC-Qiangke 49",
+    "engagement": "前 10 名分属 8 所不同学校",
+    "platform": "GitHub",
+    "date": "2026-09-27"
+   },
+   {
+    "url": "https://github.com/ceilf6/Auto_courseGrabber",
+    "quote": "多课程并发选课、课程名或课号检索、时间/教师筛选、换课、定时开抢与图形化控制台；兼容性因校而异，见'正方高校覆盖与兼容性记录'",
+    "engagement": "972 stars, 60 forks, 94 commits, 2026-07-28 更新",
+    "platform": "GitHub",
+    "date": "2026-07-28"
+   }
+  ],
+  "existing_solutions": "按校定制的油猴/Python 脚本（换校即失效、学校禁用）；教务系统官方无余课提醒。",
+  "why_unsolved": "教务系统厂商多、各校深度定制且接口不公开；学校将抢课脚本视为违规；市场是学生、无付费能力，没人做通用产品。",
+  "crowd_signal": "several",
+  "confidence": 0.5,
+  "source_finder": "gh-zh-platform-gaps"
+ },
+ {
+  "title": "体检报告 AI 通俗解读",
+  "description": "普通人拿到体检报告看不懂指标与箭头，医院不提供解读、网上搜索焦虑。2025-2026 年 GitHub 上冒出大量 AI 体检报告解读小项目（health-report-analyzer 3★、MediRead 2★、health-report-reader 2★ ×2、baihua-tijian-app 1★、HealthLens、child-health-explain 等 10 个），全部 ≤3★、多为 OCR+LLM/RAG，说明需求被很多人独立感知但没有一个可信、被广泛采用的方案。",
+  "audience": "每年体检的上班族、给父母看报告的子女",
+  "domain": "健康/医疗",
+  "evidence": [
+   {
+    "url": "https://github.com/search?q=%E4%BD%93%E6%A3%80%E6%8A%A5%E5%91%8A+%E8%A7%A3%E8%AF%BB&type=repositories&s=stars&o=desc",
+    "quote": "health-report-analyzer 3（智健解语 - 个人体检报告智能分析网站）/ health-report-reader 2 / MediRead 2（体检报告智能解读平台 · OCR + RAG + Agent）/ health-report-reader 2（13系统60+指标，5级风险分级）/ baihua-tijian-app2026 1（白话体检APP，体检报告图像识别与通俗解读）/ MedicalKnowledge 1 / HealthLens 0（体检报告 AI 解读官）/ child-health-explain 0",
+    "engagement": "10 个项目全部 ≤3 stars，9 个创建于 2025-09 至 2026-09",
+    "platform": "GitHub",
+    "date": "2026-09-27"
+   }
+  ],
+  "existing_solutions": "体检机构 APP 的简单标注；通用大模型手动粘贴（隐私顾虑、无结构化）；付费在线问诊。",
+  "why_unsolved": "医疗合规与责任风险让大厂不敢做诊断式解读；报告格式各机构不同需 OCR；用户对上传体检数据有隐私顾虑；小项目缺医学审校难以获得信任。",
+  "crowd_signal": "several",
+  "confidence": 0.4,
+  "source_finder": "gh-zh-platform-gaps"
+ },
+ {
+  "title": "微信聊天记录导出与本地归档",
+  "description": "微信用户想把自己的聊天记录（文字/图片/语音）完整导出、备份、做年度报告或喂给个人 AI，但微信官方只提供手机间迁移、没有任何导出功能。WeChatMsg 作者的动机是「数据属于用户」：微信只是壳，对话背后的故事和记忆才有意义，用户应能留存自己的数据。项目 42k star、5.3k fork，说明需求极大；但作者已声明「此项目很久没有（也不会）更新了」，issue 区也已无内容，随微信版本更新（数据库加密方式变化）工具持续失效。",
+  "audience": "普通微信用户（尤其想留存家人对话、做记忆归档、训练个人 AI 的人）",
+  "domain": "社交/个人数据主权",
+  "evidence": [
+   {
+    "url": "https://github.com/LC044/WeChatMsg",
+    "quote": "我深信有意义的不是微信，而是隐藏在对话框背后的一个个深刻故事……此项目很久没有（也不会）更新了",
+    "engagement": "42,086 stars / 5,329 forks（API 数据）；页面显示 42.1k★，issue 列表为空（No results）",
+    "date": "repo 创建 2023-01-11；页面访问 2026-09-27",
+    "platform": "GitHub"
+   },
+   {
+    "url": "https://github.com/LC044/WeChatMsg/issues?q=is%3Aissue+sort%3Areactions-%2B1-desc",
+    "quote": "No results — Try adjusting your search filters（issue 已被清空/关闭）",
+    "engagement": "unknown",
+    "date": "2026-09-27",
+    "platform": "GitHub"
+   }
+  ],
+  "existing_solutions": "微信官方「迁移与备份」只能整机迁移到另一台手机或电脑微信备份（不可读）；WeChatMsg/留痕等开源工具依赖逆向解密本地数据库；付费取证软件昂贵且面向执法。",
+  "why_unsolved": "腾讯出于平台锁定和合规考虑不提供导出 API；逆向方案随微信版本更新（加密方式改变、4.0 新数据库）反复失效，且有法律灰色风险，导致最流行的项目停更，用户只能不停找替代品。",
+  "crowd_signal": "viral",
+  "confidence": 0.9,
+  "source_finder": "gh-self-built-readme"
+ },
+ {
+  "title": "无广告可自定音源的音乐播放器",
+  "description": "普通听歌用户苦于版权分割（歌曲分散在 QQ 音乐/网易云/酷狗等）、会员墙和满屏广告，想要一个「一个 App 搜遍全网、无广告、本地保存数据」的播放器。lx-music-desktop（54k★）和 MusicFree（27k★）都是这一需求的社区造轮子：作者刻意做成「本身不集成任何平台音源」的空壳播放器，靠插件/自定义源接入。两项目 issue 常年在 1,300 / 273 个开放，用户持续要求 iOS 版、WebDAV/SMB 本地库、私人漫游等功能。",
+  "audience": "国内普通听歌用户、多平台会员疲劳者",
+  "domain": "音乐/娱乐",
+  "evidence": [
+   {
+    "url": "https://github.com/lyswhut/lx-music-desktop",
+    "quote": "本项目的各官方平台在线数据来源原理是从其公开服务器中拉取数据……（不提供音源，用户需 24 小时内清除版权数据）",
+    "engagement": "53,970 stars / 7,039 forks / 1,282 open issues（API）",
+    "date": "repo 创建 2019-08-14；访问 2026-09-27",
+    "platform": "GitHub"
+   },
+   {
+    "url": "https://github.com/maotoumao/MusicFree",
+    "quote": "插件化、定制化、无广告的免费音乐播放器……本软件仅仅是一个播放器，本身并不集成任何平台的任何音源",
+    "engagement": "27,130 stars / 1,951 forks / 273 open issues；作者称每天只有约 30 分钟开发时间",
+    "date": "repo 创建 2022-08-22；访问 2026-09-27",
+    "platform": "GitHub"
+   },
+   {
+    "url": "https://github.com/maotoumao/MusicFree/issues?q=is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc",
+    "quote": "#88 iOS .ipa package（wontfix）；#10 是否有加入smb或者webdav等协议的支持；#99 本地音乐文件夹映射和管理；#545 希望开发一个像网易云音乐类似的私人漫游的功能",
+    "engagement": "273 open issues，👍 数页面未显示（unknown）",
+    "date": "2022-10 至 2025-11",
+    "platform": "GitHub"
+   }
+  ],
+  "existing_solutions": "各平台官方 App（广告+会员+曲库分割）；Spotify/Apple Music 国内曲库不全；洛雪/MusicFree 等开源播放器需用户自行找「音源」插件，且 iOS 无法上架。",
+  "why_unsolved": "版权被平台分割是商业结构问题，任何合法产品都无法一站式聚合；开源方案只能做「空壳+插件」规避法律风险，维护者精力有限、无法在 iOS 分发，用户体验始终有缺口。",
+  "crowd_signal": "viral",
+  "confidence": 0.85,
+  "source_finder": "gh-self-built-readme"
+ },
+ {
+  "title": "免费离线的截图OCR桌面工具",
+  "description": "学生、办公人群需要把屏幕上/PDF/图片里的文字、公式、表格快速提取成可编辑文本，但大厂 OCR 都是云端、限次、收费或有隐私顾虑。Umi-OCR（47.5k★、356 open issues）以「开源、免费、离线、无需联网」切入；eSearch 作者则明确写道从 Windows 换到 Linux 后「没有等价的 Snipaste」，Flameshot 也缺直观取色，于是自己写了截图+OCR+贴图工具。用户仍在追问 macOS 支持（Umi-OCR #263 自 2023-12 开放无回复）、表格提取、数学公式识别等。",
+  "audience": "学生、文员、研究人员、Linux/macOS 用户",
+  "domain": "效率工具/OCR",
+  "evidence": [
+   {
+    "url": "https://github.com/hiroi-sora/Umi-OCR",
+    "quote": "OCR software, free and offline. 开源、免费的离线OCR软件。支持截屏/批量导入图片，PDF文档识别，排除水印/页眉页脚",
+    "engagement": "47,514 stars / 4,645 forks / 356 open issues",
+    "date": "repo 创建 2022-03-28；访问 2026-09-27",
+    "platform": "GitHub"
+   },
+   {
+    "url": "https://github.com/hiroi-sora/Umi-OCR/issues/263",
+    "quote": "有没有支持 macOS 的计划？",
+    "engagement": "open，0 comments，👍 unknown",
+    "date": "2023-12-10",
+    "platform": "GitHub"
+   },
+   {
+    "url": "https://github.com/xushengfeng/eSearch",
+    "quote": "作者在 Windows 上用 Snipaste，换到 Linux 后没有等价物（Flameshot 缺直观取色器），并想把手机上的「大爆炸/传送门」式即时信息搜索带到桌面，于是自己写了 eSearch",
+    "engagement": "7,214 stars / 518 forks / 70 open issues；4,453 commits",
+    "date": "repo 创建 2021-10-06；访问 2026-09-27",
+    "platform": "GitHub"
+   }
+  ],
+  "existing_solutions": "百度/腾讯云 OCR（云端、按量收费）；微信/QQ 截图提取文字（需联网、仅移动端/Windows）；Snipaste（闭源、仅 Windows/macOS）；Flameshot（无 OCR）。",
+  "why_unsolved": "大厂把 OCR 作为云服务变现，不做免费离线版；开源方案依赖 PaddleOCR 等模型，跨平台打包（尤其 macOS）和 GUI 维护成本高，多由个人开发者兼职维护。",
+  "crowd_signal": "viral",
+  "confidence": 0.85,
+  "source_finder": "gh-self-built-readme"
+ },
+ {
+  "title": "高质量长期维护的开源中文词库",
+  "description": "想摆脱搜狗/百度/微信输入法（云端上传、广告、弹窗、隐私）的用户转向开源 Rime，却发现官方词库老旧、错词多、无人维护。rime-ice 作者写道「没有找到一份比较好的词库，干脆自己维护一个」，五年做成 19.5k★ 的雾凇拼音，成为事实上的开源中文输入法标准配置。这说明「无广告、隐私、词库质量高」的中文输入方案是长期未被商业方满足的需求。",
+  "audience": "注重隐私/讨厌广告的中文输入用户、开发者、macOS/Linux 用户",
+  "domain": "输入法/隐私",
+  "evidence": [
+   {
+    "url": "https://github.com/iDvel/rime-ice",
+    "quote": "没有找到一份比较好的词库，干脆自己维护一个",
+    "engagement": "19,515 stars / 1,190 forks / 3 open issues；1,000+ commits，持续维护",
+    "date": "repo 创建 2021-01-29；访问 2026-09-27",
+    "platform": "GitHub"
+   }
+  ],
+  "existing_solutions": "搜狗/百度/讯飞/微信输入法（词库好但云端、广告、隐私）；Rime 官方 luna_pinyin（词库陈旧）；清华/搜狗细胞词库需手工转换。",
+  "why_unsolved": "商业输入法靠数据和广告变现，不会开放词库；开源词库需要长期人工纠错和新词维护，几乎全靠个人志愿者，且 Rime 配置门槛高，普通用户难以受益。",
+  "crowd_signal": "viral",
+  "confidence": 0.8,
+  "source_finder": "gh-self-built-readme"
+ },
+ {
+  "title": "纯文件、无锁定的Markdown笔记",
+  "description": "用户想要一个「笔记就是磁盘上的 Markdown 文件、无专有格式、无云锁定」、但又有好搜索、附件、标签、导入 Evernote 的桌面笔记应用。Notable 作者写道「I couldn't find a note-taking app that ticked all the boxes I'm interested in」，项目 23.5k★，但后来转为闭源、单人维护，729 个 open issue 长期悬而未决，最受关注的移动端（#23，2018 年提出）、内置同步（#819）、加密（#7）至今未做。",
+  "audience": "知识工作者、开发者、Evernote/Notion 逃离者",
+  "domain": "笔记/知识管理",
+  "evidence": [
+   {
+    "url": "https://github.com/notable/notable",
+    "quote": "I couldn't find a note-taking app that ticked all the boxes I'm interested in: notes are written and rendered in GitHub Flavored Markdown, no WYSIWYG, no proprietary formats",
+    "engagement": "23,495 stars / 1,180 forks / 729 open issues；新版本已闭源",
+    "date": "repo 创建 2018-12-22；访问 2026-09-27",
+    "platform": "GitHub"
+   },
+   {
+    "url": "https://github.com/notable/notable/issues?q=is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc",
+    "quote": "按 👍 排序前列：#140 Search & replace in note、#23 Mobile app、#116 Version control、#7 Encryption、#819 Built-in synchronization（均 open，milestone Future/Next）",
+    "engagement": "729 open issues；👍 数页面未渲染（unknown）",
+    "date": "2018-12 至 2019-09 提出，至今 open",
+    "platform": "GitHub"
+   },
+   {
+    "url": "https://github.com/notable/notable/issues/23",
+    "quote": "Mobile app — 请求移动端至少能查看笔记",
+    "engagement": "open，0 comments，👍 unknown",
+    "date": "2018-12-27",
+    "platform": "GitHub"
+   }
+  ],
+  "existing_solutions": "Obsidian（闭源、同步收费）、Joplin（自有格式+数据库）、Typora（付费编辑器无管理）、Notion/Evernote（云锁定）。",
+  "why_unsolved": "「纯文件」与「跨端同步/搜索/加密」天然冲突，做好很难；成功的产品转向闭源或订阅变现，开源项目多为单人维护，功能请求积压数年。",
+  "crowd_signal": "viral",
+  "confidence": 0.8,
+  "source_finder": "gh-self-built-readme"
+ },
+ {
+  "title": "免广告免追踪的Google搜索前端",
+  "description": "普通用户想用 Google 的搜索质量，但不想要广告、AMP、Cookie 和 IP 追踪。Whoogle 提供「Google search results, but without any ads, JavaScript, AMP links, cookies, or IP address tracking」，11.6k★、1.1k fork，大量用户自部署。2025 年起 Google 封堵无 JavaScript 查询，作者于 2026-08-14 归档项目：「Google closed both doors; there's no third one to try.」需求依旧存在，但目前无可用方案。",
+  "audience": "注重隐私的普通网民、自托管爱好者",
+  "domain": "搜索/隐私",
+  "evidence": [
+   {
+    "url": "https://github.com/benbusby/whoogle-search",
+    "quote": "Since early 2025, Google has steadily shut the door on search queries made without JavaScript, banning working User-Agent strings as fast as they were found... Google closed both doors; there's no third one to try.",
+    "engagement": "11,569 stars / 1.1k forks；已归档（2026-08-14）",
+    "date": "repo 创建 2020-01-21；归档 2026-08-14",
+    "platform": "GitHub"
+   }
+  ],
+  "existing_solutions": "DuckDuckGo/Startpage/Brave Search（结果质量不及 Google）；SearXNG（Google 引擎同样被封）；浏览器广告拦截（挡不住追踪与 AMP）。",
+  "why_unsolved": "Google 主动技术封锁第三方前端；替代搜索引擎索引质量差距大；付费无广告 Google 不存在。",
+  "crowd_signal": "viral",
+  "confidence": 0.75,
+  "source_finder": "gh-self-built-readme"
+ },
+ {
+  "title": "Windows自动切换深浅色主题",
+  "description": "Windows 用户想像 macOS/Android/iOS 一样，按日出日落或光线自动切换系统深色/浅色主题、壁纸和强调色，但 Windows 十年来没有内置此功能。Auto Dark Mode 作者以「Tired of looking at dark content while the sun is shining brightly? But at night everything is suddenly too bright?」为动机，项目 9.7k★、3,100+ commits，并获 2022 年 Microsoft Store App Award。微软直到 2025-10 才在 PowerToys 加入 Light Switch，且与该工具冲突（issue #1116）。",
+  "audience": "Windows 10/11 普通用户",
+  "domain": "操作系统/个性化",
+  "evidence": [
+   {
+    "url": "https://github.com/AutoDarkMode/Windows-Auto-Night-Mode",
+    "quote": "Tired of looking at dark content while the sun is shining brightly? But at night everything is suddenly too bright?（README；并指出其他操作系统早已提供自动切换）",
+    "engagement": "9,730 stars / 309 forks / 62 open issues；Microsoft Store App Award 2022",
+    "date": "repo 创建 2018-11-17；访问 2026-09-27",
+    "platform": "GitHub"
+   },
+   {
+    "url": "https://github.com/AutoDarkMode/Windows-Auto-Night-Mode/issues?q=is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc",
+    "quote": "#1116 PowerToys' new Light Switch messes with Auto Dark Mode（8 comments）；#469 Wallpaper switching does not work with multiple desktops（31 comments，known issue）",
+    "engagement": "62 open issues",
+    "date": "2022-06 / 2025-10",
+    "platform": "GitHub"
+   }
+  ],
+  "existing_solutions": "Windows 手动切换；任务计划+注册表脚本（门槛高）；PowerToys Light Switch（2025 年才出现，功能简单且与第三方冲突）。",
+  "why_unsolved": "微软长期未把该功能列入系统优先级；壁纸/多显示器/多桌面切换涉及未公开 API，第三方只能靠 hack 维持。",
+  "crowd_signal": "many",
+  "confidence": 0.8,
+  "source_finder": "gh-self-built-readme"
+ },
+ {
+  "title": "完全离线的中文语音输入法",
+  "description": "写作者、程序员、行动不便者想用语音快速输入中文，但主流语音输入（讯飞、搜狗、微信）必须联网、上传音频、延迟高且不可自定义。CapsWriter-Offline 作者的目标是「完全离线（不受网络限制）、响应极快、高准确率 且 高度自定义」，按住 CapsLock 说话松开上屏，6.9k★、199 open issues。至今仅支持 Windows，macOS 因键盘库限制不支持，用户持续要求长语音自动上屏、多语言、GPU 加速、mac 客户端。",
+  "audience": "文字工作者、程序员、老年人/手部不便者、隐私敏感用户",
+  "domain": "输入法/语音",
+  "evidence": [
+   {
+    "url": "https://github.com/HaujetZhao/CapsWriter-Offline",
+    "quote": "完全离线（不受网络限制）、响应极快、高准确率 且 高度自定义……macOS unsupported due to keyboard library constraints",
+    "engagement": "6.9k stars / 637 forks / 199 open issues；524 commits",
+    "date": "访问 2026-09-27（前身 CapsWriter 创建 2020-07-10，已废弃）",
+    "platform": "GitHub"
+   },
+   {
+    "url": "https://github.com/HaujetZhao/CapsWriter-Offline/issues?q=is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc",
+    "quote": "#91 希望支持长语音自动上屏；#177 mac服务端没问题，运行客户端报zsh: segmentation fault；#117 希望增加其他语言；#105 有显卡时，能优先使用GPU吗？",
+    "engagement": "199 open issues，👍 unknown",
+    "date": "2024-02 至 2026-08",
+    "platform": "GitHub"
+   }
+  ],
+  "existing_solutions": "讯飞/搜狗/微信语音输入（云端、需联网、隐私）；Windows 自带语音识别（中文效果差）；macOS 听写（离线中文可用但不可自定义热词）。",
+  "why_unsolved": "高质量离线中文 ASR 模型近两年才成熟（Paraformer/SenseVoice/Qwen3-ASR），个人开发者打包跨平台客户端（尤其 macOS 键盘 hook 权限）成本高；商业输入法无动力做离线版。",
+  "crowd_signal": "many",
+  "confidence": 0.8,
+  "source_finder": "gh-self-built-readme"
+ },
+ {
+  "title": "Android免Root虚拟定位",
+  "description": "用户想在手机上模拟 GPS 位置（游戏、打卡、隐私、测试），但现有工具「收费的，而且贼贵」或必须 ROOT。GoGoGo 作者因此自研基于 Android 调试 API 的免 Root 方案并加摇杆移动，11.4k★、1.3k fork，至今活跃维护（556 commits、15 open PR）。",
+  "audience": "Android 普通用户、LBS 游戏玩家、App 测试人员",
+  "domain": "移动工具",
+  "evidence": [
+   {
+    "url": "https://github.com/ZCShou/GoGoGo",
+    "quote": "现有方案要么是「收费的，而且贼贵」，要么需要 ROOT，于是自己研究实现（README 动机）",
+    "engagement": "11,362 stars / 1,300 forks / 1 open issue / 15 open PRs；556 commits",
+    "date": "repo 创建 2021-12-03；访问 2026-09-27",
+    "platform": "GitHub"
+   }
+  ],
+  "existing_solutions": "Fake GPS 类商业 App（收费/广告/易被检测）；Xposed/Magisk 模块（需 Root）；开发者选项「模拟位置应用」原生能力有限。",
+  "why_unsolved": "系统安全模型限制非 Root 修改定位，只能借开发者调试 API 走灰色路径；应用商店审核不允许此类工具上架，只能靠 GitHub 分发。",
+  "crowd_signal": "viral",
+  "confidence": 0.6,
+  "source_finder": "gh-self-built-readme"
+ },
+ {
+  "title": "Linux上Everything级即时文件搜索",
+  "description": "Windows 用户习惯 Everything 输入即出的全盘文件名搜索，切换到 Linux 后找不到等价物。FSearch 作者写道「On Linux I couldn't find anything that's even remotely as fast and powerful」，MATE Search Tool、Recoll 都不满足轻量+C 级性能要求，于是自己写了 FSearch（4.4k★、2,900+ commits）。用户仍在要求网格视图、托盘常驻、缩略图等。",
+  "audience": "Linux 桌面用户（尤其从 Windows 迁移者）",
+  "domain": "文件管理/桌面工具",
+  "evidence": [
+   {
+    "url": "https://github.com/cboxdoerfer/fsearch",
+    "quote": "On Linux I couldn't find anything that's even remotely as fast and powerful (as Everything Search Engine)",
+    "engagement": "4,385 stars / 285 forks / 152 open issues；2,933 commits",
+    "date": "访问 2026-09-27",
+    "platform": "GitHub"
+   },
+   {
+    "url": "https://github.com/cboxdoerfer/fsearch/issues/597",
+    "quote": "Add Grid view mode",
+    "engagement": "👍 7，0 comments，open",
+    "date": "2025-01-02",
+    "platform": "GitHub"
+   },
+   {
+    "url": "https://github.com/cboxdoerfer/fsearch/issues/730",
+    "quote": "Tray Indicator & Background Running",
+    "engagement": "👍 2，2 comments，open",
+    "date": "2026-08-10",
+    "platform": "GitHub"
+   }
+  ],
+  "existing_solutions": "locate/plocate（命令行、无 GUI）；Recoll/Tracker（全文索引重、慢）；ANGRYsearch、Catfish（性能/功能不足）。",
+  "why_unsolved": "Linux 桌面碎片化（GTK/Qt/Wayland）使 GUI 工具维护成本高；没有商业公司投入，个人维护者精力有限。",
+  "crowd_signal": "many",
+  "confidence": 0.75,
+  "source_finder": "gh-self-built-readme"
+ },
+ {
+  "title": "PC端基金实时估值浮窗",
+  "description": "上班族买了基金后想在电脑工作时悄悄看一眼自选基金实时估值、持仓收益，但基金公司/支付宝/天天基金只有手机 App 或笨重网页。作者写道「买了基金后，一直想找一款 pc 端的 chrome 扩展插件……便打算自己写一个」，funds 扩展 3.2k★、410 fork、121 open issues，用户持续追加分组、总资产、成本线、定投、股票等需求，数年未全部满足。",
+  "audience": "有基金/理财的上班族、办公室白领",
+  "domain": "个人理财",
+  "evidence": [
+   {
+    "url": "https://github.com/x2rr/funds",
+    "quote": "买了基金后，一直想找一款 pc 端的 chrome 扩展插件……便打算自己写一个",
+    "engagement": "3,225 stars / 410 forks / 121 open issues；已上架 Chrome/Edge/Firefox 商店并有小程序",
+    "date": "repo 创建 2020-04-14；访问 2026-09-27",
+    "platform": "GitHub"
+   },
+   {
+    "url": "https://github.com/x2rr/funds/issues?q=is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc",
+    "quote": "#62 基金分组（2020-11）；#137 希望能够显示总资产（2021-03）；#276 可不可以加个成本线（2026-03）；#315 希望增加一个定投功能（2026-05）；#14 大佬，整个股票的呀（2020-07）",
+    "engagement": "121 open issues，👍 unknown",
+    "date": "2020-07 至 2026-05",
+    "platform": "GitHub"
+   }
+  ],
+  "existing_solutions": "天天基金/蚂蚁财富 App（仅手机）；同花顺/东方财富 PC 端（面向股票、臃肿）；Excel 手动记录。",
+  "why_unsolved": "基金销售平台以 App 为流量入口，无动力做轻量 PC 端；估值数据接口非官方、易变；开源扩展靠个人维护，功能请求积压。",
+  "crowd_signal": "many",
+  "confidence": 0.75,
+  "source_finder": "gh-self-built-readme"
+ },
+ {
+  "title": "微信群永久二维码/活码",
+  "description": "社群运营者、小商家、教师建群拉人时，微信群二维码 7 天过期且满 200 人后失效，海报/网页上的码要反复更换。作者「苦于微信群聊二维码频繁变动」，做了一个部署在 Cloudflare 上、无需服务器的永久短链+二维码工具，后台换码前台不变。项目 2025-03 创建即 1.9k★、808 fork（大量用户自部署）。",
+  "audience": "社群运营者、小商家、培训机构、班主任",
+  "domain": "社交/小商家运营",
+  "evidence": [
+   {
+    "url": "https://github.com/xxnuo/serverless-qrcode-hub",
+    "quote": "苦于微信群聊二维码频繁变动，开发这个能生成永久二维码的工具，仅需后台统一更新新二维码。不需要服务器。",
+    "engagement": "1,858 stars / 808 forks / 6 open issues；106 commits，最近更新 2026-03-07",
+    "date": "repo 创建 2025-03-14；访问 2026-09-27",
+    "platform": "GitHub"
+   }
+  ],
+  "existing_solutions": "草料/微号帮等商业活码服务（按码/按量收费、数据托管在第三方、常有广告页）；企业微信「客户群活码」（需企业认证、仅企微群）。",
+  "why_unsolved": "微信出于反营销/反诈考虑不开放长期有效群码；商业活码服务面向企业收费，个人和小商家缺少低成本、数据自持的方案。",
+  "crowd_signal": "many",
+  "confidence": 0.8,
+  "source_finder": "gh-self-built-readme"
+ },
+ {
+  "title": "普通摄像头实现Windows刷脸解锁",
+  "description": "大量笔记本/台式机用户的普通摄像头不支持 Windows Hello（需 IR 红外摄像头），只能输密码/PIN。FaceWinUnlock 作者看到同事新电脑能刷脸后发问「凭什么他能刷脸，我不行?」，自研 Credential Provider + OpenCV 实现类 Windows Hello 解锁，2026-01 创建即 1.9k★、71 open issues。但只做 2D 识别可被照片欺骗，且作者宣布 2026-03-01 起闭源，需求仍无安全、开放的解法。",
+  "audience": "没有 IR 摄像头的 Windows 用户",
+  "domain": "操作系统/身份认证",
+  "evidence": [
+   {
+    "url": "https://github.com/zs1083339604/FaceWinUnlock-Tauri",
+    "quote": "凭什么他能刷脸，我不行?……standard cameras lack Windows Hello support；developer announced source code closure beginning March 1, 2026",
+    "engagement": "1,932 stars / 108 forks / 71 open issues；v0.3.7 2026-02-25",
+    "date": "repo 创建 2026-01-02；访问 2026-09-27",
+    "platform": "GitHub"
+   },
+   {
+    "url": "https://github.com/zs1083339604/FaceWinUnlock-Tauri/issues?q=is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc",
+    "quote": "#111 建议增加「人数判断 / 防偷看模式」；#76 建议增加自动锁屏的功能；#80 应该支持手动设置摄像头旋转；#84 锁屏一段时间后核心解锁服务故障",
+    "engagement": "71 open issues，👍 unknown",
+    "date": "2026-01 至 2026-05",
+    "platform": "GitHub"
+   }
+  ],
+  "existing_solutions": "Windows Hello（需 IR/3D 摄像头硬件）；KeyLemon/Rohos 等第三方付费方案（老旧、兼容差）；指纹外设。",
+  "why_unsolved": "微软出于安全把人脸解锁绑定 IR 硬件；2D 人脸识别防伪不足，做安全又开源的方案技术门槛高；个人项目转闭源。",
+  "crowd_signal": "many",
+  "confidence": 0.7,
+  "source_finder": "gh-self-built-readme"
+ },
+ {
+  "title": "自托管个人/家庭病历聚合",
+  "description": "个人及家庭成员的病历、化验、处方分散在多年就诊的多家医院系统里，用户想在一个自己掌控的地方汇总。Fasten 作者「couldn't find any software that worked as I'd like」，因为现有方案都要求把敏感医疗数据交给公司。项目 2.8k★、195 open issues，但 2026-07-18 归档：自托管版无法直接对接医院 EHR（只能手动录入或上传 FHIR 包），对接 5 万家机构的能力只在商业版 Fasten Connect。",
+  "audience": "有慢性病或多位家人就医记录的个人/家庭",
+  "domain": "健康/个人数据",
+  "evidence": [
+   {
+    "url": "https://github.com/fastenhealth/fasten-onprem",
+    "quote": "my medical history (and the medical history of my family members) is a lot more complicated than I realized and distributed across the many healthcare providers I've used over the years……couldn't find any software that worked as I'd like",
+    "engagement": "2,795 stars / 182 forks / 195 open issues；已归档 2026-07-18",
+    "date": "repo 创建 2022-08-23；归档 2026-07-18",
+    "platform": "GitHub"
+   }
+  ],
+  "existing_solutions": "Apple Health Records（仅美国部分医院、iOS）；各医院 Portal/App（互不打通）；商业 PHR（数据托管在厂商）。",
+  "why_unsolved": "医院 EHR 接口（FHIR/OAuth）注册和维护成本极高，只能由公司做且倾向商业化；隐私法规与自托管难以兼得；开源版失去维护动力被归档。",
+  "crowd_signal": "many",
+  "confidence": 0.7,
+  "source_finder": "gh-self-built-readme"
+ },
+ {
+  "title": "Twitter/X评论区黄推诈骗屏蔽",
+  "description": "中文 Twitter/X 用户「实在受不了推文下无休无止的回复引流的黄推」和诈骗账号，平台审核长期不作为。2023 年 6-7 月短短一个月内出现至少两个独立造轮子项目：Twitter-Block-Porn（共享黑名单一键拉黑，2.0k★）和 Block-Pornographic-Replies（关键词隐藏回复，849★）。两者均依赖非官方接口，活跃度已下滑，问题本身并未解决。",
+  "audience": "Twitter/X 中文用户",
+  "domain": "社交/内容治理",
+  "evidence": [
+   {
+    "url": "https://github.com/daymade/Twitter-Block-Porn",
+    "quote": "受不了评论区黄推了? 共享黑名单, 一键拉黑所有黄推诈骗犯",
+    "engagement": "2,025 stars / 62 forks / 6 open issues；311 commits，近期活跃度下降",
+    "date": "repo 创建 2023-07-07；访问 2026-09-27",
+    "platform": "GitHub"
+   },
+   {
+    "url": "https://github.com/slarkvan/Block-Pornographic-Replies",
+    "quote": "实在受不了推文下无休无止的回复引流的黄推了",
+    "engagement": "849 stars / 64 forks / 8 open issues；43 commits",
+    "date": "repo 创建 2023-06-28；访问 2026-09-27",
+    "platform": "GitHub"
+   }
+  ],
+  "existing_solutions": "X 自带「隐藏回复」「静音关键词」（只对自己生效、需手动）；付费 Premium 不解决；第三方脚本靠共享黑名单或关键词，误判率约 10%。",
+  "why_unsolved": "平台审核缺位且 API 收费/封锁第三方；黑产账号批量生成，个人维护的黑名单追不上；脚本随前端改版失效。",
+  "crowd_signal": "many",
+  "confidence": 0.7,
+  "source_finder": "gh-self-built-readme"
+ },
+ {
+  "title": "macOS本地音乐库播放器",
+  "description": "拥有大量本地音乐文件（FLAC/MP3）的 Mac 用户「missed having a good offline music player on macOS」，试过多款免费和付费播放器都缺少流媒体 App 里习以为常的简洁体验和功能（智能歌单、同步歌词、无缝播放）。Petrichor 作者因此自己写了一个，2025-04 创建即 1.7k★、565 commits，用户仍在提 iPod Classic 支持、Subsonic、波形进度条等需求。",
+  "audience": "有本地音乐收藏的 macOS 用户、音频发烧友",
+  "domain": "音乐/桌面应用",
+  "evidence": [
+   {
+    "url": "https://github.com/kushalpandya/Petrichor",
+    "quote": "I have a large collection of music files……missed having a good offline music player on macOS. I tried several free and paid options but missed the simplicity and features commonly found in streaming apps.",
+    "engagement": "1,693 stars / 73 forks / 17 open issues；565 commits",
+    "date": "repo 创建 2025-04-20；访问 2026-09-27",
+    "platform": "GitHub"
+   },
+   {
+    "url": "https://github.com/kushalpandya/Petrichor/issues?q=is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc",
+    "quote": "#86 Feature Request: iPod Classic support；#56 Subsonic Support?；#326 Waveform Seekbar；#194 1.5x or 2x speed for Podcasts",
+    "engagement": "17 open issues，👍 unknown",
+    "date": "2025-07 至 2026-09",
+    "platform": "GitHub"
+   }
+  ],
+  "existing_solutions": "Apple Music/音乐 App（被流媒体裹挟、本地库体验退化）；Swinsian/VOX/Colibri（付费或停更）；foobar2000 mac 版功能有限。",
+  "why_unsolved": "Apple 把本地音乐并入流媒体产品；小众付费播放器市场小、多数停更；开源桌面播放器在 macOS 上原生体验做得少。",
+  "crowd_signal": "several",
+  "confidence": 0.65,
+  "source_finder": "gh-self-built-readme"
+ },
+ {
+  "title": "家庭保修与发票管理",
+  "description": "家庭里家电、数码产品的发票、保修卡散落各处，报修时才发现「找错了发票、保修刚过期几个月」。Warracker 作者因父亲洗碗机保修乌龙而做了自托管保修追踪器：到期提醒、收据/说明书存档、多用户、CSV 导入导出、Paperless 集成。2025-03 创建，1.5k★、49 open issues，持续活跃。",
+  "audience": "普通家庭、自托管爱好者、小店主管理设备",
+  "domain": "家庭事务/消费者权益",
+  "evidence": [
+   {
+    "url": "https://github.com/sassanix/Warracker",
+    "quote": "When my father's dishwasher broke, we had the invoice and assumed it was under warranty, only to find out we were referencing the wrong one, and the warranty had ended by a couple of months.",
+    "engagement": "1,490 stars / 47 forks / 49 open issues",
+    "date": "repo 创建 2025-03-02；访问 2026-09-27",
+    "platform": "GitHub"
+   }
+  ],
+  "existing_solutions": "手机相册/微信收藏拍发票；商业 App（订阅制、数据在厂商云）；电商平台订单页（仅该平台购买的商品）。",
+  "why_unsolved": "厂商和电商各自为政，没有统一的保修凭证标准；面向消费者的免费、跨渠道、数据自持的方案没有商业动力。",
+  "crowd_signal": "many",
+  "confidence": 0.65,
+  "source_finder": "gh-self-built-readme"
+ },
+ {
+  "title": "Apple备忘录数据整体导出",
+  "description": "长期用 Apple Notes 的用户想把全部笔记（含附件）导出为 Markdown/JSON 用于其他工具，但 Apple 只支持逐条导出 PDF、无批量导出。apple-notes-liberator 作者为「scratch my own itch of getting data out of Apple Notes so I can use and edit it other places」直接解析 Notes 的 SQLite 数据库导出，1.0k★；但需要完全磁盘访问权限，Markdown 导出仍标注「early development」。",
+  "audience": "iPhone/Mac 用户、想迁移到 Obsidian/Notion 等工具的人",
+  "domain": "笔记/个人数据主权",
+  "evidence": [
+   {
+    "url": "https://github.com/HamburgChimps/apple-notes-liberator",
+    "quote": "To 'scratch my own itch' of getting data out of Apple Notes so I can use and edit it other places……Markdown feature noted as 'in early development'",
+    "engagement": "1,018 stars / 26 forks / 16 open issues",
+    "date": "repo 创建 2023-03-26；访问 2026-09-27",
+    "platform": "GitHub"
+   }
+  ],
+  "existing_solutions": "Apple 备忘录仅支持单条导出 PDF；Exporter（App Store 付费小工具）；手动复制粘贴。",
+  "why_unsolved": "Apple 有意维持生态锁定，不提供批量导出 API；第三方只能逆向私有数据库格式，随系统更新易失效。",
+  "crowd_signal": "several",
+  "confidence": 0.6,
+  "source_finder": "gh-self-built-readme"
+ },
+ {
+  "title": "查出占用Windows热键的程序",
+  "description": "Windows 用户按下自定义快捷键没反应，却不知道被哪个后台程序抢占了。作者「couldn't find any working and simple program that would just show me what process has stolen my hotkey」——老工具 Hotkey Explorer 依赖穷举按键，在 Windows 8 以后已失效。Hotkey Detective 改为 hook 所有进程等待热键消息，844★、17 open issues。",
+  "audience": "普通 Windows 用户、效率工具/游戏玩家",
+  "domain": "操作系统/桌面工具",
+  "evidence": [
+   {
+    "url": "https://github.com/ITachiLab/hotkey-detective",
+    "quote": "I couldn't find any working and simple program that would just show me what process has stolen my hotkey……(Hotkey Explorer's approach no longer works on) Windows 8 and later",
+    "engagement": "844 stars / 36 forks / 17 open issues",
+    "date": "repo 创建 2020-10-29；访问 2026-09-27",
+    "platform": "GitHub"
+   }
+  ],
+  "existing_solutions": "Hotkey Explorer（Win8+ 失效）；Windows 无内置查看器；逐个关闭后台程序排查。",
+  "why_unsolved": "Windows 不暴露全局热键注册表；需要管理员权限注入 hook，微软无意提供；小众需求缺乏商业方跟进。",
+  "crowd_signal": "several",
+  "confidence": 0.6,
+  "source_finder": "gh-self-built-readme"
+ }
+]

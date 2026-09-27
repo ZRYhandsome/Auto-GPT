@@ -1,0 +1,1647 @@
+[
+ {
+  "ranked": {
+   "ranked": [
+    {
+     "rank": 1,
+     "cluster_id": "C23",
+     "title": "自建相册家庭要好用的共享与断点上传",
+     "one_liner": "寄生Immich API的家庭共享伴侣服务",
+     "audience": "自托管相册家庭与NAS用户",
+     "pain": "伴侣共享只能整库不能挑图库且官方冻结两年",
+     "why_unsolved": "共享涉及访问控制重构，Immich 2024-09起feature",
+     "existing_solutions": "Immich四套共享（自认confusing）",
+     "platforms": [
+      "GitHub"
+     ],
+     "independent_source_count": 6,
+     "top_urls": [
+      "https://github.com/immich-app/immich/issues/12614",
+      "https://github.com/immich-app/immich/pull/22385",
+      "https://github.com/photoprism/photoprism/issues/98"
+     ],
+     "top_quotes": [
+      "Immich #12614「Better sharing」👍749/259评论，仓库最高票，冻结至今open",
+      "「Upload large files in chunks」792票榜首"
+     ],
+     "unmet_score": 6,
+     "crowd_score": 8,
+     "buildable_score": 5,
+     "total_score": 6.6,
+     "verdict_summary": "unmet=weak(6) crowd=confirmed(8) buildable=weak(5)",
+     "product_concept": "Docker单容器+Web面板：成员各用API key接入",
+     "mvp_scope": "4-6周1-2人：API配对、规则共享",
+     "risks": "价值全寄生Immich API且上游已在做（#12614重设计"
+    },
+    {
+     "rank": 2,
+     "cluster_id": "C03",
+     "title": "微信用户要免电脑可读可搜的聊天记录导出与瘦身",
+     "one_liner": "不碰微信数据库的聊天存证归档器：截图本地OCR→可检索档案",
+     "audience": "微信重度用户、换机者、维权者",
+     "pain": "微信占满手机、迁移需两台设备且备份加密不可读",
+     "why_unsolved": "SQLCipher加密+iOS沙盒使手机端读取不可能",
+     "existing_solutions": "官方迁移备份（加密）；WeChatMsg 42k★停更",
+     "platforms": [
+      "微博",
+      "小红书",
+      "GitHub"
+     ],
+     "independent_source_count": 21,
+     "top_urls": [
+      "https://github.com/LC044/WeChatMsg",
+      "https://github.com/github/dmca/blob/master/2026/01/2026-01-08-tencent.md",
+      "https://github.com/LifeArchiveProject/WeChatDataAnalysis"
+     ],
+     "top_quotes": [
+      "WeChatMsg 42,086★首行「此项目很久没有（也不会）更新了」；WeFlow 9个月14,488★",
+      "腾讯2026-01-08 DMCA点名29仓库、波及4,195 fork；十年≥9位作者反复重造"
+     ],
+     "unmet_score": 6,
+     "crowd_score": 8,
+     "buildable_score": 3,
+     "total_score": 6.2,
+     "verdict_summary": "unmet=weak(6) crowd=confirmed(8) buildable=refuted(3)",
+     "product_concept": "手机端对会话录屏/连续截图，本地OCR按气泡分割解析说话人与时间戳",
+     "mvp_scope": "3-5周：截图→OCR→分割去重、导出",
+     "risks": "buildable被反驳(3)：免电脑全保真被沙盒与腾讯法律姿态封死"
+    },
+    {
+     "rank": 3,
+     "cluster_id": "C29",
+     "title": "消费者要一键直达各企业人工客服的路径库",
+     "one_liner": "持续验证的各企业转人工路径库+一键拨号按键序列+投诉模板",
+     "audience": "遇售后/快递/银行纠纷的消费者与",
+     "pain": "智能客服绕圈找不到人工，各家路径不同且频繁改动；12315只登记不解决接通",
+     "why_unsolved": "企业刻意隐藏并频繁改入口需持续众包验证",
+     "existing_solutions": "GetHuman（美国）、Pixel/iOS 26代排队（大陆不可用）",
+     "platforms": [
+      "微博"
+     ],
+     "independent_source_count": 4,
+     "top_urls": [
+      "https://s.weibo.com//weibo?q=%23%E4%BA%BA%E6%B0%91%E6%97%A5%E6%8A%A5%E6%89%B9%E6%99%BA%E8%83%BD%E5%AE%A2%E6%9C%8D%E4%B8%8D%E6%99%BA%E8%83%BD%23&t=31&band_rank=12&Refer=top",
+      "https://gethuman.com",
+      "https://github.com/FuzzyLogic112/zhuanrengong"
+     ],
+     "top_quotes": [
+      "《人民日报批智能客服不智能》热搜#12，同日《人工客服难找》#20、#18三话题在榜",
+      "GitHub「转人工/gethuman」127个仓库无一是消费者侧工具；GetHuman靠路径库存活近20年"
+     ],
+     "unmet_score": 7,
+     "crowd_score": 5,
+     "buildable_score": 7,
+     "total_score": 6.2,
+     "verdict_summary": "unmet=confirmed(7) crowd=weak(5) buildable=confirmed(7)",
+     "product_concept": "小程序+H5：收录Top300企业热线、DTMF转人工按键序列、在线客服转人工步骤与申诉渠道",
+     "mvp_scope": "2-4周：实测入库Top200-300家",
+     "risks": "crowd仅weak(5)：证据全为热搜标题无用户原话"
+    },
+    {
+     "rank": 4,
+     "cluster_id": "C07",
+     "title": "读者要把公众号等封闭平台变成RSS并归档",
+     "one_liner": "合规收缩的公众号归档器：自有号导出+正文剪藏检索+私有RSS",
+     "audience": "RSS/Obsidian用户",
+     "pain": "公众号无RSS；三大开源方案2026集体失守（exporter 13k★停维",
+     "why_unsolved": "腾讯主动关闭旁路（2026-07-31关搜索接口）",
+     "existing_solutions": "微信读书订阅、搜狗搜索、we-mp-rss 4.7k★",
+     "platforms": [
+      "GitHub"
+     ],
+     "independent_source_count": 17,
+     "top_urls": [
+      "https://github.com/wechat-article/wechat-article-exporter/issues/200",
+      "https://github.com/cooderl/wewe-rss",
+      "https://github.com/DIYgod/RSSHub/tree/master/lib/routes/wechat"
+     ],
+     "top_quotes": [
+      "wechat-article-exporter 13k★ #200「停止维护说明」：所依赖的微信上游核心接口已被官方关闭",
+      "wewe-rss 9.7k★ 2026-05归档，#209「订阅数量过多被永封了」"
+     ],
+     "unmet_score": 6,
+     "crowd_score": 7,
+     "buildable_score": 4,
+     "total_score": 6,
+     "verdict_summary": "unmet=weak(6) crowd=confirmed(7) buildable=weak(4)",
+     "product_concept": "创作者用自己后台一键把自有公众号历史文章导出HTML/PDF/MD并增量归档",
+     "mvp_scope": "3-5周：剪藏插件+FTS、自有号导出",
+     "risks": "buildable仅weak(4)：任意号稳定RSS依赖腾讯正在关闭的旁路"
+    },
+    {
+     "rank": 5,
+     "cluster_id": "C36",
+     "title": "自由行用户要把小红书攻略一键变成可协作行程",
+     "one_liner": "小红书攻略→LLM抽地点生成行程→免下载链接多人共编→导航",
+     "audience": "以小红书为攻略来源的年轻自由行游",
+     "pain": "收藏几十篇攻略后手动抄地点逐个搜地图",
+     "why_unsolved": "攻略是非结构化UGC且小红书反爬严；旅行App依赖装机量不做免下载协作",
+     "existing_solutions": "圆周旅迹、点点AI、携程/高德AI行程、腾讯文档",
+     "platforms": [
+      "小红书",
+      "GitHub"
+     ],
+     "independent_source_count": 10,
+     "top_urls": [
+      "https://www.xiaohongshu.com/explore/6a48c8bb000000002103f29e",
+      "https://github.com/liketrek/TREK",
+      "https://github.com/liketrek/TREK/issues/2420"
+     ],
+     "top_quotes": [
+      "小红书测评：「多人协作功能需要下载App才能参与编辑和查看详情」",
+      "TREK 6个月14,388★\"Guest accounts requiring no login\""
+     ],
+     "unmet_score": 5,
+     "crowd_score": 7,
+     "buildable_score": 6,
+     "total_score": 6,
+     "verdict_summary": "unmet=weak(5) crowd=confirmed(7) buildable=weak(6)",
+     "product_concept": "微信内可开的H5/PWA：粘贴攻略或上传截图，多模态LLM抽取地点/天次/价格",
+     "mvp_scope": "3-5周：截图→LLM→高德→聚类",
+     "risks": "贴链接若服务端抓取属灰色只能截图粘贴；点点AI同赛道，携程随时加协作"
+    },
+    {
+     "rank": 6,
+     "cluster_id": "C05",
+     "title": "用户要批量下载备份抖音/B站/视频号内容",
+     "one_liner": "个人收藏备份器：用本人B站账号枚举收藏夹",
+     "audience": "把短视频当资料库的用户",
+     "pain": "收藏夹视频\"已失效\"无通知；平台不提供导出",
+     "why_unsolved": "平台视留存为核心资产，持续升级签名/风控并以律师函清除下载器",
+     "existing_solutions": "MediaCrawler 65.8k★",
+     "platforms": [
+      "GitHub"
+     ],
+     "independent_source_count": 19,
+     "top_urls": [
+      "https://github.com/NanmiCoder/MediaCrawler",
+      "https://github.com/yaobiao131/downkyicore",
+      "https://github.com/amtoaer/bili-sync"
+     ],
+     "top_quotes": [
+      "downkyicore 7.5k★「本仓库停止维护并永久关停」——2026-07收到B站律师函",
+      "≥15位作者累计>200k★；\"抖音 下载\"920个仓库"
+     ],
+     "unmet_score": 5,
+     "crowd_score": 7.5,
+     "buildable_score": 4,
+     "total_score": 5.8,
+     "verdict_summary": "unmet=weak(5) crowd=confirmed(7.5) buildable=weak(4)",
+     "product_concept": "桌面/NAS Docker应用：用已登录B站账号（SESSDATA+公开wbi签名",
+     "mvp_scope": "3-5周：B站收藏同步+失效检测",
+     "risks": "buildable仅weak(4)：视频号/抖音属规避技术措施灰区"
+    },
+    {
+     "rank": 7,
+     "cluster_id": "C17",
+     "title": "多生态设备间要不靠云直连传文件与同步剪贴板",
+     "one_liner": "跨iPhone/Android/Win/Mac不同网扫码热点",
+     "audience": "多生态设备持有者、办公写作人群",
+     "pain": "AirDrop/Quick Share生态锁定",
+     "why_unsolved": "iOS无热点/Wi-Fi Direct API、后台读剪贴板不允许",
+     "existing_solutions": "LocalSend 92.8k★（同网）、PairDrop",
+     "platforms": [
+      "GitHub",
+      "X/Twitter"
+     ],
+     "independent_source_count": 10,
+     "top_urls": [
+      "https://github.com/localsend/localsend/issues/189",
+      "https://github.com/microsoft/PowerToys/issues/26296",
+      "https://github.com/spieglt/FlyingCarpet"
+     ],
+     "top_quotes": [
+      "LocalSend 92.8k★按👍前4个open issue全是\"不同网也能传\"：#189👍63、#850👍48",
+      "PowerToys #26296「Mouse Without Borders for Android」👍146"
+     ],
+     "unmet_score": 5,
+     "crowd_score": 7,
+     "buildable_score": 5,
+     "total_score": 5.8,
+     "verdict_summary": "unmet=weak(5) crowd=confirmed(7) buildable=weak(5)",
+     "product_concept": "Tauri/Flutter工具：Win/Linux/Android开热点并把SSID+PSK+IP",
+     "mvp_scope": "4-6周1-3人：热点二维码传输",
+     "risks": "iPhone侧被Apple硬封顶只能消除一半"
+    },
+    {
+     "rank": 8,
+     "cluster_id": "C27",
+     "title": "独居者要定时签到、超时自动报警的守护App",
+     "one_liner": "低负担被动式\"我还在\"守护：长时间无活动才升级提醒并通知联系",
+     "audience": "独居青年、空巢老人及子女",
+     "pain": "独居突发疾病无人知晓；手机SOS需本人触发、老人不戴手环",
+     "why_unsolved": "独立产品因命名与合规争议夭折；大厂认为市场小涉生死责任不碰",
+     "existing_solutions": "死了么/活了么（下架）、系统SOS、手表跌倒检测、社区智能水表",
+     "platforms": [
+      "微博",
+      "GitHub"
+     ],
+     "independent_source_count": 4,
+     "top_urls": [
+      "https://s.weibo.com//weibo?q=%23%E6%AD%BB%E4%BA%86%E4%B9%88APP%E5%9B%9E%E5%BA%94%E4%B8%8B%E8%BD%BD%E9%87%8F%E7%99%BB%E9%A1%B6%E4%BB%98%E8%B4%B9%E6%A6%9C%E7%AC%AC%E4%B8%80%23&t=31&band_rank=34&Refer=top",
+      "https://github.com/search?q=%22%E6%AD%BB%E4%BA%86%E4%B9%88%22&type=repositories",
+      "https://github.com/slinky-daxie/sweetpea-public"
+     ],
+     "top_quotes": [
+      "《死了么APP回应下载量登顶付费榜第一》热搜#34，5天上榜10余次，随后《死了么APP下架》#11",
+      "GitHub搜\"死了么\"31个仓库、约40位作者克隆几乎全建于2026-01，但最高仅15★无一进商店"
+     ],
+     "unmet_score": 5,
+     "crowd_score": 6,
+     "buildable_score": 7,
+     "total_score": 5.8,
+     "verdict_summary": "unmet=weak(5) crowd=weak(6) buildable=confirmed(7)",
+     "product_concept": "中性命名（如\"在呢\"）的小程序+App：被动心跳读取微信运动步数/解锁事件/HealthKit",
+     "mvp_scope": "2-4周：签到+宽限+梯度升级",
+     "risks": "证据三条同一App同一新闻周期，克隆星数反证持续需求弱；签到疲劳留存下滑"
+    },
+    {
+     "rank": 9,
+     "cluster_id": "C34",
+     "title": "用户与独立开发者要可信的干净软件发现分发渠道",
+     "one_liner": "中文版AlternativeTo：干净软件目录",
+     "audience": "找无广告替代软件的用户",
+     "pain": "国产App强更膨胀会员广告；搜软件满是捆绑下载器与假官网；好软件停更找不到替代",
+     "why_unsolved": "下载站靠捆绑盈利，干净目录无商业模式；商店外分发受备案/网信办规定制约",
+     "existing_solutions": "AlternativeTo（英文）、小众软件/少数派",
+     "platforms": [
+      "知乎",
+      "抖音",
+      "v2ex.com",
+      "GitHub"
+     ],
+     "independent_source_count": 20,
+     "top_urls": [
+      "https://www.zhihu.com/question/371060188",
+      "https://github.com/ruanyf/weekly/issues?q=is%3Aissue+%E8%87%AA%E8%8D%90",
+      "https://github.com/ImranR98/Obtainium"
+     ],
+     "top_quotes": [
+      "知乎「苹果手机app不更新就用不了怎么解决？每天都一大堆APP等着更新 烦都烦死了」",
+      "阮一峰周刊104,796★/9,246 open issue一天十条「开源自荐」"
+     ],
+     "unmet_score": 5,
+     "crowd_score": 7,
+     "buildable_score": 5,
+     "total_score": 5.8,
+     "verdict_summary": "unmet=weak(5) crowd=confirmed(7) buildable=weak(5)",
+     "product_concept": "结构化目录站+插件：从winget/Scoop/Homebrew（含官方URL与SHA256）",
+     "mvp_scope": "3-5周：导入标注2-5k条",
+     "risks": "商店外分发受管、iOS无侧载，约一半痛点不能覆盖；\"免会员去广告\"是破解需求须排除"
+    },
+    {
+     "rank": 10,
+     "cluster_id": "C24",
+     "title": "离线地图用户要公交换乘、轨迹导航与同步",
+     "one_liner": "隐私离线地图用户的开源离线公交换乘+GPX轨迹导航",
+     "audience": "用Organic Maps",
+     "pain": "完全离线的公交换乘无人做成（#5331最高票悬赏两年）；GPX不能沿轨迹导航",
+     "why_unsolved": "全球GTFS聚合需资金/许可（部分禁再分发，中国无开放GTFS）",
+     "existing_solutions": "OsmAnd 6k★（有轨迹导航无时刻表公交）",
+     "platforms": [
+      "GitHub"
+     ],
+     "independent_source_count": 6,
+     "top_urls": [
+      "https://github.com/organicmaps/organicmaps/issues/5331",
+      "https://github.com/organicmaps/organicmaps/issues/1360",
+      "https://github.com/public-transport/transitous"
+     ],
+     "top_quotes": [
+      "Organic Maps #5331「public transport routing」👍82/82评论",
+      "OsmAnd #6878避开拥堵👍85/102评论自2019仅Nice to Have"
+     ],
+     "unmet_score": 5,
+     "crowd_score": 7,
+     "buildable_score": 4,
+     "total_score": 5.6,
+     "verdict_summary": "unmet=weak(5) crowd=confirmed(7) buildable=weak(4)",
+     "product_concept": "专注离线公交换乘的App/SDK：服务端从Mobility Database",
+     "mvp_scope": "4-6周：GTFS抓取/许可过滤/打包",
+     "risks": "\"全球、实时路况\"被GTFS许可碎片化锁死；FOSS用户付费低（悬赏两年无人领）"
+    },
+    {
+     "rank": 11,
+     "cluster_id": "C01",
+     "title": "记账者要无广告自动导账单可多人共享的记账",
+     "one_liner": "无广告、账单半自动导入、零门槛家庭共享账本",
+     "audience": "年轻上班族、情侣室友分账者",
+     "pain": "记账App开屏广告、突然付费、限额导流、共享弱、手动录入累",
+     "why_unsolved": "微信/支付宝/银行不开放交易接口，\"自动\"只能CSV或Xposed灰色手",
+     "existing_solutions": "随手记/鲨鱼（广告导流）、钱迹/MOZE（付费）",
+     "platforms": [
+      "小红书",
+      "知乎",
+      "GitHub",
+      "Hacker News",
+      "TikTok"
+     ],
+     "independent_source_count": 28,
+     "top_urls": [
+      "https://github.com/mayswind/ezbookkeeping/issues/53",
+      "https://github.com/TNT-Likely/BeeCount",
+      "https://github.com/AutoAccountingOrg/AutoAccounting"
+     ],
+     "top_quotes": [
+      "ezBookkeeping 5.7k★ #53「shared/co-owned accounts",
+      "小红书「以前免费突然付费…找来找去没有功能差不多的软件」；BeeCount 13个月2,436★"
+     ],
+     "unmet_score": 4,
+     "crowd_score": 7,
+     "buildable_score": 5,
+     "total_score": 5.4,
+     "verdict_summary": "unmet=weak(4) crowd=confirmed(7) buildable=weak(5)",
+     "product_concept": "Flutter三端本地优先记账：账本分个人与共享（成员角色、Splitwise式分摊结算）",
+     "mvp_scope": "4-6周2-3人：Flutter",
+     "risks": "\"真自动同步\"在中国无合法实时路径；流水属PIPL敏感需备案"
+    },
+    {
+     "rank": 12,
+     "cluster_id": "C14",
+     "title": "家庭要不限量可拍照/小票自动录入的物品管理",
+     "one_liner": "不限量不丢图、批量拍照/小票AI自动入库",
+     "audience": "衣服多囤货多的年轻女性",
+     "pain": "测评多款App每款有硬伤：积分用完不能添加、免费但丢图、超30/49件付费",
+     "why_unsolved": "细分小众低付费，靠限额/积分变现与不限量冲突",
+     "existing_solutions": "收纳先生/橘兜（限量丢图）、氧气/尽简（30/49件付费）",
+     "platforms": [
+      "小红书",
+      "GitHub"
+     ],
+     "independent_source_count": 12,
+     "top_urls": [
+      "https://github.com/grocy/grocy/issues/404",
+      "https://github.com/sysadminsmedia/homebox",
+      "https://github.com/Duelion/homebox-companion"
+     ],
+     "top_quotes": [
+      "grocy 9.5k★ #404「OCR shopping receipts」2019-10开至今👍30/17评论",
+      "小红书测评：「积分用完不能再添加」「免费但丢过图片」「超过30/49件就付费」"
+     ],
+     "unmet_score": 5,
+     "crowd_score": 5,
+     "buildable_score": 7,
+     "total_score": 5.4,
+     "verdict_summary": "unmet=weak(5) crowd=weak(5) buildable=confirmed(7)",
+     "product_concept": "小程序/Flutter+对象存储：物品与存储永不限（OSS约¥0.1/GB/月）",
+     "mvp_scope": "4-6周3人：不限量库+位置树+OSS",
+     "risks": "crowd仅weak(5)：GitHub证据2条跑题，小红书测评无URL"
+    },
+    {
+     "rank": 13,
+     "cluster_id": "C13",
+     "title": "家人要远程守护父母手机防骗与异常扣费预警",
+     "one_liner": "跨品牌跨App跨支付：父母手机异常扣费/可疑安装",
+     "audience": "异地子女、独自用手机的老人",
+     "pain": "父母被骗老人App、免密支付、短剧套娃付费、AI仿声",
+     "why_unsolved": "跨App/支付监控权限iOS拿不到，安卓受厂商限制且HarmonyOS",
+     "existing_solutions": "小米/华为/OPPO亲情守护（同品牌无支付预警）",
+     "platforms": [
+      "微博",
+      "知乎",
+      "北京日报",
+      "文学城",
+      "中新网/中消协",
+      "GitHub"
+     ],
+     "independent_source_count": 14,
+     "top_urls": [
+      "https://s.weibo.com//weibo?q=%E7%9C%9F%E7%9A%84%E5%BB%BA%E8%AE%AE%E6%A3%80%E6%9F%A5%E4%B8%80%E4%B8%8B%E7%88%B8%E5%A6%88%E7%9A%84%E6%89%8B%E6%9C%BA&t=31&band_rank=12&Refer=top",
+      "https://github.com/pppscn/SmsForwarder",
+      "https://github.com/search?q=elderly+scam+protection&type=repositories&s=stars&o=desc"
+     ],
+     "top_quotes": [
+      "《真的建议检查一下爸妈的手机》热搜#12；《呼吁老人大额转账设24小时冷静期》#18上榜2天",
+      "GitHub 2026年≥8位开发者各自造\"远程守护父母手机\"轮子（Lead 2★、clan 0★）全部0-7★弃坑"
+     ],
+     "unmet_score": 5,
+     "crowd_score": 5.5,
+     "buildable_score": 5,
+     "total_score": 5.2,
+     "verdict_summary": "unmet=weak(5) crowd=weak(5.5) buildable=weak(5)",
+     "product_concept": "父母端Android（老人可见可关）+子女端小程序订阅消息：NotificationListener",
+     "mvp_scope": "3-5周2人：通知/短信采集+安装来源",
+     "risks": "只能发现不能拦截；iOS不可行，华为老人第一品牌而NEXT不兼容APK"
+    },
+    {
+     "rank": 14,
+     "cluster_id": "C28",
+     "title": "中小商家要AI假图鉴别与恶意仅退款申诉工具",
+     "one_liner": "商家侧售后AI假图多信号鉴别+按平台规则组织申诉材料",
+     "audience": "中小电商与生鲜农产品卖家",
+     "pain": "买家用AI生成烂水果假图仅退款，职业退款人一人退款上千次",
+     "why_unsolved": "裁决权在平台且倾向买家；平台掌握原图/身份/全网记录",
+     "existing_solutions": "平台申诉与高退款屏蔽、2025取消强制仅退款",
+     "platforms": [
+      "微博",
+      "GitHub"
+     ],
+     "independent_source_count": 4,
+     "top_urls": [
+      "https://s.weibo.com//weibo?q=%23%E9%81%AD%E4%BB%85%E9%80%80%E6%AC%BE%E6%8D%9F%E5%A4%B120%E4%B8%87%E8%80%81%E6%9D%BF%E6%9C%89%E5%8D%95%E4%B9%9F%E4%B8%8D%E6%95%A2%E6%8E%A5%23&t=31&band_rank=11&Refer=top",
+      "https://s.weibo.com//weibo?q=%23%E5%A4%AE%E8%A7%86%E6%9B%9D%E5%85%89%E7%94%A8AI%E9%80%A0%E5%81%87%E5%9B%BE%E9%AA%97%E9%80%80%E6%AC%BE%E4%B9%B1%E8%B1%A1%23&t=31&band_rank=30&Refer=top",
+      "https://github.com/lynote-ai/ai-image-detector"
+     ],
+     "top_quotes": [
+      "《遭仅退款损失20万老板有单也不敢接》热搜#11；榴莲事件共10+话题上榜近2个月",
+      "GitHub「仅退款」28个、「恶意买家」35个均无关"
+     ],
+     "unmet_score": 6,
+     "crowd_score": 5,
+     "buildable_score": 4,
+     "total_score": 5.2,
+     "verdict_summary": "unmet=weak(6) crowd=weak(5) buildable=weak(4)",
+     "product_concept": "商家侧鉴伪申诉助手：上传售后图+订单，多信号融合（元数据/隐水印+像素级检测或AIGC API",
+     "mvp_scope": "3-5周1-3人：三层鉴别+报告",
+     "risks": "核心是平台裁决权商家侧软件不能消除；报告对平台无约束力，误报真实买家有法律风险"
+    },
+    {
+     "rank": 15,
+     "cluster_id": "C30",
+     "title": "消费者要多账号同时比价取证大数据杀熟的工具",
+     "one_liner": "邀好友各自查同一商品价格，OCR对齐时间与券/会员标识",
+     "audience": "怀疑被杀熟的外卖/咖啡",
+     "pain": "瑞幸4部手机3种价格且会员更贵、携程被罚后仍被问为何还杀熟",
+     "why_unsolved": "定价按账号/设备实时生成无API，唯一合法数据源是用户自己的屏幕",
+     "existing_solutions": "慢慢买/Keepa（单账号历史价）、changedetection.io",
+     "platforms": [
+      "微博",
+      "GitHub"
+     ],
+     "independent_source_count": 4,
+     "top_urls": [
+      "https://s.weibo.com//weibo?q=%23%E7%91%9E%E5%B9%B8%E5%9B%9E%E5%BA%944%E9%83%A8%E6%89%8B%E6%9C%BA%E7%82%B9%E5%87%BA3%E7%A7%8D%E4%BB%B7%E6%A0%BC%23&t=31&band_rank=8&Refer=top",
+      "https://github.com/red-fox-yj/Capture",
+      "https://github.com/dgtlmoon/changedetection.io"
+     ],
+     "top_quotes": [
+      "《瑞幸回应4部手机点出3种价格》热搜#8上榜2天；《携程 杀熟》#5、《罚了51.79亿携程为何还在杀熟》#20",
+      "GitHub「杀熟」32个仓库仅2个相关且均2★；changedetection.io 34,584★但全部单账号"
+     ],
+     "unmet_score": 7,
+     "crowd_score": 4,
+     "buildable_score": 4,
+     "total_score": 5.2,
+     "verdict_summary": "unmet=confirmed(7) crowd=weak(4) buildable=weak(4)",
+     "product_concept": "\"比价房间\"小程序：发起人建房间选定商品，邀3-5位不同画像好友在各自App查同一商品并上传截图",
+     "mvp_scope": "2-4周1-2人：房间/邀请/上传",
+     "risks": "crowd仅weak(4)：证据全为热搜标题无人表达\"要工具\""
+    },
+    {
+     "rank": 16,
+     "cluster_id": "C39",
+     "title": "大学生要教务课表导入与选课余量捡漏提醒",
+     "one_liner": "LLM零适配导入教务课表的无广告小组件课表+合规选课余量提醒",
+     "audience": "在校大学生",
+     "pain": "想一键导入教务课表配小组件但不要广告社交",
+     "why_unsolved": "教务系统数百种无统一接口；教务厂商无候补提醒",
+     "existing_solutions": "超级课程表/课程格子（广告社交）、WakeUp课程表（有广告）",
+     "platforms": [
+      "GitHub"
+     ],
+     "independent_source_count": 6,
+     "top_urls": [
+      "https://github.com/ceilf6/Auto_courseGrabber",
+      "https://github.com/ShiGuangSchedule/shiguangschedule",
+      "https://github.com/search?q=%E6%8A%A2%E8%AF%BE&type=repositories&s=stars&o=desc"
+     ],
+     "top_quotes": [
+      "Auto_courseGrabber一年972★默认2秒轮询余量",
+      "拾光课程表一年921★「开源、无广告、极简」适配仓170 forks约100+校；「WakeUp课程表 去广告」28★"
+     ],
+     "unmet_score": 4,
+     "crowd_score": 7,
+     "buildable_score": 4,
+     "total_score": 5.2,
+     "verdict_summary": "unmet=weak(4) crowd=confirmed(7) buildable=weak(4)",
+     "product_concept": "极简课表App：App内WebView登录本校教务，LLM解析课表页或截图零适配导入",
+     "mvp_scope": "3-5周：WebView+LLM解析",
+     "risks": "导入侧已被WakeUp/拾光/系统课表解决增量小"
+    },
+    {
+     "rank": 17,
+     "cluster_id": "C02",
+     "title": "听歌用户要免费无广告一站听全并迁移歌单",
+     "one_liner": "合法切片歌单管家：把网易云/QQ歌单迁到Apple",
+     "audience": "大陆听歌用户、转向本地",
+     "pain": "版权分裂被迫装3个App各买会员忍广告，歌单大量灰歌不能播",
+     "why_unsolved": "版权独占与会员模式使合法一站式无广告不成立",
+     "existing_solutions": "各平台VIP、洛雪54k★（抽源）、MusicFree 27.1k★",
+     "platforms": [
+      "GitHub",
+      "appinn.com"
+     ],
+     "independent_source_count": 28,
+     "top_urls": [
+      "https://github.com/lyswhut/lx-music-desktop/issues/1912",
+      "https://github.com/lyswhut/lx-music-desktop/issues/1643",
+      "https://github.com/Bistutu/GoMusic"
+     ],
+     "top_quotes": [
+      "洛雪lx-music-desktop 54.0k★；#1643（220评论）2023-10收腾讯移除通知",
+      "围绕免费/聚合/复活灰歌至少8位作者合计>190k★；lx-ikun-music-sources"
+     ],
+     "unmet_score": 4,
+     "crowd_score": 7,
+     "buildable_score": 3,
+     "total_score": 5,
+     "verdict_summary": "unmet=weak(4) crowd=confirmed(7) buildable=refuted(3)",
+     "product_concept": "只做合法切片：读取网易云/QQ/汽水公开分享链接，按歌名+歌手+时长模糊匹配",
+     "mvp_scope": "1-2周1人：分享链接解析→Spotif",
+     "risks": "buildable被反驳(3)：核心\"免费无广告一站听全\"是版权与商业模式问题"
+    },
+    {
+     "rank": 18,
+     "cluster_id": "C06",
+     "title": "手机用户要装上即用的开屏/摇一摇广告屏蔽",
+     "one_liner": "给爸妈配机的零配置Android开屏跳过器：内置规则",
+     "audience": "国产安卓用户、为长辈配机的家庭",
+     "pain": "打开国产App看3-5秒开屏，摇一摇误触跳淘宝京东",
+     "why_unsolved": "开屏与跳转是厂商核心收入，SDK持续对抗；无障碍权限被收紧",
+     "existing_solutions": "GKD 42.3k★（无规则、HyperOS失效not planned",
+     "platforms": [
+      "微博",
+      "GitHub"
+     ],
+     "independent_source_count": 18,
+     "top_urls": [
+      "https://github.com/gkd-kit/gkd",
+      "https://github.com/AIsouler/GKD_subscription",
+      "https://github.com/gkd-kit/gkd/issues/1449"
+     ],
+     "top_quotes": [
+      "GKD 42.3k★但「默认不提供规则」；最大订阅AIsouler 12,010★ 2026-02因维护者热情耗尽归档",
+      "GKD #1449「HyperOS 4对微信无效」、#1247/#1063/#1405全部closed as not"
+     ],
+     "unmet_score": 4,
+     "crowd_score": 7,
+     "buildable_score": 3,
+     "total_score": 5,
+     "verdict_summary": "unmet=weak(4) crowd=confirmed(7) buildable=refuted(3)",
+     "product_concept": "Kotlin AccessibilityService+内置规则包（复用SKIP/GKD语法",
+     "mvp_scope": "2-4周：无障碍+规则包+文本跳过",
+     "risks": "buildable被反驳(3)：开屏跳过已被GKD/SKIP免费覆盖且监管整治后开屏基本"
+    },
+    {
+     "rank": 19,
+     "cluster_id": "C09",
+     "title": "做饭者要结构化可检索菜谱与今天吃什么决策",
+     "one_liner": "基于HowToCook公域语料的结构化中文菜谱库+按食材",
+     "audience": "自己做饭的年轻人、双职工父母",
+     "pain": "\"今天吃什么\"决策疲劳与记热量割裂；菜谱App广告多步骤不严谨按食材找菜难",
+     "why_unsolved": "商业产品靠广告电商会员变现；HowToCook维护者坚持Markdown",
+     "existing_solutions": "下厨房/豆果（广告UGC）、薄荷/Keep（弹窗会员）",
+     "platforms": [
+      "GitHub",
+      "小红书"
+     ],
+     "independent_source_count": 16,
+     "top_urls": [
+      "https://github.com/Anduin2017/HowToCook/issues/60",
+      "https://github.com/Anduin2017/HowToCook",
+      "https://github.com/mealie-recipes/mealie"
+     ],
+     "top_quotes": [
+      "HowToCook 102,352★ #60「用JSON或yaml定义每一个菜谱」👍105/59评论",
+      "小红书「薄荷app害死人」；推荐替代品时「小弹窗广告较少（目前为0）」竟成卖点"
+     ],
+     "unmet_score": 4,
+     "crowd_score": 5,
+     "buildable_score": 7,
+     "total_score": 5,
+     "verdict_summary": "unmet=weak(4) crowd=weak(5) buildable=confirmed(7)",
+     "product_concept": "PWA+小程序+MCP server：把HowToCook（公有领域",
+     "mvp_scope": "3-4周1-2人：ETL+词典+检索",
+     "risks": "crowd仅weak(5)：3条证据2条同仓库1条点子清单"
+    },
+    {
+     "rank": 20,
+     "cluster_id": "C20",
+     "title": "办公学生要免费离线批量OCR含表格Mac版",
+     "one_liner": "macOS原生、免费离线、批量、含表格→Excel与忽略区域",
+     "audience": "学生科研人员、行政财务文员",
+     "pain": "想批量把截图/扫描件/PDF/表格识别成可编辑文本/Excel且不上传不限次",
+     "why_unsolved": "大厂把OCR做云服务变现；开源主力绑在Win/Linux",
+     "existing_solutions": "Umi-OCR 47.5k★（Win/Linux）",
+     "platforms": [
+      "GitHub",
+      "少数派"
+     ],
+     "independent_source_count": 8,
+     "top_urls": [
+      "https://github.com/hiroi-sora/Umi-OCR",
+      "https://github.com/hiroi-sora/Umi-OCR/issues/1083",
+      "https://github.com/RapidAI/RapidTable"
+     ],
+     "top_quotes": [
+      "Umi-OCR 47,514★ README「适用于Windows7 x64、Linux x64」",
+      "#677「UMI-OCR对表格的识别太弱了…格式错乱」；作者#146「没有能力和精力去做Linux和Mac的适配」"
+     ],
+     "unmet_score": 4,
+     "crowd_score": 5,
+     "buildable_score": 7,
+     "total_score": 5,
+     "verdict_summary": "unmet=weak(4) crowd=weak(5) buildable=confirmed(7)",
+     "product_concept": "SwiftUI原生Mac App：拖入文件夹→队列并发OCR→导出txt/md/xlsx/docx",
+     "mvp_scope": "4-6周1-2人：批量队列+双引擎",
+     "risks": "crowd仅weak(5)：8条证据5条同仓库，Mac请求每条0-3👍"
+    },
+    {
+     "rank": 21,
+     "cluster_id": "C38",
+     "title": "技术用户要过滤AI/SEO垃圾的搜索与资讯流",
+     "one_liner": "LLM语义分主题的\"HN minus AI",
+     "audience": "开发者、研究者、对AI话题疲劳的",
+     "pain": "Google被SEO垃圾与AI内容淹没，DuckDuckGo也在enshitti",
+     "why_unsolved": "搜索索引成本极高免费必走广告，付费搜索用户少难摊薄（重度用户API成本$",
+     "existing_solutions": "uBlacklist 6.6k★+社区黑名单（中文垃圾站7.5k★",
+     "platforms": [
+      "Hacker News",
+      "GitHub"
+     ],
+     "independent_source_count": 7,
+     "top_urls": [
+      "https://news.ycombinator.com/item?id=42281581",
+      "https://github.com/iorate/ublacklist",
+      "https://github.com/searxng/searxng"
+     ],
+     "top_quotes": [
+      "HN「Ask HN: How do I search the web in the age of",
+      "uBlacklist 6,645★+AI图站黑名单5,789★/200 open issues"
+     ],
+     "unmet_score": 4,
+     "crowd_score": 6,
+     "buildable_score": 5,
+     "total_score": 5,
+     "verdict_summary": "unmet=weak(4) crowd=weak(6) buildable=weak(5)",
+     "product_concept": "两个解耦产品件：①\"HN分频\"——用HN官方API拉top/new",
+     "mvp_scope": "2周HN插件/RSS+2-4周元搜索de",
+     "risks": "元搜索经济结构性不成立：上游API成本使定价下限即Kagi，用户核心抱怨恰是嫌贵"
+    },
+    {
+     "rank": 22,
+     "cluster_id": "C40",
+     "title": "家庭要自己掌握的全家病历与血压用药共享",
+     "one_liner": "跨品牌的父母血压/血糖/用药家人视图+吃药提醒+家庭药箱",
+     "audience": "为父母管理健康的异地子女",
+     "pain": "血压计/血糖仪数据锁在各硬件厂商App无家人视图，只能借滴答清单做吃药提醒",
+     "why_unsolved": "健康数据锁在硬件生态（欧姆龙私有BLE），老人端操作复杂",
+     "existing_solutions": "Apple Health共享+用药提醒（需HealthKit血压计）",
+     "platforms": [
+      "小红书",
+      "GitHub"
+     ],
+     "independent_source_count": 6,
+     "top_urls": [
+      "https://github.com/fastenhealth/fasten-onprem",
+      "https://github.com/DMJoh/Mediqux",
+      "https://www.xiaohongshu.com/mobile/question/991418"
+     ],
+     "top_quotes": [
+      "fasten-onprem 2,794★/182 fork，README「my medical history",
+      "Mediqux（2025-08，214★）README：\"I wanted a private,"
+     ],
+     "unmet_score": 6,
+     "crowd_score": 4,
+     "buildable_score": 5,
+     "total_score": 5,
+     "verdict_summary": "unmet=weak(6) crowd=weak(4) buildable=weak(5)",
+     "product_concept": "小程序/Flutter\"家庭健康本\"：家庭码邀请多成员，父母端极简大字一键",
+     "mvp_scope": "3-5周1-2人：多成员账号",
+     "risks": "crowd仅weak(4)：三条证据一条重复计数一条硬件选购误读"
+    },
+    {
+     "rank": 23,
+     "cluster_id": "C48",
+     "title": "家属要亲人去世后微信/游戏账号内容的托管保存",
+     "one_liner": "白区数字遗产托管：生前指定联系人+定期备份提醒",
+     "audience": "失去亲人的家属、有规划意识的中老",
+     "pain": "父亲去世多年微信账号突然消失（热搜2天）、亡妻在游戏中的房子没了",
+     "why_unsolved": "腾讯协议账号归腾讯不可继承、无纪念账号/遗产联系人机制",
+     "existing_solutions": "微信支付余额继承（仅钱包）、微博/B站纪念账号",
+     "platforms": [
+      "微博",
+      "GitHub"
+     ],
+     "independent_source_count": 3,
+     "top_urls": [
+      "https://s.weibo.com//weibo?q=%23%E7%BD%91%E5%8F%8B%E7%88%B8%E7%88%B8%E5%8E%BB%E4%B8%96%E5%A4%9A%E5%B9%B4%E5%BE%AE%E4%BF%A1%E8%B4%A6%E5%8F%B7%E7%AA%81%E7%84%B6%E6%B6%88%E5%A4%B1%23&t=31&band_rank=9&Refer=top",
+      "https://github.com/xaoyaoo/PyWxDump",
+      "https://github.com/alpyxn/aeterna"
+     ],
+     "top_quotes": [
+      "《网友爸爸去世多年微信账号突然消失》热搜#9上榜2天；《人去世了微信朋友圈会消失吗》#22上榜2天，次日微信客服回应",
+      "PyWxDump 9.7k★ 2025-10收微信律师函「删除全部代码与提交历史」"
+     ],
+     "unmet_score": 6,
+     "crowd_score": 5,
+     "buildable_score": 3,
+     "total_score": 5,
+     "verdict_summary": "unmet=weak(6) crowd=weak(5) buildable=refuted(3)",
+     "product_concept": "明确不承诺保存微信内容的\"数字遗产清单+死人开关\"小程序/Web：生前录入账号清单（不存密码或存入E",
+     "mvp_scope": "2-4周：账号清单+E2E保险箱",
+     "risks": "buildable被反驳(3)：核心痛点内容在腾讯/游戏厂商服务器且按条款不可继承"
+    },
+    {
+     "rank": 24,
+     "cluster_id": "C16",
+     "title": "旅客观众要合规的余票监控与候补成功率工具",
+     "one_liner": "\"只查不抢\"的12306余票监控桌面端+微信推送",
+     "audience": "春运旅客与返乡学生",
+     "pain": "12306开票即候补、候补概率不透明；大麦开票秒空回流靠手动刷新",
+     "why_unsolved": "余票与候补队列数据只有12306/票务平台掌握",
+     "existing_solutions": "12306候补/接续换乘/起售提醒（不显示概率）",
+     "platforms": [
+      "微博",
+      "GitHub"
+     ],
+     "independent_source_count": 10,
+     "top_urls": [
+      "https://github.com/testerSunshine/12306",
+      "https://github.com/wxory/CRTMonitor",
+      "https://github.com/search?q=12306+%E5%80%99%E8%A1%A5+%E6%88%90%E5%8A%9F%E7%8E%87&type=repositories"
+     ],
+     "top_quotes": [
+      "testerSunshine/12306 34,070★（归档，issue首页仍是\"现在还能用吗？\"）",
+      "GitHub搜\"12306 候补 成功率\"total_count=1且无关，\"演唱会 开票 提醒\"0结果"
+     ],
+     "unmet_score": 5,
+     "crowd_score": 5,
+     "buildable_score": 4,
+     "total_score": 4.8,
+     "verdict_summary": "unmet=weak(5) crowd=weak(5) buildable=weak(4)",
+     "product_concept": "明确只查不抢的Electron/Tauri桌面端+浏览器插件：用户本机以30-60秒间隔轮询1230",
+     "mvp_scope": "2-6周：桌面端余票监控+微信推送（1-",
+     "risks": "候补队列不公开成功率只能估算且冷启动需跨越一个春运"
+    },
+    {
+     "rank": 25,
+     "cluster_id": "C50",
+     "title": "报销职场人自动从邮箱微信收集发票并生成汇总",
+     "one_liner": "本地优先桌面工具：把QQ/163/Gmail邮箱与微信卡包",
+     "audience": "频繁出差报销的职场人",
+     "pain": "数电票散落在邮箱/微信/支付宝/短信，月底要一封封翻找下载手工查重分类填Exce",
+     "why_unsolved": "微信卡包/支付宝对个人无API，报销方接口仅对企业主体开放",
+     "existing_solutions": "Invoice-Downloader 443★（仅QQ/163",
+     "platforms": [
+      "GitHub"
+     ],
+     "independent_source_count": 2,
+     "top_urls": [
+      "https://github.com/EthanYoQ/Invoice-Downloader",
+      "https://github.com/EthanYoQ/Invoice-Downloader/issues/1",
+      "https://github.com/WRCoding/autoEmail"
+     ],
+     "top_quotes": [
+      "WRCoding/autoEmail README：\"每个月有报销发票的需求",
+      "Invoice-Downloader 2026-03创建半年443★"
+     ],
+     "unmet_score": 4,
+     "crowd_score": 5,
+     "buildable_score": 6,
+     "total_score": 4.8,
+     "verdict_summary": "unmet=weak(4) crowd=weak(5) buildable=weak(6)",
+     "product_concept": "Tauri/Electron本地桌面应用：IMAP/OAuth连接QQ/163/126/Gmail",
+     "mvp_scope": "3-4周1-2人：多邮箱采集+PDF",
+     "risks": "微信/支付宝渠道对个人无API只能靠手动转发，差异化受制于生态"
+    },
+    {
+     "rank": 26,
+     "cluster_id": "C46",
+     "title": "视障者过验证码人脸识别弹窗的本地视觉辅助",
+     "one_liner": "与读屏并存的Android\"按需视觉助手",
+     "audience": "使用争渡/保益/TalkBack",
+     "pain": "登录支付抢票领补贴时被图片验证码、滑块、\"请眨眼\"人脸活体",
+     "why_unsolved": "验证码本质反自动化，自动过验证码与风控对立",
+     "existing_solutions": "VoiceOver屏幕识别（不理解图形）",
+     "platforms": [
+      "中新网",
+      "深圳市信息无障碍研究会",
+      "GitHub",
+      "少数派"
+     ],
+     "independent_source_count": 4,
+     "top_urls": [
+      "https://www.chinanews.com.cn/sh/2023/12-06/10123190.shtml",
+      "https://github.com/deepseek-ai/DeepSeek-V3/issues/609",
+      "https://github.com/cartertemm/AI-content-describer"
+     ],
+     "top_quotes": [
+      "中新网2023-12：\"App上的验证码、人脸识别和弹窗常常令人头疼，例如以图片形式呈现的验证码",
+      "DeepSeek-V3 #609（视障用户，25 reactions"
+     ],
+     "unmet_score": 5,
+     "crowd_score": 4,
+     "buildable_score": 5,
+     "total_score": 4.6,
+     "verdict_summary": "unmet=weak(5) crowd=weak(4) buildable=weak(5)",
+     "product_concept": "与现有读屏并行的Android无障碍服务\"看一眼\"：音量键长按或悬浮球触发",
+     "mvp_scope": "3-4周1名Android开发",
+     "risks": "iOS完全封闭砍掉一半用户；支付/补贴/人脸页面多设FLAG_SECURE最痛场景拿不到"
+    },
+    {
+     "rank": 27,
+     "cluster_id": "C12",
+     "title": "消费者要自动盘点订阅/免密授权并代为取消",
+     "one_liner": "\"订阅体检\"工具：导入支付宝/微信账单与Apple收据",
+     "audience": "开着多个订阅与免密支付的城市消费",
+     "pain": "不记得订了什么何时扣款哪些没用；取消入口被刻意做深；三处授权列表互不汇总",
+     "why_unsolved": "续费是平台核心营收，Apple/支付宝/微信不开放授权列表读取与取消接口",
+     "existing_solutions": "支付宝自动扣款/微信自动续费/Apple订阅页（单渠道）",
+     "platforms": [
+      "微博",
+      "小红书",
+      "Hacker News",
+      "TikTok",
+      "X/Twitter",
+      "Medium",
+      "App Store"
+     ],
+     "independent_source_count": 14,
+     "top_urls": [
+      "https://s.weibo.com//weibo?q=%23%E7%94%B7%E5%AD%90%E7%88%B1%E5%A5%87%E8%89%BA%E4%BC%9A%E5%91%98%E5%85%85%E4%BA%8625%E5%B9%B4%E9%81%87%E9%80%80%E8%B4%B9%E9%9A%BE%23&t=31&band_rank=2&Refer=top",
+      "https://github.com/ellite/Wallos",
+      "https://github.com/rohunvora/just-fucking-cancel"
+     ],
+     "top_quotes": [
+      "微博热搜《男子爱奇艺会员充了25年遇退费难》#2、同事件3话题上榜；《建议严禁免密支付默认勾选》#10",
+      "Wallos 8.6k★/432 forks，topic:subscription-tracker共142个仓库全部手工"
+     ],
+     "unmet_score": 4,
+     "crowd_score": 5,
+     "buildable_score": 4,
+     "total_score": 4.4,
+     "verdict_summary": "unmet=weak(4) crowd=weak(5) buildable=weak(4)",
+     "product_concept": "网页/小程序\"订阅体检\"：用户导出支付宝账单CSV、微信账单邮件zip",
+     "mvp_scope": "3-5周1-3人：账单解析+LLM识别",
+     "risks": "Apple/支付宝/微信不开放读取与取消接口，\"自动盘点+代取消"
+    },
+    {
+     "rank": 28,
+     "cluster_id": "C21",
+     "title": "普通人要免登录、多模型切换核验的AI入口",
+     "one_liner": "微信小程序形态的\"多模型陪审团\"：openid静默登录免手机",
+     "audience": "普通AI用户、学生、办公族",
+     "pain": "DeepSeek反复崩（同话题上榜13天）、豆包收费后月活减610万",
+     "why_unsolved": "国内生成式AI管理办法与实名制让合规产品无法真免登录",
+     "existing_solutions": "duck.ai/LMArena/ChatGPT免登录（需翻墙）",
+     "platforms": [
+      "微博",
+      "抖音"
+     ],
+     "independent_source_count": 7,
+     "top_urls": [
+      "https://s.weibo.com//weibo?q=%23DeepSeek%E5%B4%A9%E4%BA%86%23&t=31&band_rank=47&Refer=top",
+      "https://github.com/xtekky/gpt4free",
+      "https://github.com/karpathy/llm-council"
+     ],
+     "top_quotes": [
+      "微博热搜《DeepSeek崩了》同一话题上榜13天，《豆包崩了》上榜3天；《刘美含吐槽5家AI答案不一样》#42",
+      "gpt4free 66.7k★/13.5k forks 2026-09仍更新"
+     ],
+     "unmet_score": 5,
+     "crowd_score": 4,
+     "buildable_score": 4,
+     "total_score": 4.4,
+     "verdict_summary": "unmet=weak(5) crowd=weak(4) buildable=weak(4)",
+     "product_concept": "微信小程序\"三问\"：openid静默登录让用户感知上不用注册手机号，以企业主体做生成式AI应用登记",
+     "mvp_scope": "2-3周1-2人：小程序+网关接3-5家",
+     "risks": "面向公众的生成式AI服务须备案/登记、内容审核、AI标识，真免登录与实名制冲突"
+    },
+    {
+     "rank": 29,
+     "cluster_id": "C43",
+     "title": "外卖用户要下单前核验幽灵店/同址多店的工具",
+     "one_liner": "\"截图核验\"小程序：上传美团/饿了么商家资质截图",
+     "audience": "外卖用户与家长",
+     "pain": "\"你点的三家外卖可能出自同一口锅\"、点到僵尸店骑手被罚",
+     "why_unsolved": "平台不愿暴露损害GMV的商户状况",
+     "existing_solutions": "美团/饿了么法定证照公示（看不出挂靠/无堂食）",
+     "platforms": [
+      "微博"
+     ],
+     "independent_source_count": 4,
+     "top_urls": [
+      "https://s.weibo.com//weibo?q=%23%E4%BD%A0%E7%82%B9%E7%9A%84%E4%B8%89%E5%AE%B6%E5%A4%96%E5%8D%96%E5%8F%AF%E8%83%BD%E5%87%BA%E8%87%AA%E5%90%8C%E4%B8%80%E5%8F%A3%E9%94%85%23&t=31&band_rank=20&Refer=top",
+      "https://github.com/justjavac/weibo-trending-hot-search/blob/master/archives/2024-08-25.md",
+      "https://github.com/4165306/Chengdu-Takeaway-Blacklist"
+     ],
+     "top_quotes": [
+      "微博热搜《你点的三家外卖可能出自同一口锅》#20、《整治幽灵外卖新规发布》#30",
+      "GitHub搜\"同址多店\"\"外卖 商家 核验\"\"美团 商家 证照\"全部total_count=0"
+     ],
+     "unmet_score": 5,
+     "crowd_score": 4,
+     "buildable_score": 4,
+     "total_score": 4.4,
+     "verdict_summary": "unmet=weak(5) crowd=weak(4) buildable=weak(4)",
+     "product_concept": "微信小程序\"这家店真的吗\"：用户把店铺\"商家资质\"页截图上传，OCR提取主体名称",
+     "mvp_scope": "3-5周1-3人：截图OCR",
+     "risks": "数据与下单入口都在平台手里，第三方无法嵌入下单流程每次切出截图摩擦极高"
+    },
+    {
+     "rank": 30,
+     "cluster_id": "C44",
+     "title": "普通上镜者要AI盗脸盗声的监测取证与维权工具",
+     "one_liner": "面向配音师/主播/被盗脸者的\"线索比对+一键取证+投诉包",
+     "audience": "配音演员、带货主播、短视频博主",
+     "pain": "普通人形象被AI短剧盗脸、配音师声音被AI克隆商用、演员被换脸做不雅视频",
+     "why_unsolved": "\"主动发现\"需持有抖音/快手/红果全量内容并做人脸/声纹检索",
+     "existing_solutions": "Loti AI（个人免费基础版，不覆盖中国平台）",
+     "platforms": [
+      "微博"
+     ],
+     "independent_source_count": 4,
+     "top_urls": [
+      "https://s.weibo.com//weibo?q=%23%E5%A4%AE%E8%A7%86%E6%9B%9DAI%E5%85%8B%E9%9A%86%E5%A3%B0%E9%9F%B3%E4%B9%B1%E8%B1%A1%23&t=31&band_rank=10&Refer=top",
+      "https://github.com/hacksider/Deep-Live-Cam",
+      "https://github.com/chaynHQ/tools"
+     ],
+     "top_quotes": [
+      "微博热搜《央视曝AI克隆声音乱象》#10（同日《央视曝光AI仿冒名人乱象》）",
+      "生成侧远大于防护侧：Deep-Live-Cam 96.8k★/14.1k forks、faceswap 57.6k★"
+     ],
+     "unmet_score": 5,
+     "crowd_score": 4,
+     "buildable_score": 3,
+     "total_score": 4.2,
+     "verdict_summary": "unmet=weak(5) crowd=weak(4) buildable=refuted(3)",
+     "product_concept": "明确不做全网扫描的\"维权工具箱\"网页/小程序：用户上传自拍与录音在本地生成脸",
+     "mvp_scope": "2-4周1-3人：本地脸/声纹比对",
+     "risks": "buildable被反驳(3)：核心价值\"主动发现\"需要全网人脸/声纹索引"
+    },
+    {
+     "rank": 31,
+     "cluster_id": "C47",
+     "title": "听障者要免费离线不限机型的实时字幕与通话转写",
+     "one_liner": "基于sherpa-onnx的免费离线中文实时字幕App",
+     "audience": "听障/聋人学生与职场人",
+     "pain": "要把周围人说的话实时变成字幕、打电话对方语音转文字自己打字转语音",
+     "why_unsolved": "Android 9+与iOS均不向第三方开放通话音频流",
+     "existing_solutions": "音书（免费云端听障专用）、讯飞输入法/讯飞听见（付费）",
+     "platforms": [
+      "知乎",
+      "哔哩哔哩",
+      "结绳志"
+     ],
+     "independent_source_count": 4,
+     "top_urls": [
+      "https://www.zhihu.com/question/376800723",
+      "https://github.com/k2-fsa/sherpa-onnx",
+      "https://github.com/andygmassey/telephone-and-conversation-transcriber"
+     ],
+     "top_quotes": [
+      "知乎376800723：\"本人听障大学生。请问有免费或者低费的实时或者快速将声音转化为字幕的工具 软件吗 求推荐",
+      "andygmassey/telephone-and-conversation-transcriber（130★"
+     ],
+     "unmet_score": 4,
+     "crowd_score": 4,
+     "buildable_score": 5,
+     "total_score": 4.2,
+     "verdict_summary": "unmet=weak(4) crowd=weak(4) buildable=weak(5)",
+     "product_concept": "Android/iOS/HarmonyOS三端免费离线实时字幕App：内置sherpa-onnx流式",
+     "mvp_scope": "2-4周1-3人：Android端she",
+     "risks": "通话字幕在\"不限机型、不免提\"前提下第三方软件做不到（Android"
+    },
+    {
+     "rank": 32,
+     "cluster_id": "C37",
+     "title": "手机用户要一站式隐私体检、拦骚扰与泄露溯源",
+     "one_liner": "Android端\"隐私管家\"：枚举已装App高危权限生成体检",
+     "audience": "隐私敏感手机用户、女性用户",
+     "pain": "央视曝光\"App小程序成隐私刺客\"、315曝光骚扰电话黑色产业链",
+     "why_unsolved": "跨App权限读写是OS特权，Android/iOS/鸿蒙都在收紧",
+     "existing_solutions": "iOS App隐私报告/安全检查/静音未知来电",
+     "platforms": [
+      "微博"
+     ],
+     "independent_source_count": 8,
+     "top_urls": [
+      "https://s.weibo.com//weibo?q=%23%E5%A4%AE%E8%A7%86%E6%9B%9DApp%E5%B0%8F%E7%A8%8B%E5%BA%8F%E6%88%90%E9%9A%90%E7%A7%81%E5%88%BA%E5%AE%A2%23&t=31&band_rank=10&Refer=top",
+      "https://github.com/aj3423/SpamBlocker",
+      "https://github.com/zuzhiang/SMS_Bomber"
+     ],
+     "top_quotes": [
+      "微博热搜《央视曝App小程序成隐私刺客》#10、《接不完的骚扰电话有条黑色产业链》#15（315晚会同日）",
+      "aj3423/SpamBlocker 1,865★（2024-04创建"
+     ],
+     "unmet_score": 4,
+     "crowd_score": 4,
+     "buildable_score": 4,
+     "total_score": 4,
+     "verdict_summary": "unmet=weak(4) crowd=weak(4) buildable=weak(4)",
+     "product_concept": "Android端\"隐私管家\"App：用PackageManager枚举全部已装App的已授予高危权限",
+     "mvp_scope": "4-6周1-2人：Android权限体检",
+     "risks": "批量关权限需root/Shizuku，iOS/鸿蒙NEXT下连枚举其他App都做不到"
+    },
+    {
+     "rank": 33,
+     "cluster_id": "C26",
+     "title": "多端用户要隐私友好离线的中文拼音与语音输入",
+     "one_liner": "把Rime+雾凇拼音与离线中文语音输入打包成带GUI安装器",
+     "audience": "隐私敏感的办公人群与程序员",
+     "pain": "搜狗/百度/讯飞输入法弹窗广告、词库与音频上传、各平台体验不一致",
+     "why_unsolved": "验证显示核心诉求实际已被解决：Rime生态（Weasel 8.1k★",
+     "existing_solutions": "Rime引擎与各端前端+雾凇拼音/oh-my-rime",
+     "platforms": [
+      "GitHub"
+     ],
+     "independent_source_count": 4,
+     "top_urls": [
+      "https://github.com/iDvel/rime-ice",
+      "https://github.com/cjpais/Handy",
+      "https://github.com/Mark24Code/rime-auto-deploy"
+     ],
+     "top_quotes": [
+      "rime-ice 19,519★/1,190 forks且open issues仅3-5个",
+      "CapsWriter-Offline 6,873★/211 open issues"
+     ],
+     "unmet_score": 3,
+     "crowd_score": 7,
+     "buildable_score": 7,
+     "total_score": 5.4,
+     "verdict_summary": "unmet=refuted(3) crowd=confirmed(7) buildable=confirmed(7)",
+     "product_concept": "Tauri 2桌面应用\"静默输入\"：GUI安装器检测系统后静默安装对应Rime壳（Weasel",
+     "mvp_scope": "4-6周1-3人：Windows",
+     "risks": "unmet被反驳：验证者核实Rime生态、rime-ice"
+    },
+    {
+     "rank": 34,
+     "cluster_id": "C04",
+     "title": "用户要把微信读书等平台数据整体导出带走",
+     "one_liner": "基于微信读书2026-05官方Skill API的免逆向",
+     "audience": "有系统读书笔记习惯的知识工作者",
+     "pain": "微信读书内置导出仅划线/想法、有条数限制格式差",
+     "why_unsolved": "验证显示核心场景已被解决：微信读书2026-05-17发布官方Agent",
+     "existing_solutions": "微信读书官方Skill API（2026-05）",
+     "platforms": [
+      "GitHub"
+     ],
+     "independent_source_count": 21,
+     "top_urls": [
+      "https://github.com/malinkang/weread2notion",
+      "https://github.com/BENZEMA216/awesome-weread",
+      "https://github.com/zhaohongxuan/obsidian-weread-plugin/issues/355"
+     ],
+     "top_quotes": [
+      "微信读书导出/同步类工具至少15个独立作者且各>280★：weread2notion-pro 3,414★/6,417",
+      "obsidian-weread-plugin #355\"[BUG]登录后，显示cookie失效，登录失败\"52条评论"
+     ],
+     "unmet_score": 3,
+     "crowd_score": 7,
+     "buildable_score": 6,
+     "total_score": 5.2,
+     "verdict_summary": "unmet=refuted(3) crowd=confirmed(7) buildable=weak(6)",
+     "product_concept": "面向非技术用户的托管同步器\"书摘流\"：用户粘贴微信读书官方API Key（App内设置一键获取）",
+     "mvp_scope": "2-4周1-2人：官方API接入",
+     "risks": "unmet被反驳：验证者核实weread2notion/obsidian-weread-"
+    },
+    {
+     "rank": 35,
+     "cluster_id": "C18",
+     "title": "多屏Windows用户要按屏独立桌面自动平铺",
+     "one_liner": "面向非技术多屏用户的零配置GUI工具：应用层cloak实现",
+     "audience": "Windows多显示器办公",
+     "pain": "切换虚拟桌面时所有显示器一起切（PowerToys #58 👍337自2019",
+     "why_unsolved": "验证显示komorebi 15.2k★与GlazeWM",
+     "existing_solutions": "komorebi 15.2k★（商用需许可、CLI配置）",
+     "platforms": [
+      "GitHub"
+     ],
+     "independent_source_count": 9,
+     "top_urls": [
+      "https://github.com/microsoft/PowerToys/issues/58",
+      "https://github.com/LGUG2Z/komorebi",
+      "https://github.com/glzr-io/glazewm"
+     ],
+     "top_quotes": [
+      "PowerToys #58：\"I always have Outlook on monitor 1, but want",
+      "反证：komorebi 15,222★\"Every monitor has its own collection of"
+     ],
+     "unmet_score": 3,
+     "crowd_score": 7,
+     "buildable_score": 6,
+     "total_score": 5.2,
+     "verdict_summary": "unmet=refuted(3) crowd=confirmed(7) buildable=weak(6)",
+     "product_concept": "Rust/C#托盘应用\"Spaces for Windows\"：不碰系统虚拟桌面",
+     "mvp_scope": "4-6周1名Win32开发：按屏独立工作",
+     "risks": "unmet被反驳：komorebi/GlazeWM/FancyWM已覆盖且免费活跃"
+    },
+    {
+     "rank": 36,
+     "cluster_id": "C22",
+     "title": "多机用户要可靠的短信验证码跨设备转发",
+     "one_liner": "免webhook的\"扫码配对\"短信转发：Android副机E",
+     "audience": "双卡多机用户、海外用国内号码者",
+     "pain": "验证码发到另一台手机要跑去拿；SmsForwarder 28k★需自建webho",
+     "why_unsolved": "验证显示SmsForwarder已成熟覆盖（28,138★、通道全",
+     "existing_solutions": "SmsForwarder 28.1k★（#760/#727保活open",
+     "platforms": [
+      "GitHub"
+     ],
+     "independent_source_count": 6,
+     "top_urls": [
+      "https://github.com/pppscn/SmsForwarder",
+      "https://github.com/pppscn/SmsForwarder/issues/760",
+      "https://github.com/chenxuuu/sms_forwarding"
+     ],
+     "top_quotes": [
+      "SmsForwarder 28,138★/3,432 forks，搜\"保活\"命中10个issue、9个不同作者",
+      "过去2年至少10位作者重造并向硬件走：sms_forwarding 1,531★（¥27.8模块）"
+     ],
+     "unmet_score": 3,
+     "crowd_score": 7,
+     "buildable_score": 5,
+     "total_score": 5,
+     "verdict_summary": "unmet=refuted(3) crowd=confirmed(7) buildable=weak(5)",
+     "product_concept": "三件套：Android发送端（前台服务+directBootAware组件解决HyperOS",
+     "mvp_scope": "4-6周1-3人：Android发送端",
+     "risks": "unmet被反驳：SmsForwarder及周边生态已成熟，新产品只在UX增量"
+    },
+    {
+     "rank": 37,
+     "cluster_id": "C49",
+     "title": "女性要无低俗广告、隐私可信、功能全的经期记录",
+     "one_liner": "本地优先、零广告零埋点的国产经期与备孕记录App",
+     "audience": "女性用户（含备孕）",
+     "pain": "美柚等头部经期App\"功能一直没有提升\"且\"各种低俗小广告霸屏\"",
+     "why_unsolved": "验证显示用户已找到满意替代：簇内原帖自己推荐苹果健康",
+     "existing_solutions": "苹果健康经期跟踪、华为/小米/三星健康周期",
+     "platforms": [
+      "小红书"
+     ],
+     "independent_source_count": 3,
+     "top_urls": [
+      "https://www.xiaohongshu.com/discovery/item/5b0bada1aac7cb3c66d93506",
+      "https://github.com/getify/youperiod.app",
+      "https://github.com/EmmaTellblom/Mensinator"
+     ],
+     "top_quotes": [
+      "小红书：许多用户反映美柚等应用\"功能一直没有提升\"和\"各种低俗小广告霸屏\"；\"姨妈来了在进入App时有广告，不太推荐\"",
+      "3位用户在2个去广告规则仓库分别提issue「请添加【美柚】去广告规则」"
+     ],
+     "unmet_score": 3,
+     "crowd_score": 6,
+     "buildable_score": 7,
+     "total_score": 5,
+     "verdict_summary": "unmet=refuted(3) crowd=weak(6) buildable=confirmed(7)",
+     "product_concept": "iOS优先（SwiftUI+SwiftData，可选CloudKit走云上贵州",
+     "mvp_scope": "2-4周1-2人：iOS版日历打卡",
+     "risks": "unmet被反驳：苹果健康、华米三星健康、Clue/Flo"
+    },
+    {
+     "rank": 38,
+     "cluster_id": "C08",
+     "title": "自建书库用户要无线投递电纸书与手写批注",
+     "one_liner": "Audiobookshelf的Kobo/OPDS桥接器",
+     "audience": "用Audiobookshelf",
+     "pain": "想要Send-to-Kindle同等体验：一键无线推EPUB到电纸书并同步进度（",
+     "why_unsolved": "验证显示Calibre-Web 18.3k★/CWA 6.3k★",
+     "existing_solutions": "Calibre-Web（逆向Kobo商店协议",
+     "platforms": [
+      "GitHub"
+     ],
+     "independent_source_count": 16,
+     "top_urls": [
+      "https://github.com/advplyr/audiobookshelf/issues/3504",
+      "https://github.com/koreader/koreader/issues/2633",
+      "https://github.com/janeczku/calibre-web"
+     ],
+     "top_quotes": [
+      "ABS #3504：\"Currently send to ereader only supports via",
+      "koreader #2633手写批注👍95/47评论，koreader（29.9k★）开放issue榜第1"
+     ],
+     "unmet_score": 3,
+     "crowd_score": 7,
+     "buildable_score": 4,
+     "total_score": 4.8,
+     "verdict_summary": "unmet=refuted(3) crowd=confirmed(7) buildable=weak(4)",
+     "product_concept": "Docker小服务\"ABS Bridge\"：读取Audiobookshelf REST API",
+     "mvp_scope": "3-5周1-2人：OPDS目录（1周",
+     "risks": "unmet被反驳：Calibre-Web/CWA/Komga"
+    },
+    {
+     "rank": 39,
+     "cluster_id": "C10",
+     "title": "多网盘用户要聚合挂载成本地盘且断点上传",
+     "one_liner": "\"OpenList增强发行版\"：Tauri桌面壳一键打包Op",
+     "audience": "持有百度/阿里/夸克/115",
+     "pain": "每个网盘一个App、非会员限速几十KB/s、不给直链不支持WebDAV",
+     "why_unsolved": "验证显示OpenList PR #2723（2026-08",
+     "existing_solutions": "OpenList 24.8k★（40+驱动、分块续传、安全分享）",
+     "platforms": [
+      "GitHub",
+      "v2ex.com",
+      "meta.appinn.net"
+     ],
+     "independent_source_count": 15,
+     "top_urls": [
+      "https://github.com/AlistGo/alist",
+      "https://github.com/OpenListTeam/OpenList",
+      "https://github.com/rclone/rclone/issues/2099"
+     ],
+     "top_quotes": [
+      "AList 50,229★/524 open issues",
+      "rclone #2099\"support for baidu pan\"自2018 open"
+     ],
+     "unmet_score": 3,
+     "crowd_score": 7,
+     "buildable_score": 4,
+     "total_score": 4.8,
+     "verdict_summary": "unmet=refuted(3) crowd=confirmed(7) buildable=weak(4)",
+     "product_concept": "面向普通NAS/Windows用户的桌面壳\"网盘盒\"：Tauri打包OpenList内核",
+     "mvp_scope": "4-6周1-3人：桌面壳+一键挂载",
+     "risks": "unmet被反驳：OpenList已上线分块续传与安全分享"
+    },
+    {
+     "rank": 40,
+     "cluster_id": "C11",
+     "title": "本地优先用户要自托管多端同步与选择性差量同步",
+     "one_liner": "Syncthing伴侣面板：Dropbox式勾选树选择性同步",
+     "audience": "多设备隐私/自托管用户",
+     "pain": "订阅、书签、高亮、时间追踪数据在设备间不同步只能手工导入导出（NewPipe",
+     "why_unsolved": "验证显示文件层已被Syncthing 89k★/Nextcloud",
+     "existing_solutions": "Syncthing（Android分支2.9k★",
+     "platforms": [
+      "GitHub"
+     ],
+     "independent_source_count": 15,
+     "top_urls": [
+      "https://github.com/syncthing/syncthing/issues/2491",
+      "https://github.com/syncthing/syncthing/issues/9083",
+      "https://github.com/TeamNewPipe/NewPipe/issues/5325"
+     ],
+     "top_quotes": [
+      "NewPipe #5325（2021开仍open无维护者回应）：\"I have two phones and a",
+      "Syncthing #2491\"Next Gen Ignores\"要求\"simple tree view with"
+     ],
+     "unmet_score": 3,
+     "crowd_score": 7,
+     "buildable_score": 4,
+     "total_score": 4.8,
+     "verdict_summary": "unmet=refuted(3) crowd=confirmed(7) buildable=weak(4)",
+     "product_concept": "Docker单二进制\"SyncHub\"：Syncthing伴侣Web面板调用/rest/db",
+     "mvp_scope": "2-4周1-2人：Syncthing选择",
+     "risks": "unmet被反驳：Syncthing/Nextcloud/Seafile与各应用自托管方"
+    },
+    {
+     "rank": 41,
+     "cluster_id": "C25",
+     "title": "读者要无广告可换源导入自有书跨端同步阅读器",
+     "one_liner": "国内自有书库用户的\"无广告本地阅读器+托管云同步",
+     "audience": "有自有电子书库的重度阅读者",
+     "pain": "番茄/七猫广告章节付费无法导出；微信读书/Kindle封闭格式笔记不能跨平台同步",
+     "why_unsolved": "验证显示换源半边由legado活跃分支（legado-with-MD3",
+     "existing_solutions": "legado主库（挂阅文侵权公告）及分支",
+     "platforms": [
+      "GitHub",
+      "豆瓣豆列"
+     ],
+     "independent_source_count": 5,
+     "top_urls": [
+      "https://github.com/gedoor/legado",
+      "https://github.com/koodo-reader/koodo-reader",
+      "https://github.com/readest/readest/issues/5033"
+     ],
+     "top_quotes": [
+      "legado 47,105★仓库仅剩1 commit与阅文公告\"本项目涉及侵权行为的违法，也为此承担了相应的法律责任\"",
+      "koodo-reader 28,317★ #1451：\"I'd pay that $5 a year for pro"
+     ],
+     "unmet_score": 3,
+     "crowd_score": 7,
+     "buildable_score": 4,
+     "total_score": 4.8,
+     "verdict_summary": "unmet=refuted(3) crowd=confirmed(7) buildable=weak(4)",
+     "product_concept": "Flutter/Tauri跨端自有书阅读器\"书箧\"：foliate-js渲染EPUB/TXT",
+     "mvp_scope": "2-6周1-3人：Android",
+     "risks": "unmet被反驳：koodo-reader/Readest/Anx"
+    },
+    {
+     "rank": 42,
+     "cluster_id": "C19",
+     "title": "家庭要跨端共享日历待办与家务分工轮换",
+     "one_liner": "微信小程序+H5的\"家务轮值表\"：情侣/室友",
+     "audience": "同居情侣、双职工夫妻、合租室友",
+     "pain": "想把家务分工明确化可轮换可统计；搜\"家务分配app\"只返回家政服务",
+     "why_unsolved": "验证显示海外已被Cozi、TimeTree、Google家庭组",
+     "existing_solutions": "Donetick（需自建、iOS alpha）",
+     "platforms": [
+      "小红书",
+      "抖音",
+      "GitHub"
+     ],
+     "independent_source_count": 9,
+     "top_urls": [
+      "https://github.com/nextcloud/server/issues/1600",
+      "https://github.com/donetick/donetick",
+      "https://github.com/grocy/grocy/issues/1651"
+     ],
+     "top_quotes": [
+      "Nextcloud #1600\"Allow (internal) sharing of subscribed",
+      "反证：Donetick 2,591★已实现\"按完成最少/随机/轮流(round-robin)自动轮换\""
+     ],
+     "unmet_score": 3,
+     "crowd_score": 5,
+     "buildable_score": 7,
+     "total_score": 4.6,
+     "verdict_summary": "unmet=refuted(3) crowd=weak(5) buildable=confirmed(7)",
+     "product_concept": "uni-app/Taro一套代码出微信小程序+H5：微信分享邀请伴侣/室友即配对天然跨iOS/安卓",
+     "mvp_scope": "2-6周1-3人：小程序+H5前端",
+     "risks": "unmet被反驳：Cozi/TimeTree/Google家庭组/OurHome"
+    },
+    {
+     "rank": 43,
+     "cluster_id": "C31",
+     "title": "重度用户要跨App的深夜静默与刷屏限额工具",
+     "one_liner": "Android端\"夜间静默+限额\"：识别抖音/快手/B站",
+     "audience": "想戒短视频的成年重度用户",
+     "pain": "越刷越焦虑、\"脑腐\"，两会建议短视频凌晨1-5点深夜静默（热搜#1上榜2天）",
+     "why_unsolved": "验证显示iOS停用时间/Android就寝模式/华为小米\"健康使用手机",
+     "existing_solutions": "iOS屏幕使用时间（Downtime/限额/密码）",
+     "platforms": [
+      "微博"
+     ],
+     "independent_source_count": 4,
+     "top_urls": [
+      "https://s.weibo.com//weibo?q=%23%E5%BB%BA%E8%AE%AE%E7%9F%AD%E8%A7%86%E9%A2%91%E5%87%8C%E6%99%A81%E7%82%B9%E8%87%B35%E7%82%B9%E6%B7%B1%E5%A4%9C%E9%9D%99%E9%BB%98%23&t=31&band_rank=1&Refer=top",
+      "https://github.com/curbox-app/curbox-android",
+      "https://github.com/Snownamida/touch-grass"
+     ],
+     "top_quotes": [
+      "微博热搜《建议短视频凌晨1点至5点深夜静默》#1上榜2天（两会建议，另有《建议推出老年人防沉迷模式》）",
+      "curbox-android 1.4k★ open issue #431"
+     ],
+     "unmet_score": 3,
+     "crowd_score": 6,
+     "buildable_score": 5,
+     "total_score": 4.6,
+     "verdict_summary": "unmet=refuted(3) crowd=weak(6) buildable=weak(5)",
+     "product_concept": "Android优先\"夜间静默\"App：UsageStatsManager读用量",
+     "mvp_scope": "3-4周1名Android开发：时段锁",
+     "risks": "unmet被反驳：系统内置Downtime/就寝模式与Jomo/Opal/curbox"
+    },
+    {
+     "rank": 44,
+     "cluster_id": "C32",
+     "title": "UP主与学习者本地免费生成翻译配音视频字幕",
+     "one_liner": "买断制macOS/Windows双端精致本地字幕配音App",
+     "audience": "自媒体/知识类UP主（自制内容",
+     "pain": "想给视频一键生成中英字幕、断句校对、翻译、配音并烧录而不按分钟付费不上云",
+     "why_unsolved": "验证显示pyvideotrans 19.2k★（Windows免Pyth",
+     "existing_solutions": "pyvideotrans（非商业许可、包体2.7GB）",
+     "platforms": [
+      "GitHub"
+     ],
+     "independent_source_count": 4,
+     "top_urls": [
+      "https://github.com/Huanshere/VideoLingo",
+      "https://github.com/WEIFENG2333/VideoCaptioner",
+      "https://github.com/buxuku/SmartSub"
+     ],
+     "top_quotes": [
+      "VideoLingo 18,529★/211 open issues、VideoCaptioner 16,114★",
+      "VideoLingo #415（open）：\"看说明使用本地ollama，不用配置api key，但为什么还是报错"
+     ],
+     "unmet_score": 2,
+     "crowd_score": 7,
+     "buildable_score": 5,
+     "total_score": 4.6,
+     "verdict_summary": "unmet=refuted(2) crowd=confirmed(7) buildable=weak(5)",
+     "product_concept": "Tauri打包的macOS/Windows桌面App\"字幕工坊",
+     "mvp_scope": "3-5周1-3人：拖入视频→本地ASR→",
+     "risks": "unmet被反驳(2)：pyvideotrans/SmartSub"
+    },
+    {
+     "rank": 45,
+     "cluster_id": "C33",
+     "title": "家长学生海外华人免费获取按年级检索的电子教材",
+     "one_liner": "合法层的\"课本导航+本地阅读器\"：按年级/学科",
+     "audience": "K12家长与学生、教师、自学者",
+     "pain": "想免费下载官方小初高课本PDF预习辅导海外中文教育",
+     "why_unsolved": "验证显示核心场景已被官方国家中小学智慧教育平台（按学段/年级/学科",
+     "existing_solutions": "basic.smartedu.cn+智慧中小学App（需登录",
+     "platforms": [
+      "GitHub"
+     ],
+     "independent_source_count": 2,
+     "top_urls": [
+      "https://github.com/TapXWorld/ChinaTextbook",
+      "https://github.com/TapXWorld/ChinaTextbook/issues/198",
+      "https://github.com/happycola233/tchMaterial-parser"
+     ],
+     "top_quotes": [
+      "ChinaTextbook 82,329★/18,674 forks/116 open issues",
+      "tchMaterial-parser 6.7k★/862 forks（今天仍在提交）衍生至少10个独立作者克隆"
+     ],
+     "unmet_score": 3,
+     "crowd_score": 7,
+     "buildable_score": 3,
+     "total_score": 4.6,
+     "verdict_summary": "unmet=refuted(3) crowd=confirmed(7) buildable=refuted(3)",
+     "product_concept": "不托管任何PDF的\"课本导航\"网页+桌面阅读器：网页按学段/年级/学科/版本建立结构化索引",
+     "mvp_scope": "1-2周：索引站+官方深链+教程",
+     "risks": "unmet与buildable均被反驳：官方平台已免费按年级"
+    },
+    {
+     "rank": 46,
+     "cluster_id": "C35",
+     "title": "厌倦订阅者要买断制无广告的单功能工具",
+     "one_liner": "面向macOS/iOS的\"买断工具包",
+     "audience": "对广告和订阅疲劳的普通手机用户",
+     "pain": "记事本、症状记录、课程表、音量控制、小组件这类简单工具打开就弹订阅墙",
+     "why_unsolved": "验证显示供给侧已被成熟方案覆盖：Android有F-Droid",
+     "existing_solutions": "Fossify套件（捐赠制、仅Android）",
+     "platforms": [
+      "Hacker News",
+      "Google Play",
+      "App Store",
+      "Medium",
+      "Substack"
+     ],
+     "independent_source_count": 15,
+     "top_urls": [
+      "https://news.ycombinator.com/item?id=34041962",
+      "https://github.com/FossifyOrg",
+      "https://github.com/SimpleMobileTools/General-Discussion/issues/241"
+     ],
+     "top_quotes": [
+      "HN \"Ask HN: Anyone tired of everything being a",
+      "SimpleMobileTools 2023-12售予ZipoApps后General-Discussion立刻出现#2"
+     ],
+     "unmet_score": 3,
+     "crowd_score": 6,
+     "buildable_score": 5,
+     "total_score": 4.6,
+     "verdict_summary": "unmet=refuted(3) crowd=weak(6) buildable=weak(5)",
+     "product_concept": "macOS/iOS优先的\"买断工具包\"：SwiftUI原生实现5-10个单功能小工具（离线记事本",
+     "mvp_scope": "2-4周1-2人：3个小工具（记事本",
+     "risks": "unmet被反驳：Fossify/F-Droid/Apple内置/买断精品"
+    },
+    {
+     "rank": 47,
+     "cluster_id": "C41",
+     "title": "自我管理者要极简无广告能记耗时主动提醒的打卡",
+     "one_liner": "Flutter双端\"照片打卡日历\"：自建打卡事件",
+     "audience": "学生、考研党、上班族中的自我管理",
+     "pain": "小红书\"时间管理app\"问答反复吐槽：时光序越做越复杂",
+     "why_unsolved": "验证显示\"极简+无广告+记耗时+可靠提醒\"组合已在iOS",
+     "existing_solutions": "Streaks（iOS买断，无照片日历）",
+     "platforms": [
+      "小红书"
+     ],
+     "independent_source_count": 5,
+     "top_urls": [
+      "https://www.xiaohongshu.com/mobile/question/395527",
+      "https://github.com/iSoron/uhabits",
+      "https://github.com/iSoron/uhabits/issues/1808"
+     ],
+     "top_quotes": [
+      "小红书问答（该线程在10次不同查询结果中反复出现）：\"各款时间管理应用都有各自的缺点，如不能具体记录耗时",
+      "\"habit tracker\"在GitHub命中61,946个仓库"
+     ],
+     "unmet_score": 3,
+     "crowd_score": 5,
+     "buildable_score": 7,
+     "total_score": 4.6,
+     "verdict_summary": "unmet=refuted(3) crowd=weak(5) buildable=confirmed(7)",
+     "product_concept": "Flutter双端App\"日拾\"：自建打卡事件（习惯/待办/运动）",
+     "mvp_scope": "3-5周1-3人：打卡/计时/耗时统计",
+     "risks": "unmet被反驳：Streaks/Loop/HabitNow/Habitify"
+    },
+    {
+     "rank": 48,
+     "cluster_id": "C15",
+     "title": "笔记用户要层级标签、多归属与工作私人分库",
+     "one_liner": "Joplin \"Tag Tree\"插件：把现有a/b",
+     "audience": "Joplin/Trilium",
+     "pain": "Joplin用户要像Evernote那样可折叠的嵌套/层级标签（#375",
+     "why_unsolved": "验证显示每一类需求都已有成熟免费方案：Obsidian原生嵌套标签",
+     "existing_solutions": "Obsidian（闭源免费同步收费）、Logseq 45k★",
+     "platforms": [
+      "GitHub"
+     ],
+     "independent_source_count": 12,
+     "top_urls": [
+      "https://github.com/paperless-ngx/paperless-ngx/discussions/1841",
+      "https://github.com/laurent22/joplin/issues/375",
+      "https://github.com/paperless-ngx/paperless-ngx/pull/10833"
+     ],
+     "top_quotes": [
+      "Joplin #375\"[Feature request] Hierarchical tags\"（2018-04开",
+      "\"嵌套/层级标签\"跨十余个仓库反复出现：AFFiNE被独立提了3次、Notesnook、Karakeep"
+     ],
+     "unmet_score": 2,
+     "crowd_score": 7,
+     "buildable_score": 4,
+     "total_score": 4.4,
+     "verdict_summary": "unmet=refuted(2) crowd=confirmed(7) buildable=weak(4)",
+     "product_concept": "Joplin插件\"Tag Tree\"：用joplin.data.get(['tags'])读取全部标",
+     "mvp_scope": "1-2周1人：Joplin插件树面板",
+     "risks": "unmet被反驳(2)：Obsidian/Logseq/思源/QOwnNotes"
+    },
+    {
+     "rank": 49,
+     "cluster_id": "C42",
+     "title": "普通用户要备份快、视频不锁会员的可靠云相册",
+     "one_liner": "BYO存储的\"自带云相册\"App：相机胶卷（含视频",
+     "audience": "手机存储吃紧、需长期保存家庭照片",
+     "pain": "百度一刻相册/百度网盘备份速度慢、视频要会员才能备份、担心数据能否恢复",
+     "why_unsolved": "验证显示该场景已被两条成熟路线覆盖：付费云（iCloud国区50GB",
+     "existing_solutions": "iCloud（云上贵州）、Google Photos/Google",
+     "platforms": [
+      "小红书"
+     ],
+     "independent_source_count": 5,
+     "top_urls": [
+      "https://www.xiaohongshu.com/mobile/question/690698",
+      "https://github.com/immich-app/immich",
+      "https://github.com/fregie/pho"
+     ],
+     "top_quotes": [
+      "小红书问答：关于百度网盘的一刻相册服务，用户反映备份速度慢、需要会员才能备份视频等问题",
+      "Immich 115.1k★/7.1k forks（GitHub增长最快项目之一）"
+     ],
+     "unmet_score": 3,
+     "crowd_score": 5,
+     "buildable_score": 4,
+     "total_score": 4,
+     "verdict_summary": "unmet=refuted(3) crowd=weak(5) buildable=weak(4)",
+     "product_concept": "Flutter/原生\"自带云相册\"App：用户填入自己的阿里云OSS/腾讯COS/七牛",
+     "mvp_scope": "3-5周1-2人：OSS/COS/R2",
+     "risks": "unmet被反驳：iCloud/厂商云/Google Photos与NAS"
+    },
+    {
+     "rank": 50,
+     "cluster_id": "C45",
+     "title": "普通人发布长尾小需求并即时生成可用小应用",
+     "one_liner": "垂直场景的\"说一句就有\"小应用生成器：自然语言→受约束单文件",
+     "audience": "有个性化小需求、不会编程的普通用",
+     "pain": "\"怎么没有一个能给猫做健康记录的工具\"\"为什么没有一个简单有趣的聚会抽奖器\"",
+     "why_unsolved": "验证显示到2026-09这是消费级AI最拥挤的赛道之一",
+     "existing_solutions": "蚂蚁灵光（免费、持久化与分享待迭代）",
+     "platforms": [
+      "36氪",
+      "知乎",
+      "人人都是产品经理",
+      "Quora"
+     ],
+     "independent_source_count": 4,
+     "top_urls": [
+      "https://36kr.com/p/3582110406376581",
+      "https://www.zhihu.com/question/668224936",
+      "https://github.com/dyad-sh/dyad"
+     ],
+     "top_quotes": [
+      "36氪《被超级APP忽视的需求，用户自己来做了》：\"怎么没有一个能给猫做健康记录的工具？\"",
+      "prompt→app品类大众级关注：dyad 21,612★/2,649 forks（2025-04创建）"
+     ],
+     "unmet_score": 2,
+     "crowd_score": 4,
+     "buildable_score": 7,
+     "total_score": 3.8,
+     "verdict_summary": "unmet=refuted(2) crowd=weak(4) buildable=confirmed(7)",
+     "product_concept": "Web/H5+PWA的\"小工具即刻\"：自然语言描述→流式生成受约束的单文件HTML",
+     "mvp_scope": "2-6周1-3人：基于cloudflar",
+     "risks": "unmet被反驳(2)：灵光/秒哒/扣子与Claude Artifacts"
+    }
+   ],
+   "method_notes": "方法：23路搜索代理在微博、小红书、知乎、抖音、B站、豆瓣、少数派、HN、Product Hunt、X等平台按关键词矩阵扫描普通用户的抱怨与愿望，另有6路GitHub挖掘做需求侧与方案侧的星标/issue核对；相似诉求聚成50个簇，再由三名独立验证者从unmet/crowd/buildable三视角核查打分，总分=unmet×0.4+crowd×0.4+buildable×0.2，任一验证者在unmet或crowd判refuted的簇一律排到榜尾并在risks注明“被反驳”。局限：WebSearch会话配额200次在第一轮即耗尽，每路只完成5-15次查询，样本不是穷尽式的；小红书/抖音/知乎等只能看到搜索引擎摘要与标题，看不到评论区互动数，crowd分数因此偏向GitHub可见的star/issue信号；验证阶段是离线知识+GitHub模式检索而非逐条联网复核原帖，涉及商业产品与平台政策的判断已在原文标注不确定；所有引文与链接只来自输入文件，未做二次爬取。本结构化输出受单轮输出上限约束，各字段为压缩版；完整版（每簇8条链接、4条引文、完整产品概念与风险）见 /tmp/claude-0/-home-user-Auto-GPT/f87645c4-3b4f-513a-8bfa-66d2a4de3ed6/scratchpad/research/report_dump/ranked_full.json。",
+   "coverage_notes": "已覆盖：微博热搜（含热搜归档仓库）、小红书（仅搜索摘要与聚合问答页）、知乎、抖音搜索词、B站、豆瓣豆列、少数派、36氪/人人都是产品经理、中新网等媒体、Hacker News、Product Hunt/X/Medium/TikTok（英文侧标题级）、GitHub（issue/star/PR，核验最充分）。未覆盖或只能间接覆盖：reddit.com因Anthropic爬虫策略不可访问；threads.net、hn.algolia.com不可直连；小红书/知乎/抖音/微博/B站等国内站点全部无法直连（出口代理拦截），只能通过搜索引擎摘要间接获取，因此看不到评论区、点赞与转发数；除github.com外WebFetch/curl均被拦截，验证者对商业产品与平台政策的判断依赖离线知识。第二轮应补的平台：酷安、吾爱破解、PTT/Dcard、Lemmy、厂商官方反馈板（小米社区/花粉俱乐部等）、职业社区（脉脉/牛客/丁香园）、付费定制需求平台（猪八戒/一品威客）以及各App商店评论区；这些渠道可能显著改变若干簇的crowd分数与排名。"
+  },
+  "judges": [
+   {
+    "lens": "user-pain-first",
+    "pick_cluster_id": "C29",
+    "pick_title": "消费者要一键直达各企业人工客服的路径库",
+    "runner_up_ids": [
+     "C01",
+     "C03"
+    ],
+    "reasoning": "选 C29 的理由（痛感 × 真实 × 传播 × 硬约束四项同时满足）：\n\n1. 痛感最普遍、情绪最强。\"智能客服绕圈找不到人\"是几乎每个中国消费者都亲历过的高频愤怒场景（快递丢件、银行冻卡、退款被拒时尤甚），人民日报点名批评 + 同日三个热搜（#12/#18/#20）说明它已上升到公共议题层面。12 个候选里只有它同时拿到 unmet=confirmed(7) 和 buildable=confirmed(7)。crowd 仅 weak(5) 是因为证据是热搜标题而非用户原话，但这类痛点不需要\"原话\"来证明——美国 GetHuman 靠同一套路径库存活近 20 年，是最好的需求存在性证据。\n\n2. 最容易口口相传。产品的\"最小可分享单元\"天然存在：一张\"京东 950618 → 按 0 → 说'人工'\"的小抄图，本身就是小红书/抖音已有的爆款内容类型（\"转人工秘籍\"）。用户在被机器人折磨 20 分钟后 30 秒接通人工，会立刻转发给朋友。零学习成本、无需注册、不下载 App。\n\n3. 完全符合\"无外网容器 + 单开发者\"硬约束。纯静态 vanilla HTML/JS + 仓库内 JSON 数据，tel: 链接带暂停/DTMF 自动按键，无平台 API、无付费服务、无逆向、无服务器。我核实了输入里的 https://github.com/FuzzyLogic112/zhuanrengong ：它确实是一个消费者侧静态站（63 家企业、25 条实测路径、0 star、3 commits、vanilla 无 CDN、数据 CC BY-SA），这反过来证明该形态在离线容器里可实现；其零星数只说明它刚建、无传播，不构成需求反证——反而可作为兼容的数据格式/贡献对象。数据准确性是唯一真风险，用\"每条路径标注最近验证日期 + 无服务器的众包反馈导出→GitHub PR\"来解，不构成\"大量人工运营\"。\n\n其他候选为何不选（按痛感排序）：\n- C03 微信聊天记录：痛感全场最强、呼声最真实（42k★、WeFlow 9 个月 14k★、十年 9 位作者反复重造、腾讯 DMCA 波及 4,195 fork）。但\"可搜\"必须依赖本地 OCR 模型（tesseract.js chi_sim ≈ 20-40MB 或 PaddleOCR），无外网容器拿不到模型，演示会退化成\"截图拼长图\"而失去核心价值；且 buildable 已被反驳(3)。故只作候补：一旦开发环境证实有离线 OCR 引擎，应立刻做。\n- C01 记账：28 个独立来源、5 平台，是 crowd 最广的；纯前端 PWA + 微信/支付宝官方账单 CSV 导入 + Splitwise 式共享账本完全可离线做。但 unmet 仅 4（BeeCount、ezBookkeeping、钱迹等替代太多），痛感是慢性烦躁而非急性愤怒，口碑传播需要数周使用才发生。作候补 1。\n- C14 物品管理：痛点具体（小红书原话\"积分用完不能添加/丢图/超 30 件付费\"），纯 PWA 可做，但受众窄、crowd weak(5)。\n- C27 独居守护：生死议题但低频，核心承诺\"超时自动通知联系人\"离不开短信/推送通道（付费或平台），容器里无法可信演示；证据来自同一新闻周期，克隆潮无一进商店反证持续需求弱。\n- C23/C07/C05/C17/C24/C34/C36：分别依赖 Immich 实例、腾讯正在关闭的旁路、B 站登录态与律师函灰区、热点/Wi-Fi Direct 系统 API、GTFS 外部数据、大量人工标注、LLM+高德 API——都在硬约束之外或无法离线演示。",
+    "product_spec": "【产品名（暂）】找人工 / 一键转人工\n\n【一句话定位】\n一个离线可用、无需注册的网页小抄：输入企业名，30 秒内知道打哪个号、按哪几个键、说哪句话能直达人工客服；打不通时一键升级到对应监管投诉渠道并生成投诉信。\n\n【目标用户】\n- 主：遇到售后/快递/银行/运营商/出行纠纷、正被智能客服绕圈的普通消费者（25-45 岁城市用户为主）\n- 次：替父母处理纠纷的子女（大字模式）、消费维权博主（分享小抄图）\n\n【核心功能（第一版 6 项）】\n1. 企业检索 + 通话小抄卡：按名称/行业（电商、快递、银行、运营商、航司铁路、外卖出行、保险、政务）/号码搜索。每家一张卡：官方热线（含地区差异）、转人工按键序列（如\"10086 → 0 → 0\"）、语音关键词（说\"人工\"\"投诉\"）、在线客服转人工触发词与入口层级、推荐拨打时段、最近验证日期、社区成功率。\n2. 一键拨号自动按键：移动端 tel: 链接嵌入暂停与 DTMF（如 tel:10086,,0,0），点一下拨出并自动按键；桌面端显示大字小抄 + 复制号码。\n3. 万能技巧 + 失败升级路径：通用\"转人工万能法\"卡（按 0/#、说\"人工\"、重复\"投诉\"、静默等待）；每家卡片底部按行业给出升级渠道并一键拨号：12315 消费者、12305 邮政快递申诉、12300/12381 工信部电信申诉、12378 金融消费者、12328 交通运输、12326 民航、12345 政务。\n4. 投诉信/申诉模板生成器：填订单号、金额、时间线、诉求 → 生成结构化投诉信（含《消费者权益保护法》第八/十/五十五条等常用引用）→ 一键复制，可直接粘到 12315 或企业在线客服。\n5. 无服务器众包验证闭环：拨打后弹\"接通人工了吗？用了多久？\"记录到 localStorage；\"导出我的验证\"生成 JSON/Markdown 贡献片段，用户到 GitHub 提 PR 合并入 data/*.json；页面显示\"n 人验证 / 最近验证于 / 成功率\"，90 天未验证自动标\"待复核\"。\n6. 分享小抄图 + 离线 PWA：Canvas 生成每家企业的小抄图片卡（适配微信/小红书竖图），一键保存分享；Service Worker 缓存全站，地铁/信号差时也能查。\n\n【形态】\n纯静态 PWA（vanilla HTML/CSS/JS，无框架、无 CDN、无构建步骤），数据是仓库内 JSON（schema 固定：company/industry/hotline/dtmf_sequence/voice_keywords/online_path/best_time/regulator/last_verified/votes）。file:// 直接打开即可演示；附一个 Python 标准库脚本 validate.py 校验数据 schema 与 tel: 链接格式。代码 MIT、数据 CC BY-SA 4.0（与已存在的 zhuanrengong 仓库数据许可兼容，便于互相合并）。\n\n【第一版不做什么】\n- 不做服务器、账号、评论、排行榜（众包完全走 GitHub PR）\n- 不做小程序/App（需平台审核），先 H5/PWA\n- 不做自动代拨、代排队、语音识别应答（需电话/系统 API）\n- 不做在线客服自动化脚本或抓取企业页面（灰色/反爬）\n- 不追求 300 家全覆盖：首版 60-100 家高频企业 + 全部监管渠道，每条路径诚实标注\"已验证/待验证\"，宁缺毋假\n- 不采集任何用户个人信息，投诉信生成完全本地\n- 不做企业侧 SaaS（客服系统转人工 SDK）\n\n【怎么验证真的解决了问题】\n- 演示验收（容器内）：任选 10 家企业检索 → 卡片正确 → 手机点击 tel: 链接能带 DTMF 拨出；模板生成器输出可复制的完整投诉信；断网后页面仍可打开；validate.py 全部通过。\n- 北极星指标（用户自报，功能 5 收集）：从打开页面到接通人工的中位时长 < 90 秒（对照现有测评均值 171 秒、最长 660 秒）；标\"已验证\"路径的接通成功率 ≥ 70%。\n- 传播信号：把 5 张小抄图分别发到小红书/微博，看 7 天自然转发与收藏；页面\"分享小抄图\"点击率 ≥ 15%；GitHub star 与每周 PR 贡献 ≥ 3 条即视为众包闭环成立。\n- 数据健康：每条路径 90 天内至少 1 次验证；👎 反馈 24 小时内变\"待复核\"。\n- 停止信号（反证）：若拨号后反馈率 < 5%、7 日回访 < 10%、60 天内 40% 路径失效且无人贡献，说明痛点被\"随手搜一下社交平台\"足够满足，应停止投入而非加功能。"
+   },
+   {
+    "lens": "buildability-first",
+    "pick_cluster_id": "C01",
+    "pick_title": "记账者要无广告自动导账单可多人共享的记账",
+    "runner_up_ids": [
+     "C14",
+     "C24"
+    ],
+    "reasoning": "按\"一个开发者、无外网容器、纯前端/本地优先、不碰平台私有接口、不靠人工运营和双边网络效应、合法\"逐条筛 12 个候选，只有 C01、C14、C24 三个能完整通过，其中 C01 的需求证据最硬（28 个独立来源、5 个平台、crowd=confirmed 7），所以选 C01。\n\n选 C01 的理由：\n1) 三个核心痛点里两个能被软件本身彻底消除：a) 开屏广告/突然付费/限额导流——纯前端本地优先 PWA 天然没有这些；b) 手动录入累——微信支付「账单下载」和支付宝「交易流水」都是官方提供、用户自己发起的 CSV 导出，解析 CSV 不碰任何私有接口、不需要 Xposed/无障碍/爬虫，完全合法；第三个痛点\"共享弱\"可以用\"无账号的账本文件合并 + Splitwise 式分摊结算\"覆盖 70%，剩下的实时多端同步留给后续（用户自带 WebDAV），不需要我们运营服务器，也就没有 PIPL 备案问题。\n2) 工程量可控且无依赖风险：容器里已有 Node 22 / Python 3.11，浏览器与 Node 的 TextDecoder 原生支持 GBK（已实测），CSV 解析、去重、规则归类、IndexedDB 存储、Canvas 画图、WebCrypto 加密全部是 Web 平台内建能力，不需要 npm install 任何东西。一个开发者 2-3 周可以做出可演示、可真实使用的版本。\n3) 不依赖网络效应：共享是 2-4 人小组的文件交换，第一个用户独自使用就有完整价值。\n\n明确的风险：unmet 只有 4——ezBookkeeping（自托管）、BeeCount（13 个月 2.4k★，Flutter）等开源方案已存在，钱迹/MOZE 付费无广告。差异化只能靠\"零安装 PWA + 零账号共享/分摊 + 官方账单导入即用\"这一组合，不靠技术壁垒；这在 buildability-first 下可接受，但产品侧要认清是\"把现有需求做对而不是做新\"。本会话无法核验 BeeCount/ezBookkeeping #53 的具体功能（代理 403、GitHub MCP 仅限单一仓库），以上基于输入证据。\n\n淘汰理由（按 buildability 约束）：\n- C29 转人工路径库：软件部分是个静态目录+tel: 拨号链接，价值 95% 在\"持续实测入库 Top300 企业\"的数据，这是大量人工运营，且容器里无法打电话验证——违反\"软件消除痛点/不靠人工运营\"。\n- C27 独居守护：核心动作\"超时通知联系人\"需要短信/推送/微信等外部通道，纯前端和容器里都做不到；被动心跳依赖 HealthKit/微信运动（需审核平台接口）；且涉生死责任，证据只有一个新闻周期、GitHub 克隆全部 ≤15★。\n- C05、C03、C07：分别依赖 B 站 wbi 签名+SESSDATA（已收律师函）、微信数据库/沙盒（腾讯 DMCA）、腾讯正在关闭的旁路接口——违反\"不破解/逆向/私有接口\"。\n- C36：依赖 LLM 与高德 API（付费、需网络、需 key），无外网容器无法运行。\n- C23：只能寄生 Immich API 且上游正在重做 #12614，容器里无 Immich 可演示。\n- C17：热点创建需 OS/硬件能力，容器无 Wi-Fi 无法演示；同网传输部分 LocalSend/PairDrop 已解决。\n- C34：目录站的价值是数据与社区（双边）、需要持续人工标注，且\"免会员去广告\"一半需求是破解需求。\n\n候补：\n- C14 家庭物品管理：与 C01 同样可做成零依赖本地优先 PWA（IndexedDB 存照片 blob、位置树、批量拍照、zip 导出），\"不限量不丢图不付费\"被软件直接消除，buildable=7；但 crowd 仅 5、证据无 URL，且 OCR 小票在无外网容器里拿不到模型数据只能砍掉，故居次。\n- C24 离线公交换乘：可缩为\"用户自带 GTFS 的浏览器内 RAPTOR 换乘 PWA\"，开放数据合法、纯前端可做、crowd=7 有具体 issue；但容器内无真实 GTFS 可演示、大文件解析工程量大、iOS PWA 存储 7 天驱逐与无离线底图削弱\"离线\"价值，受众付费意愿低，故排第三。",
+    "product_spec": "【产品暂名】素账（PlainLedger）\n\n【一句话定位】\n一个零依赖、纯前端、本地优先的记账 PWA：把微信/支付宝官方导出的账单 CSV 拖进来自动去重归类，和伴侣/室友用\"账本文件\"共享与分摊结算——永远没有广告、没有会员墙、数据不离开你的设备。\n\n【目标用户】\n1) 被随手记/鲨鱼记账的开屏广告和\"突然付费\"赶走、又不想为钱迹/MOZE 付年费的年轻上班族；2) 需要分账的情侣/室友/合租小组（2-4 人）；3) 对流水隐私敏感、不想注册账号、不想装 Xposed 类灰色工具的人。愿意每月花 5 分钟从微信/支付宝导一次官方账单。\n\n【核心功能（6 个）】\n1. 官方账单导入：识别微信支付「账单下载」与支付宝「交易流水」两种 CSV 格式（GBK/UTF-8 自动检测、跳过表头表尾说明行、可视化字段映射确认），以 交易单号+时间+金额 为指纹去重，重复导入幂等；退款/转账自动对冲；同时保留\"手动快速记一笔\"。其他来源走通用 CSV 映射。\n2. 规则归类引擎：内置约 50 条商户关键词→分类默认规则；用户每手改一次分类，自动提示生成\"以后含 XX 的都归 YY\"规则；导入后显示\"未归类 N 条\"批量处理视图。目标：默认规则归类率 ≥70%，用户训练一个月后 ≥90%。\n3. 共享账本与分摊结算：账本内可加成员（本地记录，无账号）；每笔可设付款人与分摊方式（平均/比例/指定人/不分摊）；实时显示\"谁欠谁多少\"，一键生成结算记录（Splitwise 式）。\n4. 零账号文件式共享：账本一键导出为单个 .json（可选 WebCrypto 密码加密），通过微信文件/AirDrop/网盘任意渠道发给对方；对方导入时按记录 UUID + 修改时间三向合并，不覆盖、不重复、冲突可视化。（预留接口：用户自带 WebDAV 地址即可自动同步。）\n5. 报表与预算：月/年收支概览、分类占比、成员分摊表、月度对比；每分类月预算与超支提示；图表用 Canvas/SVG 手绘，不引入任何图表库。\n6. 数据主权：全部数据在 IndexedDB，PWA 可安装、断网可用；一键全量导出 CSV/JSON，一键清空；无遥测、无服务器。\n\n【形态】\n纯前端 PWA：一个 index.html + 少量原生 JS/CSS + manifest + service worker，零 npm 依赖，用 Node/Python 内建静态服务器即可本地演示与部署到任何静态托管；手机浏览器\"添加到主屏幕\"即成 App。不上架商店、不做小程序，不需要备案与审核。\n\n【第一版不做什么】\n- 不做任何\"自动同步流水\"：不接无障碍/通知监听/Xposed，不爬微信支付宝，不接银行接口（中国无合法实时路径）。\n- 不做账号系统、不做自建服务器的实时多端同步（避免 PIPL 备案与运营成本）；共享只做文件合并。\n- 不做银行/信用卡账单专用解析（只做微信+支付宝两种格式，其他走通用映射）。\n- 不做 OCR 小票、不做 AI 归类、不做投资/资产净值/汇率。\n- 不做原生 App（Flutter/iOS/Android）、不做桌面安装包。\n- 不做多币种、不做发票报销。\n\n【怎么验证真的解决了问题】\n容器内演示验收（开发者自测）：\n- 用 3 份构造的账单文件（微信 GBK、支付宝含表头说明行、故意重复导入+含退款）导入：去重准确率 100%、退款对冲正确、默认规则归类率 ≥70%、10k 条导入 <3 秒。\n- 两个浏览器 Profile 分别记账并互相导出/导入，合并后记录数与手算一致、无丢失无重复；分摊结算金额与手算一致。\n- 断网后打开 PWA 仍可记账与看报表。\n真实用户验证（发布后 4 周，找 10-15 位随手记/鲨鱼流失用户、含 ≥3 对情侣/室友）：\n- 导入成功率（无需手动改字段映射）≥90%；\n- 从导入到全部归类完成的时间 ≤5 分钟/月，对比其原手动录入耗时缩短 ≥70%（自报）；\n- 第 2 个月仍主动导入账单的留存 ≥50%；\n- ≥3 组完成至少一次文件式共享合并并产生一条结算记录；\n- 问卷\"是否愿意换回原 App\"：≥70% 回答否，并能说出留下的原因是\"无广告/导入省事/能分账\"之一。\n不达标的含义：若导入成功率或归类耗时不达标，说明\"官方 CSV 半自动导入\"没有消除手动录入之痛，方案核心假设不成立；若共享指标不达标而其余达标，则砍掉共享专注单人无广告记账。"
+   },
+   {
+    "lens": "business-first",
+    "pick_cluster_id": "C14",
+    "pick_title": "家庭要不限量可拍照/小票自动录入的物品管理",
+    "runner_up_ids": [
+     "C01",
+     "C29"
+    ],
+    "reasoning": "business-first 四问：谁付钱、能否持续收、竞品为什么没填、有没有护城河；再叠加硬约束（单人、无外网容器、纯前端/本地优先、不碰审核 API/付费三方/逆向/人工运营）。\n\n【为什么选 C14】\n1) 付费意愿已被竞品验证：氧气/尽简在 30/49 件处设付费墙，收纳先生/橘兜用积分限额——用户是撞到付费墙才去小红书写\"硬伤测评\"的，说明他们高频使用到了付费决策点，抗拒的是\"为限额付费\"而不是付费本身。\n2) 竞争空白是结构性的、不是没人想到：input 的 why_unsolved 写明\"靠限额/积分变现与不限量冲突\"——竞品把图片放自家云上，每多一张图就多一分成本，所以必须限量或丢图。本地优先（IndexedDB 存图、用户自己的设备/网盘做备份）把边际成本压到零，\"永不限量、永不丢图\"对我们是免费的、对竞品是亏钱的。这是可持续的成本结构优势，也是竞品短期难跟的原因。\n3) 护城河：几百件带照片、带位置的个人物品库迁移成本极高，长期留存天然好；一次性 Pro 解锁（导出/迁移/多设备）无服务器成本，独立开发者可盈利。\n4) 完全满足硬约束：摄像头 input、浏览器端压图、IndexedDB、模糊搜索、ZIP 导入导出全是纯前端可做，不需任何 API、模型下载或运营，容器内即可做出可演示 PWA；buildable=confirmed(7)，是 12 个里少数不被平台/法律/基础设施封顶的。\n5) 主要风险是 crowd 仅 weak(5)、\"细分小众低付费\"。business-first 的回应：小众但付费路径清晰、零边际成本，比\"人多但没人付钱/收不了钱\"更值得先做；验证方案直接测\"越过竞品付费墙的比例\"和 Pro 转化，两周即可判生死。\n\n【为什么 C01 是候补而非首选】记账是 28 来源/5 平台、最扎实的需求，钱迹/MOZE 证明用户会付费。但 unmet 仅 4：无广告已有钱迹免费版、开源 BeeCount/ezBookkeeping，\"竞争空白\"不成立；\"自动导入\"在国内无合法实时路径，\"多人共享\"必须要账号+后端，与本地优先/单人 MVP 相冲突，红海里只能拼体验。若 C14 验证失败，可用同一套本地优先+官方账单 CSV 导入的技术底子转向这里。\n\n【为什么 C29 是候补而非首选】唯一 unmet 与 buildable 双 confirmed 的候选，且 GetHuman 用路径库活了近 20 年，是有先例的生意；人民日报批评+三热搜是政策顺风。但它本质是持续众包验证的内容库——正违反\"不能大量人工运营\"，且无外网的开发者在容器里无法核实任何一家热线按键序列，演示只能是未经验证的数据，有误导风险；国内消费者侧付费与 B2B 中立性冲突，变现路径不清。适合作为有运营资源后的第二步。\n\n【明确排除】C27 的\"付费榜第一\"是最强的直接付费信号，但同一新闻周期、下架、31 个克隆无一进商店说明是热点而非持续需求；通知联系人必须依赖短信/推送三方服务，且涉生死责任与合规下架风险，business-first 不该碰。C03/C05/C07 被腾讯/B 站法律姿态与加密封死；C23/C24/C34 面向 FOSS/自托管用户付费意愿低或自述\"无商业模式\"；C36 依赖 LLM 与地图 API 且携程/高德随时补齐；C17 被 iOS 封顶一半。",
+    "product_spec": "【暂名】满屋 —— 本地优先的不限量家庭物品/衣橱管理 PWA\n\n一句话定位：拍一张就是一件、永不限量、照片永不丢的家庭物品库，三秒找到\"东西在哪\"。竞品靠限额和积分收费，我们把图存在你自己的设备上，所以可以不限量。\n\n目标用户：\n- 核心：衣服多、囤货多的 22-35 岁年轻女性（小红书\"衣橱管理/收纳/断舍离/囤货\"人群），已试用过收纳先生/橘兜/氧气/尽简并撞过付费墙或丢过图。\n- 次级：多储物空间的家庭主理人、频繁搬家的租房者。\n\n核心功能（v1，6 项）：\n1. 批量拍照入库：一次拍/选多张，每张自动生成一件物品，浏览器端压缩（长边 1280、约 150KB），先入库、后补信息；支持一张图裁多件。\n2. 三级位置树 + 物品卡：房间→家具→格/箱；物品含名称、分类、标签、数量、购入日期、价格、备注；批量移动位置；每个位置可打印/生成二维码标签（纯前端生成，扫码即定位到该格）。\n3. 即时搜索与快捷视图：名称/标签/位置/分类模糊搜索，\"很久没用\"\"即将过期（囤货）\"\"某季衣物\"\"某位置全部\"一键筛选。\n4. 不限量本地存储：IndexedDB 存物品与图片 Blob，申请 persistent storage，存储占用可视化，绝不设件数/图片上限。\n5. 一键导出/导入：整库导出 ZIP（JSON+图片）或 JSON；导入可恢复/合并，换机与\"永不丢图\"的信任基础；这也是后续 Pro 付费点的入口。\n6. 只读分享页：把某个位置/标签/全部衣橱生成一张单文件 HTML 或长图清单（晒衣橱、给家人看），无需服务器。\n\n形态：PWA 纯前端网页（单页应用，可添加到手机桌面、完全离线可用），无后端、无账号；后续可用 Capacitor 套壳上架或做小程序版。容器内实现：vanilla JS/TS + IndexedDB + Canvas 压图 + 自带 ZIP 打包，无外部依赖。\n\n第一版不做：\n- 账号、云同步、多人协作（有需求再用用户自有 WebDAV/网盘做 Pro 同步，不自建云）。\n- 小票 OCR 与 AI 识物（需模型下载或第三方 API，无外网不可做；且属\"锦上添花\"不是付费墙痛点）。\n- 条码扫描、电商订单导入、到期提醒推送。\n- 小程序版（需审核）、任何积分/限额/广告机制。\n\n怎么验证是否真的解决了问题（上线后两周内判断，埋点为本地匿名计数、用户可选上报）：\n- 入库门槛：首次打开 10 分钟内录入 ≥10 件的用户占比 ≥40%（批量拍照是否真降低了录入负担）。\n- 越过竞品付费墙：7 天内单用户 ≥50 件（对应竞品 30/49 件付费点）的占比 ≥25%——证明\"不限量\"是真需求而非口号。\n- 检索价值：第 2-4 周搜索/筛选次数 ÷ 新增件数 ≥1（真在用它找东西而不只是录入）；D30 留存 ≥20%。\n- 付费意愿：导出备份/换机迁移/多设备入口设 Pro 一次性解锁（¥28-38），在 ≥50 件用户中转化 ≥5%；同时以测评帖形式发小红书，收藏率对标现有\"物品管理 App 测评\"帖。\n- 定性：邀请 10 位写过相关测评的小红书作者试用，看\"不限量不丢图\"是否成为其推荐的首条理由；不足则说明痛点不在此，转向候补 C01。"
+   }
+  ]
+ }
+]

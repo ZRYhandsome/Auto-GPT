@@ -1,0 +1,146 @@
+{
+ "gaps": [
+  "分工失效/产出为零：bilibili、zhihu-为什么没人做、ph-ih 三个分工在 sweep 中 0 条产出；xhs-求app/xhs-吐槽 为部分失败后 salvaged；tieba-douban 仅 5 条（贴吧 1 条）、appstores 5 条、x-threads 6 条。这些平台实际上等于没搜。",
+  "证据质量偏弱：微博 75 条证据里 72 条是 s.weibo.com 热搜榜页（话题标题），不是用户'求软件'原帖/评论，A06/A07/A08/A10/A11/A13/A23/A24/A26 全部只靠热搜页撑起 viral；抖音 28 条里 25 条是搜索聚合页；知乎直连不可用，只靠 zhuanlan 与搜索摘要。",
+  "未覆盖的中文'求软件'聚集地：酷安（求软件/有没有 app 是核心内容）、吾爱破解悬赏问答（有偿求软件/脚本）、花粉俱乐部与鸿蒙 NEXT '缺哪些 app/求鸿蒙版' 讨论、远景/卡饭、linux.do、即刻（独立开发者/求推荐圈子）、gitee/oschina/csdn/segmentfault、百度知道/搜狗问问（下沉市场措辞）、今日头条/微头条、公众号文章（搜狗微信）、什么值得买、虎扑步行街/NGA、黑猫投诉/人民网领导留言板（投诉即需求）、猪八戒/码市/程序员客栈/电鸭（付费定制需求）、国产安卓商店评论（华为/小米/应用宝/TapTap）。",
+  "未覆盖的繁体中文市场：PTT、Dcard、Mobile01、LIHKG 完全没搜，措辞不同（有沒有推薦的App/有冇app/為什麼沒人做），且台湾/香港特有场景（发票载具对奖、健保、台铁高铁、八达通、强积金、长者手机）可与大陆簇做跨区域交叉验证。",
+  "未覆盖的英文聚集地：Reddit 不可用但其替代品 Lemmy（c/asklemmy、c/opensource、c/selfhosted、c/privacy、c/android）与 Mastodon 未搜；softwarerecs.stackexchange（未回答问题=供给空缺）、AlternativeTo 讨论区、Lobsters/Tildes、needgap（专门发'问题求解决'）、dev.to/hashnode 未搜；闭源产品官方反馈板（Canny/UserVoice/Nolt/Featurebase 公开板、Spotify Ideas、Obsidian forum、Home Assistant community、XDA app request、Apple/MS 社区）未搜——与 GitHub issue 不同，这类是'厂商多年不做'的第三方机会；Upwork/Freelancer/Fiverr/Kickstarter 的付费需求未搜。",
+  "人群缺口：open-zh-2 按人群（老人/残障/农民/骑手/教师护士/宝妈/小商家）在全网泛搜下几乎无产出（只得 B20-B23），需改为进入其自有社区定向搜：医生（丁香园）、网文作者（龙空）、货车司机（卡车之家）、家长/中学生错题与家校多 app（家长帮）、宝妈（宝宝树/妈妈网）、新能源车主充电桩聚合与车机广告（汽车之家）、摄影师、民宿房东、基层公务员表格填报。英文侧完全没有按人群搜：ADHD/神经多样性、慢病与症状记录、照护者、视障/听障/轮椅、教师护士卡车司机农民、移民/ESL。",
+  "措辞角度缺口（中文）：'有偿求/悬赏/求大佬开发/谁能写个脚本/付费定制'（付费意愿最强证据）、'X 停服/下架/限速后用什么'（迁移期暴露功能缺口）、'鸿蒙版什么时候上/鸿蒙 NEXT 缺什么 app'、'每个小区/医院/学校/停车场/充电桩一个 app 受不了，有没有聚合'、'iOS 有没有类似安卓 xx 的'。措辞角度缺口（英文）：ISO (in search of)、shut up and take my money、'alternatives after X shut down'（Pocket 2025-07、Skype 2025-05、Omnivore、Mint、Google Podcasts、Kindle 取消 USB 下载、Windows 10 EOL 2025-10 迁 Linux）、厂商社区里的 'is there a way to'。",
+  "簇证据偏少需定向补搜：A04/A05/A27/A28/A29/A30（单平台 3-4 条：独居守护、父母防骗、家庭充值预警、去世账号托管、老人健康共享、经期记录）；B13/B14（各 2 条）；B25-B30（2-3 条：独立开发者曝光、本地笔记检索、课表、选课、数据带走、发票收集）；C14-C19（1-2 条，单个 GitHub issue 撑起 viral：播客多队列、iPad VS Code、Flutter 热更新、WSL2 磁盘回收、终端 buddy、OLED 子像素渲染）；抖音簇 A02/A18/A22 依赖搜索聚合页。",
+  "结构性不可搜渠道（记录以便说明局限）：微信群/QQ 群/小程序评论、Discord/Telegram、快手、闲鱼定制需求、Apple Feedback/Microsoft Feedback Hub 不公开；日韩等非中英市场不在范围。"
+ ],
+ "new_finders": [
+  {
+   "key": "coolapk-52pojie-harmony",
+   "domains": [
+    "coolapk.com",
+    "52pojie.cn",
+    "club.huawei.com",
+    "bbs.pcbeta.com",
+    "bbs.kafan.cn"
+   ],
+   "brief": "国产安卓/Windows 硬核用户的'求软件'聚集地，此前完全未搜。酷安：搜'求软件''求推荐''有没有一个app能''谁能做一个''求鸿蒙版'的动态与评论区（记录点赞/评论数）；吾爱破解：'悬赏问答''求助'版块里'有偿求/求脚本/求破解不如求替代'的帖子，重复主题=真实付费需求；花粉俱乐部+酷安：鸿蒙 NEXT '缺哪些 app''什么时候上架鸿蒙''鸿蒙上没有 xx 怎么办'的清单式帖子（2024-2026 新增市场空白）；远景/卡饭：Windows '求一个能 xx 的软件''找了很久没找到'。顺带补证 A09/B04（广告屏蔽）、B11（验证码转发）、B14（输入法）、B18（剪贴板）、A25/A26（隐私/骚扰）。每条记录：帖子 URL、原话、互动数、是否有人回复'没有/自己写了'。"
+  },
+  {
+   "key": "paid-custom-demand",
+   "domains": [
+    "zbj.com",
+    "epwk.com",
+    "codemart.com",
+    "proginn.com",
+    "eleduck.com",
+    "zb.oschina.net",
+    "upwork.com",
+    "freelancer.com",
+    "fiverr.com",
+    "peopleperhour.com",
+    "kickstarter.com"
+   ],
+   "brief": "付费意愿最强的证据源：个人/小商家掏钱定制的小软件需求。中文：猪八戒/一品威客/码市/程序员客栈/电鸭/开源众包上预算几百到几千元的'开发一个小程序/脚本/插件/爬虫/自动化/Excel处理/微信机器人/提醒工具'需求，按主题归并，找多个不同雇主反复发布的同类需求（如：多平台房态同步、订单/发票汇总、群消息统计、抢票/监控、批量下载）。英文：Upwork/Freelancer/PPH 中 'build a simple app that''Chrome extension that''script to automate' 的小预算重复主题，Fiverr 的热门定制类目；Kickstarter 软件/App 类众筹里达标项目与评论区'finally someone made this'。记录预算、发布频次、是否已有现成产品。"
+  },
+  {
+   "key": "en-recs-lemmy-shutdowns",
+   "domains": [
+    "softwarerecs.stackexchange.com",
+    "alternativeto.net",
+    "lemmy.world",
+    "lemmy.ml",
+    "programming.dev",
+    "lobste.rs",
+    "tildes.net",
+    "mastodon.social",
+    "fosstodon.org",
+    "needgap.com",
+    "dev.to"
+   ],
+   "brief": "Reddit 不可访问，用 Lemmy 全套替代：c/asklemmy、c/opensource、c/selfhosted、c/privacy、c/android、c/degoogle、c/linux 中 'is there an app that''looking for a tool that''does anything exist that''ISO' 帖，记录评论数与'没有，我也在找'附和。softwarerecs.SE：按标签浏览未回答/低分问题与高票问题，未被满意回答=供给空缺。AlternativeTo：'looking for alternative to X with Y' 讨论 + 2025-2026 关停迁移潮（Pocket 2025-07、Skype 2025-05、Omnivore、Mint、Google Podcasts、Kindle 取消 USB 下载、Arc 停更、Windows 10 EOL 迁 Linux）中反复出现的'所有替代品都缺 X 功能'。needgap：用户发布的待解决问题及投票。Lobsters/Tildes/dev.to：'I built X because nothing existed' 自述。Mastodon：'someone please build''wish there was an app' 帖。顺带补证 C05、C11、C14、C19、C30。"
+  },
+  {
+   "key": "en-feedback-boards",
+   "domains": [
+    "canny.io",
+    "uservoice.com",
+    "nolt.io",
+    "featurebase.app",
+    "community.spotify.com",
+    "forum.obsidian.md",
+    "community.home-assistant.io",
+    "xdaforums.com",
+    "discussions.apple.com",
+    "answers.microsoft.com"
+   ],
+   "brief": "闭源/商业产品的官方反馈板与厂商社区——与 GitHub issue 不同，这里是'厂商多年不做'的高票需求，直接对应第三方工具机会。Canny/UserVoice/Nolt/Featurebase 公开板：搜 'most voted''under review''not planned' 且创建 2+ 年仍 open 的条目（Notion、Todoist、Raycast、Arc、Figma、Linear、Strava 等的 feedback.* 子域）。Spotify Ideas（Live Idea 高票且多年未实现）、Obsidian forum 的 Feature requests 与 Plugin ideas 板、Home Assistant community 的 Feature Requests 高票帖、XDA 'app request'/'is there an app' 帖、Apple 与 Microsoft 社区 'is there a way to''any app that can' 问题中官方答复'不支持'的。记录票数、开放年限、官方状态。顺带补证 C12/C14/C15/C30。"
+  },
+  {
+   "key": "zh-hant-tw-hk",
+   "domains": [
+    "ptt.cc",
+    "dcard.tw",
+    "mobile01.com",
+    "lihkg.com"
+   ],
+   "brief": "繁体中文市场此前零覆盖。措辞：'有沒有推薦的App''求推薦 app''有冇 app 可以''為什麼沒有人做''跪求''有人做出來我一定付費''找不到好用的'。PTT 看板：MobileComm、iOS、Android、Soft_Job、Lifeismoney、e-shopping、home-sale；Dcard：3C、理財、APP、租屋、考試；Mobile01：軟體討論、Apple/Android 軟體；LIHKG：科技台、Apps台、財經台。重点场景：記帳/發票載具對獎、健保快易通、台鐵高鐵訂票、悠遊卡/八達通、強積金、長者手機、租屋、補習/考公職、外送。除挖新簇外，标注哪些需求与大陆簇（记账 A15、老人 A05、抢票 A11、订阅管理 A03、云相册 A21）同构，形成跨区域交叉证据。"
+  },
+  {
+   "key": "zh-occupational-forums",
+   "domains": [
+    "dxy.cn",
+    "lkong.com",
+    "360che.com",
+    "jzb.com",
+    "babytree.com",
+    "mama.cn",
+    "club.autohome.com.cn",
+    "bbs.hupu.com",
+    "bbs.nga.cn",
+    "xitek.com"
+   ],
+   "brief": "open-zh-2 按人群泛搜几乎无产出，改为进入各职业/身份的自有社区。丁香园：医生/护士'有没有软件能'（排班、病历模板、文献、值班提醒、患者随访）；龙的天空：网文作者码字软件/大纲/防丢稿/多平台发布痛点；卡车之家：货车司机找货、油价、限行、ETC 对账、多平台接单聚合；家长帮：错题本、家校多 app（钉钉/班级小管家/校讯通）、作业打卡、中学生时间管理；宝宝树/妈妈网：疫苗提醒、辅食、母乳/睡眠记录、多人共育、育儿账本；汽车之家论坛：新能源车主'每个充电桩品牌一个 app'聚合、车机广告、一车一 app、停车/洗车/保养分散；无忌：摄影师选片交片客片管理；虎扑步行街/NGA 水区：'有没有什么 app 能''求一个软件'高回复帖。措辞加'求推荐''有没有软件''自己做了个''受不了'。每条记录职业身份、原话、回复中有无现成方案。"
+  },
+  {
+   "key": "zh-mass-qa-complaints",
+   "domains": [
+    "zhidao.baidu.com",
+    "toutiao.com",
+    "weixin.sogou.com",
+    "mp.weixin.qq.com",
+    "tousu.sina.com.cn",
+    "liuyan.people.com.cn",
+    "cca.org.cn",
+    "thepaper.cn"
+   ],
+   "brief": "下沉市场、中老年、非一线城市用户的声音，以及'投诉即需求'。百度知道/头条：'有没有什么软件可以…''什么 app 能…不要钱''求一个不收费的''谁能开发一个'，看提问量与'我也想找'追问；公众号（搜狗微信搜索 + mp.weixin.qq.com）：'有没有这样一个 App''为什么没人做''我们做了个 xx 因为找不到'文章及阅读/在看数与留言区。黑猫投诉：按'自动续费''免密扣款''未成年人充值退款''老人误扣''演出退票''找不到人工客服''押金不退''会员共享'归并投诉量，提炼用户想要但没有的工具；人民网领导留言板/澎湃问政/中消协：'每个小区/医院/学校/停车场/充电桩一个 app''政务 app 太多''老人不会用'类留言。重点补证只有单一平台的 A03/A04/A05/A07/A10/A27/A28/A29/A30。"
+  },
+  {
+   "key": "zh-dev-communities-2",
+   "domains": [
+    "linux.do",
+    "gitee.com",
+    "oschina.net",
+    "csdn.net",
+    "segmentfault.com",
+    "okjike.com",
+    "web.okjike.com",
+    "github.com"
+   ],
+   "brief": "此前未搜的中文开发者/独立开发者社区（github.com 仅限 ruanyf/weekly 与 HelloGitHub 仓库的 issue 评论区，勿再泛搜 GitHub）。linux.do（2024-2026 最活跃中文技术社区）：'求推荐''有没有''自己写了个因为找不到''需求验证'帖，记录回复数与'+1'；即刻：'独立开发者的日常''AI探索站''产品经理的日常''求推荐'圈子里'有没有一个 app''这个需求有人做吗''愿意付费'动态；gitee issues：中文 feature request 高赞；oschina/segmentfault/csdn 问答：'有没有开源的 xx''国内能用的 xx 替代''不用翻墙的'；阮一峰周刊 issue 评论区：读者'求推荐/求软件'。另加迁移角度：'印象笔记/有道云笔记/网易相册/迅雷/百度网盘限速/某工具停服后用什么'。补证 B13/B14/B17/B25/B26/B29/B30。"
+  },
+  {
+   "key": "en-underserved-groups",
+   "domains": [],
+   "brief": "英文侧按人群定向搜（对应中文 open-zh-2 的英文版，此前完全没有）。神经多样性：'ADHD app that actually''why is every ADHD app''autistic adults wish there was an app''dyslexia friendly app wish'；慢病与症状记录：'chronic illness tracker wish it could''endometriosis/POTS/migraine app frustrating'；照护者：'caring for aging parent wish there was an app''remote monitoring dad's phone scams'；无障碍：'as a blind user I wish''screen reader users app that''deaf app wish existed''wheelchair accessibility map lacking'；职业：'as a nurse/teacher/trucker/farmer/electrician I wish there was an app''small trade business still using Excel'；移民/ESL/非美国市场（印度、巴西、欧盟）'no app for X in my country'。来源不限：博客、Medium、Quora、dev.to、论坛、新闻、TikTok 文字页。记录原话、人群、有无现成方案、是否愿付费。顺带补证 C20/C21/C23 在这些人群中的表现。"
+  },
+  {
+   "key": "zh-social-verify",
+   "domains": [
+    "s.weibo.com",
+    "weibo.com",
+    "douban.com",
+    "bilibili.com",
+    "zhuanlan.zhihu.com"
+   ],
+   "brief": "定向补证与失败分工重跑，不再抓热搜榜页。微博：用 s.weibo.com/weibo?q=<簇关键词> 搜真实原帖与评论（如'微信 聊天记录 导出 求软件''自动续费 有没有app 管理''独居 定时 报警 app''幽灵外卖 核验 工具'），为 A01-A13、A23-A28 每簇补 3-5 条带转评赞数的用户原话，特别是目前只有热搜页的 A06/A07/A08/A10/A11/A13/A23/A24/A26。豆瓣小组：指定'App推荐''我们都爱效率工具''极简生活''生活组织学''独立开发者''社畜茶水间'等组搜'求 app''有没有''谁能做一个'。B站（上次 0 产出）：改搜 bilibili.com/read 专栏与视频页标题/简介'求一个软件''自己做了个 xx 因为找不到''这个需求为什么没人做'。知乎（直连不可用）：仅用 zhuanlan.zhihu.com 与搜索摘要，补上未跑成的'为什么没人做/什么功能你一直希望有/如果有人做 xx 你会付费吗'角度。"
+  }
+ ]
+}

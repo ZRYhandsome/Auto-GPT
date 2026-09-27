@@ -1,0 +1,171 @@
+[
+ {
+  "key": "xhs-求app",
+  "domains": [
+   "xiaohongshu.com"
+  ],
+  "brief": "小红书 求app/求软件/谁能开发/蹲一个/同求"
+ },
+ {
+  "key": "xhs-吐槽",
+  "domains": [
+   "xiaohongshu.com"
+  ],
+  "brief": "小红书 吐槽角度：所有app都不好用/为什么没有一个app能/停更求替代"
+ },
+ {
+  "key": "xhs-垂直1",
+  "domains": [
+   "xiaohongshu.com"
+  ],
+  "brief": "小红书 按人群：打工人/大学生/考研考公/宝妈/养宠/租房/装修/留学生/跨境电商/自媒体/小商家/老年人"
+ },
+ {
+  "key": "xhs-垂直2",
+  "domains": [
+   "xiaohongshu.com"
+  ],
+  "brief": "小红书 按生活场景：记账/健康/吃药/饮食/睡眠/情绪/时间管理/家务/收纳/二手/出行/拼单/搭子"
+ },
+ {
+  "key": "zhihu-有没有",
+  "domains": [
+   "zhihu.com"
+  ],
+  "brief": "知乎 有没有一款软件可以/为什么至今没有/市场空白"
+ },
+ {
+  "key": "zhihu-为什么没人做",
+  "domains": [
+   "zhihu.com"
+  ],
+  "brief": "知乎 为什么没有人做xx/为什么中国没有xx app/什么功能你一直希望有"
+ },
+ {
+  "key": "douyin",
+  "domains": [
+   "douyin.com"
+  ],
+  "brief": "抖音 求推荐有没有这种软件/谁做出来我第一个买"
+ },
+ {
+  "key": "weibo",
+  "domains": [
+   "weibo.com"
+  ],
+  "brief": "微博 有没有什么app能/谁能做一个/愿意付费"
+ },
+ {
+  "key": "bilibili",
+  "domains": [
+   "bilibili.com"
+  ],
+  "brief": "B站 求一个软件/UP主自己做了个软件因为找不到"
+ },
+ {
+  "key": "v2ex-appinn",
+  "domains": [
+   "v2ex.com",
+   "appinn.com",
+   "meta.appinn.net"
+  ],
+  "brief": "V2EX + 小众软件 求软件版块/自荐因为找不到就自己写了"
+ },
+ {
+  "key": "tieba-douban",
+  "domains": [
+   "tieba.baidu.com",
+   "douban.com"
+  ],
+  "brief": "贴吧+豆瓣小组 求软件帖"
+ },
+ {
+  "key": "sspai-juejin",
+  "domains": [
+   "sspai.com",
+   "juejin.cn",
+   "ithome.com",
+   "36kr.com"
+  ],
+  "brief": "少数派/掘金/IT之家/36氪 开发者自述因为找不到才自己做"
+ },
+ {
+  "key": "hn-wish",
+  "domains": [
+   "news.ycombinator.com"
+  ],
+  "brief": "HN Ask HN what tool do you wish existed / I would pay for"
+ },
+ {
+  "key": "hn-complaints",
+  "domains": [
+   "news.ycombinator.com"
+  ],
+  "brief": "HN every X app is bad / why is X still so hard / enshittification"
+ },
+ {
+  "key": "ph-ih",
+  "domains": [
+   "producthunt.com",
+   "indiehackers.com",
+   "ycombinator.com"
+  ],
+  "brief": "Product Hunt / Indie Hackers / YC RFS 需求帖"
+ },
+ {
+  "key": "x-threads",
+  "domains": [
+   "x.com",
+   "twitter.com",
+   "threads.com"
+  ],
+  "brief": "X/Threads why isn't there an app that / someone please build"
+ },
+ {
+  "key": "appstores",
+  "domains": [
+   "apps.apple.com",
+   "play.google.com"
+  ],
+  "brief": "应用商店评论 wish it could / please add / 就差这个功能"
+ },
+ {
+  "key": "github-issues",
+  "domains": [
+   "github.com"
+  ],
+  "brief": "GitHub 高赞 feature request / awesome ideas 列表"
+ },
+ {
+  "key": "quora-medium",
+  "domains": [
+   "quora.com",
+   "medium.com",
+   "substack.com"
+  ],
+  "brief": "Quora/Medium/Substack what app do you wish existed"
+ },
+ {
+  "key": "youtube-tiktok",
+  "domains": [
+   "youtube.com",
+   "tiktok.com"
+  ],
+  "brief": "YouTube/TikTok app that doesn't exist but should"
+ },
+ {
+  "key": "open-zh-1",
+  "domains": [],
+  "brief": "中文全网 为什么没有一个app能/伪需求还是真需求（配额耗尽后转 GitHub 开源社区 star/issue 挖掘）"
+ },
+ {
+  "key": "open-zh-2",
+  "domains": [],
+  "brief": "中文全网 按人群：老年人/残障/农民/骑手/教师护士/宝妈/留学生/小商家/自由职业"
+ },
+ {
+  "key": "open-en",
+  "domains": [],
+  "brief": "英文全网 why is there still no app for / I would pay for an app that"
+ }
+]
