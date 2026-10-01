@@ -48,7 +48,7 @@ SIGNALS = [
         r"(每次|总是|老是|经常)(都)?(会)?(忘|记不住|记不得|不记得|找不到)|记不住|记不得|太麻烦|好麻烦|很麻烦|麻烦死|费劲|浪费(好多)?时间"
         r"|(只能|现在都|一直)(自己)?(拿|用)(备忘录|excel|表格|笔记|截图)|手动(记|整理|统计|复制)", re.I)),
     ("付费意愿", 4, False, re.compile(
-        r"愿意(付费|花钱|掏钱|买|出钱)|付费(也行|也可以|都行|支持)|已付费|可付费|花钱(也行|都行|也愿意)|多少钱都"
+        r"(?<!不)(?<!没人)(?<!没有人)愿意(付费|花钱|掏钱|买|出钱)|付费(也行|也可以|都行|支持)|已付费|可付费|花钱(也行|都行|也愿意)|多少钱都"
         r"|谁做.{0,6}(我)?(买|用|付)|第一个(买|用|付费)|能做出来.{0,6}(买|付)|早鸟", re.I)),
     ("想要", 2, False, re.compile(
         r"(要是|如果).{0,25}(就好了|多好|该多好|就更好|就更完美|就完美)|希望(能|可以)?有(个|一个|一款)|好想要|想要(一?个|一款)"
@@ -99,6 +99,9 @@ ASK_AUTHOR = re.compile(r"怎么下载|叫什么|在哪|哪里下|链接|多少�
 REACTION = re.compile(r"^(发现宝藏|宝藏|太强了|好强|好棒|厉害|牛|学到了|收藏|码住|mark|好可爱|期待|哈哈|笑死|确实|同意|支持|赞|有道理|说得对|真的|绝了|蹲|看起来|不错)", re.I)
 # 征集帖下推荐现成产品的评论：说明已经有人做了，不算新点子
 RECOMMEND = re.compile(r"(?<![求请])(推荐|安利)|搜.{1,15}(试试|即可|就行|就有)", re.I)
+# 评论"这个帖子、这些点子、做 app 赚不赚钱"的，不是点子本身
+META = re.compile(r"伪需求|(不|没)(有)?(赚钱|盈利)|盈利模式|开发价值|白嫖|讨论区|评论区|这个帖子|点子被|投资的产品|不合法|违法|踩线|灰产"
+                  r"|日光之下|毕业设计|大创|找灵感|商机|产品经理|重做一遍|护城河|算不过账", re.I)
 EMOJI = re.compile(r"\[[^\[\]]{1,8}\]")
 JOKE = re.compile(r"\[doge\]")  # 小红书里带狗头的多半是玩笑
 
@@ -202,7 +205,7 @@ def detect(text, kind, parent=None):
             score += weight
     # 只有一级评论算回应征集：楼中楼多是在评论别人的点子（"没盈利没人搞的""有安全隐患"）
     if (kind == "评论" and parent and parent.get("type") == "征集需求"
-            and not AD.search(text) and not ASK_AUTHOR.search(text) and not RECOMMEND.search(text)):
+            and not AD.search(text) and not ASK_AUTHOR.search(text) and not RECOMMEND.search(text) and not META.search(text)):
         plain = EMOJI.sub("", text).strip()
         if len(plain) < 10 and REACTION.search(plain):
             plain = ""
@@ -429,9 +432,13 @@ def write_summary(path, run_dir, items, signal_rows, post_rows, deep):
 
     lines.append("## 得分最高的 50 条")
     lines.append("")
+    # 深挖一个帖子时每条都来自同一帖，不必每条都重复帖子标题和链接
+    one_post = len({(r["platform"], r["post_id"]) for r in signal_rows}) <= 1
     for r in signal_rows[:50]:
         text = r["text"].replace("\n", " ")[:140]
         lines.append(f"- **{r['score']}** · {r['platform_name']}{r['kind']} · {r['signals']} · 赞 {r['likes']}：{text}")
+        if one_post:
+            continue
         if r["post_title"] and r["kind"] != "帖子":
             lines.append(f"  - 所属帖子（{r['post_type']}）：{r['post_title'][:60]} {r['url']}")
         elif r["url"]:

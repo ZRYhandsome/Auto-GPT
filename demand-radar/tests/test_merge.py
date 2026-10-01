@@ -239,6 +239,10 @@ class DeepRunTest(unittest.TestCase):
     def test_deep_crawled_post_not_suggested_again(self):
         self.assertNotIn("值得深挖的帖子", self.summary)
 
+    def test_single_post_summary_skips_repeated_post_lines(self):
+        top = self.summary.split("## 得分最高的 50 条")[1].split("##")[0]
+        self.assertNotIn("所属帖子", top)
+
 
 def texts_index(rows, text):
     return [r["内容"] for r in rows].index(text)
@@ -259,6 +263,7 @@ class DetectTest(unittest.TestCase):
         self.assertNotIn("付费意愿", self.hits("蹲蹲，留下一个终身pro"))
         self.assertNotIn("缺失", self.hits("这个视频有一句说得对，就是不赚钱所以没人做，做产品更难得的是商业变现"))
         self.assertNotIn("求工具", self.hits("有没有人教我，如何用ai编小程序，我说了半天"))
+        self.assertNotIn("付费意愿", self.hits("一般人说的需求都是伪需求，就是没人愿意付费的需求，都想白嫖"))
 
     def test_real_demands(self):
         self.assertIn("求工具", self.hits("有没有那种记录&提醒周期性事件的APP，比如我今天换了牙刷"))
@@ -281,6 +286,10 @@ class DetectTest(unittest.TestCase):
         for t in ["发现宝藏啦！", "这个图怎么做的", "做了个拼豆小工具，一键生成带色号图纸+材料表 有兴趣的可以体验下", "借口生成器我有做",
                   "我做了一个宠物交友小程序，目前用户1人", "大家好！想请教各位：我公司在制作一个app", "推荐小雀幸app，聊天堪比真人",
                   "信息差，你真的了解吗？ http://xhslink.com/o/9tAFv5QM6SY"]:
+            self.assertNotIn("回应征集", self.hits(t, parent=solicit), t)
+        # 评论这个帖子、这些点子本身的话，不是点子
+        for t in ["说实话，评论区大部分的朋友的想法都没有很大的开发价值", "AI 时代所有的软件都值得重做一遍", "没意思 不赚钱",
+                  "看了所有评论，没有一个值得我王多鱼投资的产品", "做不到的基本就是盈利和违法两方面问题"]:
             self.assertNotIn("回应征集", self.hits(t, parent=solicit), t)
         self.assertNotIn("回应征集", self.hits("记录梦境！", parent={"type": "推广", "title": "我做了一个App"}))
         # 标题没提到产品的征集帖，评论自己要提到产品才算
