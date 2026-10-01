@@ -12,11 +12,22 @@ import merge  # noqa: E402
 FIXTURES = {
     "xhs": {
         "contents": [{"note_id": "n1", "title": "有没有app可以帮我记住衣柜里的衣服", "desc": "试了好几个都要会员", "liked_count": "1.2万",
-                      "comment_count": "356", "note_url": "https://www.xiaohongshu.com/explore/n1", "source_keyword": "有没有app可以", "time": 1758000000000}],
+                      "comment_count": "356", "note_url": "https://www.xiaohongshu.com/explore/n1", "source_keyword": "有没有app可以", "time": 1758000000000},
+                     # 开发者推广帖：点赞再高，帖子本身也不该排到真实需求前面
+                     {"note_id": "n2", "title": "我做了一个记账App，终于上线啦", "desc": "市面上没有好用的记账软件，所以自己做了一个", "liked_count": "10万+",
+                      "comment_count": "3000", "note_url": "https://www.xiaohongshu.com/explore/n2", "source_keyword": "有没有app可以", "time": 1758000000000},
+                     # 和需求无关的爆款：标题里有"没人做"也不算
+                     {"note_id": "n3", "title": "对的但是没人做！", "desc": "#搞笑", "liked_count": "10万+", "comment_count": "7062",
+                      "note_url": "https://www.xiaohongshu.com/explore/n3", "source_keyword": "为什么没有人做", "time": 1758000000000}],
         "comments": [
             {"comment_id": "c1", "note_id": "n1", "content": "同求！！", "like_count": "88", "sub_comment_count": "2", "create_time": 1758000100000, "parent_comment_id": 0},
             {"comment_id": "c2", "note_id": "n1", "content": "谁做出来我第一个买，现在的都太难用了", "like_count": "240", "sub_comment_count": "5", "create_time": 1758000200000, "parent_comment_id": 0},
             {"comment_id": "c3", "note_id": "n1", "content": "好看", "like_count": "3", "sub_comment_count": "0", "create_time": 1758000300000, "parent_comment_id": 0},
+            {"comment_id": "c4", "note_id": "n1", "content": "蹲安卓", "like_count": "5", "sub_comment_count": "0", "create_time": 1758000400000, "parent_comment_id": 0},
+            # 推广帖下的评论：同样的"蹲安卓"要单独计数；引流广告不算需求
+            {"comment_id": "p1", "note_id": "n2", "content": "蹲安卓", "like_count": "300", "sub_comment_count": "40", "create_time": 1758000500000, "parent_comment_id": 0},
+            {"comment_id": "p2", "note_id": "n2", "content": "安卓什么时候出", "like_count": "20", "sub_comment_count": "1", "create_time": 1758000600000, "parent_comment_id": 0},
+            {"comment_id": "p3", "note_id": "n2", "content": "有没有想做小程序的老板，欢迎咨询", "like_count": "0", "sub_comment_count": "0", "create_time": 1758000700000, "parent_comment_id": 0},
         ],
     },
     "douyin": {
@@ -77,19 +88,24 @@ class MergeTest(unittest.TestCase):
         self.assertEqual(merge.main(self.tmp.name), 0)
         self.signals = read_csv(os.path.join(self.tmp.name, "需求信号.csv"))
         self.all = read_csv(os.path.join(self.tmp.name, "全部数据.csv"))
+        self.posts = read_csv(os.path.join(self.tmp.name, "按帖子汇总.csv"))
+        with open(os.path.join(self.tmp.name, "summary.md"), encoding="utf-8") as f:
+            self.summary = f.read()
 
     def tearDown(self):
         self.tmp.cleanup()
 
     def test_outputs_exist(self):
-        for name in ["需求信号.csv", "全部数据.csv", "summary.md"]:
+        for name in ["需求信号.csv", "按帖子汇总.csv", "全部数据.csv", "summary.md"]:
             self.assertTrue(os.path.exists(os.path.join(self.tmp.name, name)), name)
 
     def test_all_platforms_loaded_and_deduped(self):
         platforms = {r["平台"] for r in self.all}
         self.assertEqual(platforms, {"小红书", "抖音", "B站", "微博", "贴吧", "知乎", "快手"})
         xhs_posts = [r for r in self.all if r["平台"] == "小红书" and r["类型"] == "帖子"]
-        self.assertEqual(len(xhs_posts), 1)
+        self.assertEqual(len(xhs_posts), 3)
+        # 不同帖子下的同一句"蹲安卓"按评论 ID 去重，两条都要保留
+        self.assertEqual(len([r for r in self.all if r["内容"] == "蹲安卓"]), 2)
 
     def test_signals_detected(self):
         by_text = {r["内容"]: r for r in self.signals}
@@ -100,34 +116,113 @@ class MergeTest(unittest.TestCase):
         self.assertIn("想要", by_text["要是有这种软件就好了，我妈天天接诈骗电话"]["需求信号"])
         self.assertIn("缺失", by_text["找了很久都没有合适的"]["需求信号"])
         self.assertIn("想要", by_text["希望能有一个自动找痛点的工具"]["需求信号"])
+        self.assertIn("求其他平台", by_text["安卓什么时候出"]["需求信号"])
         self.assertNotIn("好看", by_text)
         self.assertNotIn("不错", by_text)
+        # 引流广告、和需求无关的爆款不进需求表
+        self.assertNotIn("有没有想做小程序的老板，欢迎咨询", by_text)
+        self.assertFalse(any(t.startswith("对的但是没人做") for t in by_text))
+
+    def test_post_types_and_solicited_answers(self):
+        types = {r["内容"].split("\n")[0]: r["帖子类型"] for r in self.all if r["类型"] == "帖子"}
+        self.assertEqual(types["有没有app可以帮我记住衣柜里的衣服"], "求助")
+        self.assertEqual(types["我做了一个记账App，终于上线啦"], "推广")
+        self.assertEqual(types["为什么没有人做一个老人专用的防诈骗app"], "征集需求")
+        self.assertEqual(types["对的但是没人做！"], "其他")
+        # 征集帖下的评论就算没有求助字眼，也记一个"回应征集"
+        d1 = next(r for r in self.signals if r["内容"].startswith("要是有这种软件"))
+        self.assertIn("回应征集", d1["需求信号"])
+        self.assertEqual(d1["帖子类型"], "征集需求")
 
     def test_likes_parsed_and_links_joined(self):
-        post = next(r for r in self.all if r["平台"] == "小红书" and r["类型"] == "帖子")
+        post = next(r for r in self.all if r["平台"] == "小红书" and r["类型"] == "帖子" and r["内容"].startswith("有没有app"))
         self.assertEqual(post["点赞"], "12000")
         c = next(r for r in self.signals if r["内容"] == "同求！！")
         self.assertEqual(c["链接"], "https://www.xiaohongshu.com/explore/n1")
         self.assertTrue(c["所属帖子"].startswith("有没有app可以"))
+        self.assertEqual(c["搜索词"], "有没有app可以")
         w = next(r for r in self.signals if r["内容"] == "+1")
         self.assertEqual(w["点赞"], "15")
 
-    def test_ranking_prefers_strong_and_popular_signals(self):
+    def test_ranking_prefers_real_demand_over_popularity(self):
         scores = [float(r["得分"]) for r in self.signals]
         self.assertEqual(scores, sorted(scores, reverse=True))
-        # 1.2 万赞的求工具帖子应排第一；同样是评论时，付费意愿 + 抱怨应排在单纯附和前面
-        self.assertTrue(self.signals[0]["内容"].startswith("有没有app可以帮我记住衣柜里的衣服"))
         rank = {r["内容"]: i for i, r in enumerate(self.signals)}
+        # 征集帖下千赞的点子排第一；10 万赞的推广帖排在真实需求后面
+        self.assertTrue(self.signals[0]["内容"].startswith("要是有这种软件就好了"))
+        promo = next(i for t, i in rank.items() if t.startswith("我做了一个记账App"))
+        self.assertGreater(promo, rank["谁做出来我第一个买，现在的都太难用了"])
+        self.assertGreater(promo, rank["找了很久都没有合适的"])
+        # 同样是评论时，付费意愿 + 抱怨应排在单纯附和前面
         self.assertLess(rank["谁做出来我第一个买，现在的都太难用了"], rank["同求！！"])
+
+    def test_post_summary_and_deep_dive(self):
+        by_title = {r["帖子"]: r for r in self.posts}
+        promo = by_title["我做了一个记账App，终于上线啦"]
+        self.assertEqual(promo["求其他平台"], "2")
+        self.assertEqual(promo["求其他平台点赞"], "320")
+        ask = by_title["有没有app可以帮我记住衣柜里的衣服"]
+        self.assertEqual(ask["已抓评论"], "4")
+        self.assertEqual(ask["平台评论数"], "356")
+        # 命中多、但评论只抓了一小部分的帖子，给出深挖命令
+        self.assertIn("值得深挖的帖子", self.summary)
+        self.assertIn('-p xhs -d "https://www.xiaohongshu.com/explore/n1', self.summary)
+        self.assertIn("| 有没有app可以 |", self.summary)
 
     def test_empty_dir_reports_error(self):
         with tempfile.TemporaryDirectory() as empty:
             self.assertEqual(merge.main(empty), 1)
 
 
+class DetectTest(unittest.TestCase):
+    """真实跑出来的误报和漏报，防止改正则时退回去。"""
+
+    def hits(self, text, kind="评论", parent=None):
+        return merge.detect(text, kind, parent)[0]
+
+    def test_false_positives(self):
+        self.assertEqual(self.hits("对的但是没人做！ #搞笑", "帖子"), [])
+        self.assertNotIn("抱怨现有", self.hits("我也买了 但是是送我姐的 还没问她好用不好用"))
+        self.assertNotIn("求其他平台", self.hits("苹果系统新出了个自带app：手帐，我觉得比备忘录好用"))
+        self.assertNotIn("缺失", self.hits("北京怎么都没有185+啊"))
+        self.assertNotIn("求其他平台", self.hits("ui为什么比安卓的好看"))
+        self.assertNotIn("付费意愿", self.hits("蹲蹲，留下一个终身pro"))
+
+    def test_real_demands(self):
+        self.assertIn("求工具", self.hits("有没有那种记录&提醒周期性事件的APP，比如我今天换了牙刷"))
+        self.assertIn("想要", self.hits("要是衣服也能根据上传自拍照试穿就好了"))
+        self.assertIn("想要", self.hits("物品收纳记录这个还真的超级需要"))
+        self.assertIn("改进建议", self.hits("能不能出个匿名对骂功能"))
+        self.assertIn("改进建议", self.hits("以后会提供别人上传的模板吗？"))
+        self.assertIn("痛点", self.hits("时间久了哪家难吃根本记不得又会重复踩雷 现在都自己拿备忘录记"))
+        for t in ["蹲蹲安卓", "安卓在哪里", "没有荣耀的吗", "会做电脑版嘛", "第二眼：没有安卓？遗憾滑走", "鸿蒙出吗？", "华为搜不到"]:
+            self.assertIn("求其他平台", self.hits(t), t)
+        self.assertEqual(self.hits("蹲蹲安卓"), ["求其他平台"])  # 附和不重复计分
+
+    def test_solicited_answer_needs_context(self):
+        solicit = {"type": "征集需求", "title": "明明很需要的APP功能，为什么就是没有人做？"}
+        self.assertIn("回应征集", self.hits("滴滴拉屎，在非常急的时候能够租用居民家的厕所", parent=solicit))
+        self.assertIn("回应征集", self.hits("记录梦境！", parent=solicit))
+        self.assertNotIn("回应征集", self.hits("怎么下载", parent=solicit))
+        self.assertNotIn("回应征集", self.hits("记录梦境！", parent={"type": "推广", "title": "我做了一个App"}))
+        # 标题没提到产品的征集帖，评论自己要提到产品才算
+        loose = {"type": "征集需求", "title": "对的但是没人做"}
+        self.assertNotIn("回应征集", self.hits("我现在进餐厅发现太贵了可以坦然离开了", parent=loose))
+
+    def test_post_type(self):
+        self.assertEqual(merge.post_type("明明很需要的APP功能，为什么就是没有人做？", ""), "征集需求")
+        self.assertEqual(merge.post_type("有什么产品是需求很大，却没有人做的？", ""), "征集需求")
+        self.assertEqual(merge.post_type("求ios细糠推荐！！", ""), "求助")
+        self.assertEqual(merge.post_type("急需要开发一个小程序", ""), "求助")
+        self.assertEqual(merge.post_type("帮你夺回注意力的武器上线App Store啦", ""), "其他")
+        self.assertEqual(merge.post_type("Vibe coding了一个《爽骂》情绪树洞", ""), "推广")
+        self.assertEqual(merge.post_type("终于找到符合需求的笔记软件", "意外发现一款开发时间不长的软件"), "推广")
+
+
 class HelperTest(unittest.TestCase):
     def test_to_int(self):
         self.assertEqual(merge.to_int("1.2万"), 12000)
+        self.assertEqual(merge.to_int("10万+"), 100000)
         self.assertEqual(merge.to_int("3k"), 3000)
         self.assertEqual(merge.to_int("1,234"), 1234)
         self.assertEqual(merge.to_int(""), 0)

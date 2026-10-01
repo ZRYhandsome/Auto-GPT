@@ -73,11 +73,29 @@ say "安装需求雷达脚本到 $RADAR_HOME"
 cp "$KIT_DIR/run_mc.py" "$MC_DIR/run_mc.py"
 cp "$KIT_DIR/radar.sh" "$KIT_DIR/merge.py" "$KIT_DIR/README.md" "$RADAR_HOME/"
 chmod +x "$RADAR_HOME/radar.sh"
-if [[ -f "$RADAR_HOME/keywords.txt" ]]; then
-  ok "保留你已有的 keywords.txt"
-else
-  cp "$KIT_DIR/keywords.txt" "$RADAR_HOME/keywords.txt"
+# 关键词：没改过默认关键词就换成新版默认，改过就保留
+KW="$RADAR_HOME/keywords.txt"
+KW_DEFAULT="$RADAR_HOME/.keywords.default"
+is_first_default() {
+  cmp -s "$1" - <<'OLD'
+# 需求雷达的搜索关键词：每行一个，井号开头的行会被忽略。
+# 选词原则：像用户在求助、在抱怨、在问"为什么没有"的原话。
+# 想聚焦某个领域时，在后面加一个领域词，例如：有没有app可以 记账
+有没有app可以
+有没有软件可以
+求推荐一个软件
+为什么没有人做
+一直没找到好用的
+谁能开发一个
+OLD
+}
+if [[ ! -f "$KW" ]] || cmp -s "$KW" "$KW_DEFAULT" || is_first_default "$KW"; then
+  cp "$KIT_DIR/keywords.txt" "$KW"
+  ok "已装好默认关键词"
+elif ! cmp -s "$KW" "$KIT_DIR/keywords.txt"; then
+  ok "保留你改过的 keywords.txt（新版默认关键词在 $KIT_DIR/keywords.txt）"
 fi
+cp "$KIT_DIR/keywords.txt" "$KW_DEFAULT"
 
 say "自检"
 if (cd "$MC_DIR" && RADAR_DRY_RUN=1 .venv/bin/python run_mc.py >/dev/null 2>&1); then ok "包装脚本正常"; else die "包装脚本自检失败"; fi

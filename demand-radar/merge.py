@@ -3,15 +3,17 @@
 用法：python merge.py <一次运行的输出目录>
 输入：<目录>/<平台>/jsonl/*_contents_*.jsonl 与 *_comments_*.jsonl（MediaCrawler 的 jsonl 输出）
 输出（写在同一目录下）：
-  需求信号.csv   命中"求助/缺失/抱怨/付费意愿/附和"等信号的帖子和评论，按得分排序
+  需求信号.csv   命中需求信号的帖子和评论，按得分排序
+  按帖子汇总.csv 每个帖子的评论区命中了多少需求、有多少人求安卓或鸿蒙版
   全部数据.csv   所有帖子和评论拍平成一张表
-  需求信号.xlsx  同"需求信号.csv"（装了 openpyxl 时才生成）
-  summary.md     各平台数量、信号分布和得分最高的 50 条
+  需求信号.xlsx  上面前两张表各占一页（装了 openpyxl 时才生成）
+  summary.md     各平台、各搜索词的命中情况，得分最高的 50 条，值得深挖的帖子
 只用 Python 标准库；openpyxl 可选。
 """
 import csv
 import glob
 import json
+import math
 import os
 import re
 import sys
@@ -22,16 +24,71 @@ PLATFORM_NAMES = {
     "xhs": "小红书", "douyin": "抖音", "dy": "抖音", "bili": "B站", "bilibili": "B站",
     "weibo": "微博", "wb": "微博", "tieba": "贴吧", "zhihu": "知乎", "kuaishou": "快手", "ks": "快手",
 }
+# radar.sh -p 用的平台简称（MediaCrawler 的输出目录名 → 命令行参数）
+PLATFORM_ARGS = {"xhs": "xhs", "douyin": "dy", "dy": "dy", "bili": "bili", "bilibili": "bili", "weibo": "wb",
+                 "wb": "wb", "tieba": "tieba", "zhihu": "zhihu", "kuaishou": "ks", "ks": "ks"}
 
-# 需求信号：(名称, 权重, 正则)。一条文本可以命中多个信号。
+PRODUCT = r"(app|软件|工具|小程序|网站|插件|平台|应用|神器|系统|功能|产品)"
+OTHER_OS = r"(安卓|android|鸿蒙|华为|荣耀|小米|vivo|oppo|三星|windows|win版|电脑版|电脑端|pc版|mac|ipad|平板|网页版|watch|手表|ios|苹果|iphone|全平台)"
+
+# 需求信号：(名称, 权重, 只看评论, 正则)。一条文本可以命中多个信号。
 SIGNALS = [
-    ("求工具", 3, re.compile(r"有没有(什么|哪个|一款|一个|啥|好用的|靠谱的)?.{0,10}(app|APP|App|软件|工具|小程序|网站|插件|平台|应用|神器)|求(推荐|一个|个|款).{0,8}(app|APP|软件|工具|小程序|网站|插件|神器)|什么(app|APP|软件|工具)(可以|能)")),
-    ("缺失", 3, re.compile(r"为什么(没有|没人|不能|不支持)|怎么(没有|没人)|竟然没有|居然没有|没(有)?人做|找不到|一直没找到|找了(好久|很久|半天)|市面上没有|到现在都没有|至今没有")),
-    ("抱怨现有", 2, re.compile(r"(太|超|巨|真)?(难用|不好用|垃圾|反人类)|广告(太多|好多|满天飞)|开屏广告|强制(更新|登录)|要(开)?会员|收费了|割韭菜|停更|下架了|卸载了|越来越(难用|臃肿)")),
-    ("付费意愿", 4, re.compile(r"愿意(付费|花钱|掏钱|买)|付费(也行|也可以|都行)|花钱(也行|都行|也愿意)|多少钱都|谁做.{0,6}(我)?(买|用|付)|第一个(买|用|付费)|求(大佬|大神)?(开发|做一个|做个)|能做出来.{0,6}(买|付)")),
-    ("附和", 1, re.compile(r"^\s*(\+1|＋1|同求|同问|蹲|蹲蹲|我也(想要|需要|是|在找)|求求了|一样|me too)", re.I)),
-    ("想要", 2, re.compile(r"(要是|如果)有.{0,12}(就好了|多好|该多好)|希望(能)?有(个|一个|一款)|好想要(一个|个)?|谁能(做|开发|搞)(一个|个)?")),
+    ("求工具", 3, False, re.compile(
+        r"有没有(?!人会|会)(那种|什么|哪个|一款|一个|啥|好用的|靠谱的|免费的)?.{0,20}" + PRODUCT
+        + r"|求(推荐|一个|个|款).{0,8}" + PRODUCT + r"|什么(app|软件|工具)(可以|能)|哪个(app|软件|ai).{0,6}(适合|可以|能|好用)", re.I)),
+    ("缺失", 3, False, re.compile(
+        r"为什么(就是|都|还|一直)?(没有|没人|不能|不支持)|怎么(就是|都|还|一直)?没(有)?人(做|开发)|竟然没有|居然没有|一直没找到|找了(好久|很久|半天|一圈)"
+        r"|市面上(都|也)?没有|到现在(都|也)?没有|至今没有|找不到(好用|合适|满意|一个|一款|这样|类似)"
+        r"|没(有)?人(做|开发)(过)?.{0,6}" + PRODUCT, re.I)),
+    ("抱怨现有", 2, False, re.compile(
+        r"难用|(?<!好用)不好用|垃圾|反人类|广告(太多|好多|满天飞|多到)|开屏广告|广告.{0,12}(忍无可忍|受不了|烦死)|强制(更新|登录|升级)"
+        r"|(还|都)?要(开)?会员|要收费|收费了|不免费了|割韭菜|停更|下架了|倒闭了|(停止|暂停)运营|越来越(难用|臃肿|贵)"
+        r"|bug(一堆|较多|太多|很多)", re.I)),
+    ("痛点", 1, False, re.compile(
+        r"(每次|总是|老是|经常)(都)?(会)?(忘|记不住|记不得|不记得|找不到)|记不住|记不得|太麻烦|好麻烦|很麻烦|麻烦死|费劲|浪费(好多)?时间"
+        r"|(只能|现在都|一直)(自己)?(拿|用)(备忘录|excel|表格|笔记|截图)|手动(记|整理|统计|复制)", re.I)),
+    ("付费意愿", 4, False, re.compile(
+        r"愿意(付费|花钱|掏钱|买|出钱)|付费(也行|也可以|都行|支持)|已付费|可付费|花钱(也行|都行|也愿意)|多少钱都"
+        r"|谁做.{0,6}(我)?(买|用|付)|第一个(买|用|付费)|能做出来.{0,6}(买|付)|早鸟", re.I)),
+    ("想要", 2, False, re.compile(
+        r"(要是|如果).{0,25}(就好了|多好|该多好|就更好|就更完美|就完美)|希望(能|可以)?有(个|一个|一款)|好想要|想要(一?个|一款)"
+        r"|(太|超级?|非常|真的?|很|好)需要(这个|这种|这样)?|我也需要|应该(出|有|做)(一个|个|一款)|能不能有(一个|个)"
+        r"|谁能(做|开发|搞)(一个|个)?|求(大佬|大神)?(开发|做)(一个|个)", re.I)),
+    ("改进建议", 1, True, re.compile(
+        r"能不能|能否|可不可以|可以(加|出|增加|支持|添加|设计)|有没有可能(加|出|做)|(以后|后续|之后)(会|能)(提供|出|加|支持|有)"
+        r"|希望.{0,12}(可以|能|加|增加|添加|支持|出)|建议(加|增加|出|做)|会考虑(增加|加|出)|能(把|加|出).{0,20}(吗|么|嘛)", re.I)),
+    ("求其他平台", 2, True, re.compile(
+        r"(蹲|求|等|待|期待|坐等|想要|什么时候|啥时候|何时|会(做|出|有)|出个|做个|搞个|有没有|在哪|快(上|出)|支持|没有|没找到|搜不到"
+        r"|下载不了|能(用|装|下))[^，。,.]{0,6}" + OTHER_OS
+        + r"|" + OTHER_OS + r"[^，。,.]{0,8}(在哪|呢|吗|嘛|么|快|什么时候|啥时候|版本|蹲|求|等|没有|没找到|搜不到|下载不了|能用|可以|会做|出(吗|嘛|么|没)|上线|[!！?？])"
+        r"|(降低|放宽|降到).{0,8}(版本|系统|ios)|(出|开发|做|有)(个)?(英文|中文|繁体)版", re.I)),
+    ("附和", 1, True, re.compile(r"^\s*(\+1|＋1|同求|同问|蹲|我也(想要|需要|是|在找|想)|求求了|一样|me too|太需要了)", re.I)),
+    ("找人开发", 2, False, re.compile(
+        r"(找人|找个人|求人|求大佬|求大神|谁会|有没有会|有没有人会|需要找).{0,6}(开发|做|写|设计)|(想|需要|急需|要)(开发|做)(一个|个).{0,10}(小程序|app|软件|网站|系统)"
+        r"|(开发|做)(一个|个)?.{0,8}(多少钱|怎么收费|大概要)|求.{0,4}(小程序|app|软件|系统)开发|有没有接的|礼貌问价|招.{0,6}(开发|程序员|技术)"
+        r"|能做.{0,12}(小程序|app|软件|系统)吗", re.I)),
 ]
+# 评论区回答"你想要什么 app"时，往往只写一个点子，没有求助的字眼。这类评论单独记一个信号。
+ANSWER = ("回应征集", 2)
+
+# 帖子类型：先认"征集需求"，再认"求助"，再认"推广"；都不是就算"其他"。
+POST_SOLICIT = re.compile(r"(为什么|怎么)(就是|都|还|一直)?(没有|没)(人)?(做|开发)|没(有)?人做|需求(很大|没人)|有需求的|什么需求|个需求|想要什么|希望有|你希望|最想要|想要的(app|软件)|缺(一个|什么)", re.I)
+POST_ASK = re.compile(r"^求|(?<!需)求(推荐|一个|个|款|助)|有没有|有什么(好用|推荐|软件|app)|哪个(app|软件|好用)|推荐一下|跪求|急需|(?<!需)求.{0,6}(开发|app|软件|小程序)"
+                      r"|谁能(做|开发|推荐)|招.{0,6}(开发|程序员|技术)", re.I)
+POST_PROMO = re.compile(r"我(们)?(自己)?(独立)?(做|开发|写|搞|设计)(了|出)(一个|个|一款|款)?|上线(啦|了)|上架|开源了|内测|vibe ?coding|宝藏(app|软件|应用)"
+                        r"|(app|软件)(分享|推荐)|安利|种草|神器|邀请码|会员码|月入|接单|只做定制|外包|永久会员|天才(app|软件)|发现(一个|一款)|眼前一亮|必备(app|软件)", re.I)
+# 帖子本身的权重：推广帖不是需求，只看它的评论区
+TYPE_WEIGHT = {"征集需求": 1.0, "求助": 1.0, "其他": 0.5, "推广": 0.2}
+# 评论按所属帖子加权：征集帖下的评论就是点子；推广帖下多是对某个现成产品的反馈
+COMMENT_WEIGHT = {"征集需求": 1.2, "求助": 1.0, "其他": 1.0, "推广": 0.7}
+
+# 评论里的引流、接单、发邀请码，不算需求
+AD = re.compile(r"欢迎咨询|长期合作|可以合作|私聊|私信|随时滴滴|滴滴(我|看|私)|接单|全栈|外包|专业对接|价格(都)?好说|感兴趣(的)?(可|欢迎)|有需要(的)?(可以)?(找|联系|滴|私)"
+                r"|我们这边可以|我给你做|我可以(帮你)?做|邀请码|会员码|好友码|进群|加群|群聊|看主页|主页看|vx|wx|微信搜", re.I)
+# 回应征集帖时，这些是在问博主问题，不是在提需求
+ASK_AUTHOR = re.compile(r"怎么下载|叫什么|在哪|哪里下|链接|多少钱|收费|免费|要钱|会员|求带|求图|求资料|求文档|@|博主|作者", re.I)
+EMOJI = re.compile(r"\[[^\[\]]{1,8}\]")
+JOKE = re.compile(r"\[doge\]")  # 小红书里带狗头的多半是玩笑
 
 
 def to_int(v):
@@ -43,7 +100,10 @@ def to_int(v):
     m = re.match(r"^([\d.]+)\s*(万|w|W|千|k|K)?", s)
     if not m:
         return 0
-    n = float(m.group(1))
+    try:
+        n = float(m.group(1))
+    except ValueError:
+        return 0
     unit = m.group(2)
     if unit in ("万", "w", "W"):
         n *= 10000
@@ -105,21 +165,47 @@ def read_jsonl(path):
     return rows
 
 
-def detect(text):
+def post_type(title, desc):
+    # "对的但是没人做！"这种段子也会命中"没人做"，所以还要求标题在说产品、需求或生意
+    if POST_SOLICIT.search(title) and re.search(PRODUCT + "|需求|点子|赛道|生意|项目", title, re.I):
+        return "征集需求"
+    if POST_ASK.search(title):
+        return "求助"
+    if POST_PROMO.search(title + "\n" + desc[:300]):
+        return "推广"
+    return "其他"
+
+
+def detect(text, kind, parent=None):
+    """返回 (命中的信号名列表, 信号分)。parent 是评论所属帖子的 {"type", "title"}。"""
+    text = text or ""
+    is_comment = kind != "帖子"
     hits = []
     score = 0
-    for name, weight, rx in SIGNALS:
-        if rx.search(text or ""):
+    for name, weight, comment_only, rx in SIGNALS:
+        if comment_only and not is_comment:
+            continue
+        if rx.search(text):
             hits.append(name)
             score += weight
-    return hits, score
+    if is_comment and parent and parent.get("type") == "征集需求" and not AD.search(text) and not ASK_AUTHOR.search(text):
+        plain = EMOJI.sub("", text).strip()
+        # 帖子标题里有"app/软件/产品"时，评论区几乎都在报点子；否则要求评论自己提到产品
+        if len(plain) >= 4 and (re.search(PRODUCT, parent.get("title", ""), re.I) or re.search(PRODUCT, plain, re.I)):
+            hits.append(ANSWER[0])
+            score += ANSWER[1]
+    if "附和" in hits and len(hits) > 1:
+        # "蹲安卓"这类已经算进别的信号，附和不再重复加分
+        hits.remove("附和")
+        score -= 1
+    return hits, min(score, 8)
 
 
 def load(run_dir):
     posts = {}
     items = []
     files = sorted(glob.glob(os.path.join(run_dir, "*", "jsonl", "*.jsonl")))
-    # 先读帖子，建立 帖子ID → 标题/链接 的索引
+    # 先读帖子，建立 帖子ID → 标题/链接/类型 的索引
     for path in files:
         platform = os.path.basename(os.path.dirname(os.path.dirname(path)))
         name = os.path.basename(path)
@@ -128,15 +214,24 @@ def load(run_dir):
         for d in read_jsonl(path):
             pid = post_id(d)
             title = str(first(d, "title", "desc", "content", "content_text"))[:120]
-            text = "\n".join(x for x in [str(first(d, "title")), str(first(d, "desc", "content", "content_text"))] if x).strip()
+            desc = str(first(d, "desc", "content", "content_text"))
+            text = "\n".join(x for x in [str(first(d, "title")), desc] if x).strip()
             url = post_url(platform, d)
-            posts[(platform, pid)] = {"title": title, "url": url}
+            keyword = str(first(d, "source_keyword"))
+            key = (platform, pid)
+            if key in posts:
+                # 同一帖子被多个关键词搜到：只记关键词，不重复加
+                if keyword:
+                    posts[key]["keywords"].add(keyword)
+                continue
+            ptype = post_type(title, desc)
+            posts[key] = {"title": title, "url": url, "type": ptype, "keywords": {keyword} if keyword else set()}
             items.append({
                 "platform": platform, "kind": "帖子", "text": text, "likes": to_int(first(d, "liked_count", "voteup_count")),
                 "replies": to_int(first(d, "comment_count", "comments_count", "video_comment", "total_replay_num")),
-                "post_title": title, "url": url, "keyword": first(d, "source_keyword"),
+                "post_title": title, "post_type": ptype, "url": url, "keyword": keyword,
                 "time": to_time(first(d, "time", "create_time", "created_time", "publish_time", "create_date_time")),
-                "id": pid,
+                "id": pid, "post_id": pid,
             })
     for path in files:
         platform = os.path.basename(os.path.dirname(os.path.dirname(path)))
@@ -150,55 +245,120 @@ def load(run_dir):
                 "platform": platform, "kind": "回复" if first(d, "parent_comment_id") not in ("", "0", 0) else "评论",
                 "text": str(first(d, "content")).strip(), "likes": to_int(first(d, "like_count", "comment_like_count")),
                 "replies": to_int(first(d, "sub_comment_count")), "post_title": post.get("title", ""),
-                "url": post.get("url", "") or first(d, "note_url") or post_url(platform, d), "keyword": "",
+                "post_type": post.get("type", ""),
+                "url": post.get("url", "") or first(d, "note_url") or post_url(platform, d),
+                "keyword": "、".join(sorted(post.get("keywords", ()))),
                 "time": to_time(first(d, "create_time", "publish_time", "create_date_time")), "id": str(first(d, "comment_id")),
+                "post_id": pid,
             })
-    return items
-
-
-def score_items(items):
     for it in items:
-        hits, s = detect(it["text"])
+        if it["kind"] == "帖子":
+            it["keyword"] = "、".join(sorted(posts[(it["platform"], it["post_id"])]["keywords"]))
+    return items, posts
+
+
+def crowd(likes, replies):
+    """点赞和回复代表"多少人跟着说"。取对数：1 万赞不该比 10 赞重要一千倍。"""
+    return math.log2(1 + likes) + 0.5 * math.log2(1 + replies)
+
+
+def score_items(items, posts):
+    for it in items:
+        parent = posts.get((it["platform"], it["post_id"]))
+        hits, s = detect(it["text"], it["kind"], parent)
         it["signals"] = "、".join(hits)
-        # 信号分为主，点赞和回复作为"多少人跟着说"的放大系数
-        crowd = min(it["likes"], 5000) ** 0.5 + min(it["replies"], 500) ** 0.5
-        it["score"] = round(s * (1 + crowd / 10), 1) if hits else 0
+        if not hits or (it["kind"] != "帖子" and AD.search(it["text"])):
+            it["score"] = 0
+            continue
+        if it["kind"] == "帖子":
+            # 帖子：评论多说明话题有共鸣；推广帖本身不是需求，大幅降权
+            score = s * TYPE_WEIGHT.get(it["post_type"], 0.5) * (1 + (math.log2(1 + it["replies"]) + 0.5 * math.log2(1 + it["likes"])) / 6)
+        else:
+            score = s * COMMENT_WEIGHT.get(it["post_type"], 1.0) * (1 + crowd(it["likes"], it["replies"]) / 4)
+        if JOKE.search(it["text"]):
+            score *= 0.6
+        it["score"] = round(score, 1)
     return items
+
+
+def summarize_posts(items, posts):
+    """按帖子汇总评论区的需求信号，找出值得深挖的帖子。"""
+    by_post = defaultdict(list)
+    post_rows = {}
+    for it in items:
+        key = (it["platform"], it["post_id"])
+        if it["kind"] == "帖子":
+            post_rows[key] = it
+        else:
+            by_post[key].append(it)
+    rows = []
+    for key, post in post_rows.items():
+        comments = by_post.get(key, [])
+        hits = [c for c in comments if c["score"] > 0]
+        other_os = [c for c in hits if "求其他平台" in c["signals"]]
+        top = sorted(hits, key=lambda c: -c["score"])[:3]
+        total = round(sum(c["score"] for c in hits) + post["score"], 1)
+        rows.append({
+            "platform_name": post["platform_name"], "platform": post["platform"], "post_title": post["post_title"],
+            "post_type": post["post_type"], "likes": post["likes"], "replies": post["replies"], "crawled": len(comments),
+            "hit_comments": len(hits), "other_os": len(other_os), "other_os_likes": sum(c["likes"] for c in other_os),
+            "total": total, "top": " | ".join(EMOJI.sub("", c["text"]).replace("\n", " ")[:60] for c in top),
+            "url": post["url"], "keyword": "、".join(sorted(posts.get(key, {}).get("keywords", ()))),
+        })
+    rows.sort(key=lambda r: (-r["total"], -r["replies"]))
+    return rows
+
+
+def deep_dive_candidates(post_rows, limit=5):
+    """评论区命中多、但平台上的评论数远多于已抓数量的帖子：值得用深挖模式把评论抓全。"""
+    picks = [r for r in post_rows if r["hit_comments"] >= 2 and r["replies"] >= 3 * max(r["crawled"], 1) and r["url"]
+             and r["post_type"] != "推广"]
+    picks += [r for r in post_rows if r["hit_comments"] >= 3 and r["replies"] >= 3 * max(r["crawled"], 1) and r["url"]
+              and r["post_type"] == "推广" and r not in picks]
+    return picks[:limit]
 
 
 FIELDS = [("platform_name", "平台"), ("kind", "类型"), ("signals", "需求信号"), ("score", "得分"), ("text", "内容"),
-          ("likes", "点赞"), ("replies", "回复数"), ("post_title", "所属帖子"), ("url", "链接"), ("keyword", "搜索词"),
-          ("time", "时间")]
+          ("likes", "点赞"), ("replies", "回复数"), ("post_title", "所属帖子"), ("post_type", "帖子类型"), ("url", "链接"),
+          ("keyword", "搜索词"), ("time", "时间")]
+POST_FIELDS = [("platform_name", "平台"), ("post_title", "帖子"), ("post_type", "帖子类型"), ("total", "信号总分"),
+               ("hit_comments", "命中评论"), ("crawled", "已抓评论"), ("replies", "平台评论数"), ("other_os", "求其他平台"),
+               ("other_os_likes", "求其他平台点赞"), ("likes", "帖子点赞"), ("top", "代表评论"), ("url", "链接"),
+               ("keyword", "搜索词")]
 
 
-def write_csv(path, rows):
+def write_csv(path, rows, fields=FIELDS):
     with open(path, "w", encoding="utf-8-sig", newline="") as f:
         w = csv.writer(f)
-        w.writerow([label for _, label in FIELDS])
+        w.writerow([label for _, label in fields])
         for r in rows:
-            w.writerow([r.get(k, "") for k, _ in FIELDS])
+            w.writerow([r.get(k, "") for k, _ in fields])
 
 
-def write_xlsx(path, rows):
+def write_xlsx(path, signal_rows, post_rows):
     try:
         from openpyxl import Workbook
     except ImportError:
         return False
     wb = Workbook()
-    ws = wb.active
-    ws.title = "需求信号"
-    ws.append([label for _, label in FIELDS])
-    for r in rows:
-        ws.append([r.get(k, "") for k, _ in FIELDS])
-    widths = {"A": 8, "B": 6, "C": 18, "D": 8, "E": 80, "F": 8, "G": 8, "H": 40, "I": 40, "J": 16, "K": 17}
-    for col, w in widths.items():
-        ws.column_dimensions[col].width = w
-    ws.freeze_panes = "A2"
+    sheets = [
+        ("需求信号", FIELDS, signal_rows, [8, 6, 18, 8, 80, 8, 8, 40, 9, 40, 16, 17]),
+        ("按帖子汇总", POST_FIELDS, post_rows, [8, 40, 9, 9, 9, 9, 10, 10, 13, 9, 80, 40, 16]),
+    ]
+    for i, (title, fields, rows, widths) in enumerate(sheets):
+        ws = wb.active if i == 0 else wb.create_sheet()
+        ws.title = title
+        ws.append([label for _, label in fields])
+        for r in rows:
+            ws.append([r.get(k, "") for k, _ in fields])
+        for col, w in enumerate(widths):
+            ws.column_dimensions[chr(ord("A") + col)].width = w
+        ws.freeze_panes = "A2"
     wb.save(path)
     return True
 
 
-def write_summary(path, run_dir, items, signal_rows):
+def write_summary(path, run_dir, items, signal_rows, post_rows, deep):
     by_platform = Counter(r["platform_name"] for r in items)
     sig_platform = Counter(r["platform_name"] for r in signal_rows)
     sig_type = Counter(s for r in signal_rows for s in r["signals"].split("、") if s)
@@ -213,15 +373,65 @@ def write_summary(path, run_dir, items, signal_rows):
     for s, n in sig_type.most_common():
         lines.append(f"| {s} | {n} |")
     lines.append("")
+
+    kw_stats = defaultdict(lambda: [0, 0, 0, 0.0])  # 帖子、评论、命中、得分
+    for r in items:
+        for kw in (r["keyword"] or "").split("、"):
+            if not kw:
+                continue
+            st = kw_stats[kw]
+            st[0 if r["kind"] == "帖子" else 1] += 1
+            if r["score"] > 0:
+                st[2] += 1
+                st[3] += r["score"]
+    if kw_stats:
+        lines.append("## 各搜索词的效果")
+        lines.append("")
+        lines.append("命中少、得分低的搜索词，下次可以换掉。")
+        lines.append("")
+        lines.append("| 搜索词 | 帖子 | 评论 | 命中 | 得分合计 |")
+        lines.append("|---|---|---|---|---|")
+        for kw, (np_, nc, nh, sc) in sorted(kw_stats.items(), key=lambda x: -x[1][3]):
+            lines.append(f"| {kw} | {np_} | {nc} | {nh} | {sc:.0f} |")
+        lines.append("")
+
     lines.append("## 得分最高的 50 条")
     lines.append("")
     for r in signal_rows[:50]:
         text = r["text"].replace("\n", " ")[:140]
-        lines.append(f"- **{r['score']}** · {r['platform_name']} · {r['signals']} · 赞 {r['likes']}：{text}")
+        lines.append(f"- **{r['score']}** · {r['platform_name']}{r['kind']} · {r['signals']} · 赞 {r['likes']}：{text}")
         if r["post_title"] and r["kind"] != "帖子":
-            lines.append(f"  - 所属帖子：{r['post_title'][:60]} {r['url']}")
+            lines.append(f"  - 所属帖子（{r['post_type']}）：{r['post_title'][:60]} {r['url']}")
         elif r["url"]:
-            lines.append(f"  - {r['url']}")
+            lines.append(f"  - {r['post_type']}帖 {r['url']}")
+    lines.append("")
+
+    lines.append("## 评论区需求最多的帖子")
+    lines.append("")
+    lines.append("| 帖子 | 类型 | 命中评论 / 已抓 / 平台评论数 | 求其他平台 | 代表评论 |")
+    lines.append("|---|---|---|---|---|")
+    for r in [p for p in post_rows if p["hit_comments"] > 0][:20]:
+        title = r["post_title"].replace("\n", " ").replace("|", "/")[:30]
+        top = r["top"].replace("|", "/")[:90]
+        os_ = f"{r['other_os']} 条 / {r['other_os_likes']} 赞" if r["other_os"] else ""
+        lines.append(f"| [{title}]({r['url']}) | {r['post_type']} | {r['hit_comments']} / {r['crawled']} / {r['replies']} | {os_} | {top} |")
+    lines.append("")
+
+    if deep:
+        here = os.path.dirname(os.path.abspath(__file__))
+        lines.append("## 值得深挖的帖子")
+        lines.append("")
+        lines.append("这些帖子评论区命中多，但平台上的评论远多于这次抓到的。用深挖模式把评论和楼中楼抓全：")
+        lines.append("")
+        by_platform_deep = defaultdict(list)
+        for r in deep:
+            by_platform_deep[PLATFORM_ARGS.get(r["platform"], r["platform"])].append(r)
+            lines.append(f"- {r['post_title'][:40]}（{r['hit_comments']} 条命中，平台共 {r['replies']} 条评论）")
+        lines.append("")
+        lines.append("```bash")
+        for p, rows in by_platform_deep.items():
+            lines.append(f'"{here}/radar.sh" -p {p} -d "{",".join(r["url"] for r in rows)}"')
+        lines.append("```")
     with open(path, "w", encoding="utf-8") as f:
         f.write("\n".join(lines) + "\n")
 
@@ -230,32 +440,37 @@ def main(run_dir):
     if not os.path.isdir(run_dir):
         print(f"找不到目录：{run_dir}")
         return 1
-    items = load(run_dir)
+    items, posts = load(run_dir)
     if not items:
         print(f"{run_dir} 里没有找到 MediaCrawler 的 jsonl 数据。确认爬虫是否成功运行、是否用了 --save_data_option jsonl。")
         return 1
     for it in items:
         it["platform_name"] = PLATFORM_NAMES.get(it["platform"], it["platform"])
-    score_items(items)
-    # 同一平台同一段文字只保留一条（多个关键词可能搜到同一帖子）
+    # 去重：有 ID 按 ID（不同帖子下的同一句"蹲安卓"要分别计数），没有 ID 按文字
     seen = set()
     uniq = []
     for it in items:
-        key = (it["platform"], it["kind"], it["text"][:200])
+        key = (it["platform"], it["kind"], it["id"] or it["text"][:200])
         if key in seen or not it["text"]:
             continue
         seen.add(key)
         uniq.append(it)
+    score_items(uniq, posts)
     signal_rows = sorted([r for r in uniq if r["score"] > 0], key=lambda r: (-r["score"], -r["likes"]))
-    all_rows = sorted(uniq, key=lambda r: (r["platform_name"], r["kind"], -r["likes"]))
+    all_rows = sorted(uniq, key=lambda r: (r["platform_name"], r["post_id"], r["kind"] != "帖子", -r["likes"]))
+    post_rows = summarize_posts(uniq, posts)
+    deep = deep_dive_candidates(post_rows)
     write_csv(os.path.join(run_dir, "需求信号.csv"), signal_rows)
+    write_csv(os.path.join(run_dir, "按帖子汇总.csv"), post_rows, POST_FIELDS)
     write_csv(os.path.join(run_dir, "全部数据.csv"), all_rows)
-    has_xlsx = write_xlsx(os.path.join(run_dir, "需求信号.xlsx"), signal_rows)
-    write_summary(os.path.join(run_dir, "summary.md"), run_dir, uniq, signal_rows)
+    has_xlsx = write_xlsx(os.path.join(run_dir, "需求信号.xlsx"), signal_rows, post_rows)
+    write_summary(os.path.join(run_dir, "summary.md"), run_dir, uniq, signal_rows, post_rows, deep)
     print(f"共 {len(uniq)} 条帖子和评论，其中 {len(signal_rows)} 条命中需求信号。")
-    print("输出：需求信号.csv、全部数据.csv、summary.md" + ("、需求信号.xlsx" if has_xlsx else ""))
+    print("输出：需求信号.csv、按帖子汇总.csv、全部数据.csv、summary.md" + ("、需求信号.xlsx" if has_xlsx else ""))
     for r in signal_rows[:10]:
-        print(f"  [{r['score']}] {r['platform_name']} {r['signals']} 赞{r['likes']}：{r['text'].replace(chr(10), ' ')[:60]}")
+        print(f"  [{r['score']}] {r['platform_name']}{r['kind']} {r['signals']} 赞{r['likes']}：{r['text'].replace(chr(10), ' ')[:60]}")
+    if deep:
+        print(f"有 {len(deep)} 个帖子值得深挖（评论区命中多，但只抓了一小部分评论），命令见 summary.md 末尾。")
     return 0
 
 
