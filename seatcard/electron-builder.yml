@@ -1,0 +1,58 @@
+# 打包配置。Windows 安装程序：npm run dist:win；苹果电脑：npm run dist:mac（要在 Mac 上打）。
+appId: cn.seatcard.desktop
+productName: 座次桌签
+executableName: SeatCard
+copyright: 座次桌签
+directories:
+  output: release
+  buildResources: build
+files:
+  - package.json
+  - electron/**
+  - dist/座次桌签.html
+asar: true
+# 不做自动更新；只带中文和英文的界面资源，安装包小一些
+publish: null
+electronLanguages: [zh-CN, en-US]
+afterPack: tools/after-pack.cjs
+win:
+  icon: build/icon.ico
+  target:
+    - target: nsis
+      arch: [x64]
+    - target: zip
+      arch: [x64]
+  artifactName: SeatCard-${version}-Windows-${arch}.${ext}
+# 一键安装：双击就装好、自动打开；装在当前用户目录下，不需要管理员权限（单位电脑常常没有）
+nsis:
+  oneClick: true
+  perMachine: false
+  runAfterFinish: true
+  createDesktopShortcut: always
+  createStartMenuShortcut: true
+  shortcutName: 座次桌签
+  uninstallDisplayName: 座次桌签
+  installerLanguages: [zh_CN]
+  language: "2052"
+  unicode: true
+  deleteAppDataOnUninstall: false
+  artifactName: SeatCard-${version}-Setup.${ext}
+mac:
+  icon: build/icon.png
+  category: public.app-category.productivity
+  # 没有苹果开发者证书：用"临时签名"，苹果芯片的 Mac 上也能打开
+  identity: "-"
+  hardenedRuntime: false
+  target:
+    - target: dmg
+      arch: [arm64, x64]
+  artifactName: SeatCard-${version}-mac-${arch}.${ext}
+dmg:
+  title: 座次桌签
+linux:
+  icon: build/icon.png
+  executableName: seatcard
+  category: Office
+  target: [AppImage, deb]
+  synopsis: 会议座次和双面桌签
+  artifactName: SeatCard-${version}-linux-${arch}.${ext}

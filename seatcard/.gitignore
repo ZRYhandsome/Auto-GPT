@@ -1,3 +1,9 @@
 .smoke/
-# 仓库根目录忽略了 dist/，但这里的 dist/座次桌签.html 是给人双击使用的成品，要提交
+node_modules/
+# 打包出来的安装程序很大，不进仓库
+release/
+# 仓库根目录忽略了这几样，但这里都要提交：
+#   dist/座次桌签.html 是给人双击使用的成品；build/ 里是软件图标；package-lock.json 锁定打包工具的版本
 !dist/
+!build/
+!package-lock.json

@@ -1,0 +1,44 @@
+# 座次桌签桌面版：在 GitHub 的 Windows 和 Mac 机器上打包安装程序，打好的文件在这次运行的 Artifacts 里下载。
+# 这个仓库是复刻（fork）来的，GitHub 默认不运行 Actions：要先在仓库的 Actions 页面点"启用"。
+name: seatcard-desktop
+on:
+  push:
+    branches: [claude/user-demand-research-qzl4la]
+    paths: ['seatcard/**', '.github/workflows/seatcard-desktop.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            script: dist:win
+          - os: macos-latest
+            script: dist:mac
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: seatcard
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: seatcard/package-lock.json
+      - run: npm ci
+      - run: npm test
+      - run: npm run ${{ matrix.script }}
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SeatCard-${{ runner.os }}
+          path: |
+            seatcard/release/*.exe
+            seatcard/release/*.zip
+            seatcard/release/*.dmg
+          if-no-files-found: error
