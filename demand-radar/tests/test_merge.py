@@ -169,9 +169,70 @@ class MergeTest(unittest.TestCase):
         self.assertIn('-p xhs -d "https://www.xiaohongshu.com/explore/n1', self.summary)
         self.assertIn("| 有没有app可以 |", self.summary)
 
+    def test_summary_lists_every_hit(self):
+        # summary.md 附上全部命中的原文，发给别人分析时只发这一个文件
+        self.assertIn("## 全部命中（按帖子分组）", self.summary)
+        for r in self.signals:
+            self.assertIn(r["内容"].replace("\n", " ")[:50], self.summary)
+
     def test_empty_dir_reports_error(self):
         with tempfile.TemporaryDirectory() as empty:
             self.assertEqual(merge.main(empty), 1)
+
+
+class DeepRunTest(unittest.TestCase):
+    """深挖模式的输出：楼中楼回复、已经深挖过的帖子。"""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        d = os.path.join(self.tmp.name, "xhs", "jsonl")
+        os.makedirs(d)
+        url = "https://www.xiaohongshu.com/explore/s1?xsec_token=abc&xsec_source=pc_search"
+        post = {"note_id": "s1", "title": "明明很需要的APP功能，为什么就是没有人做？", "desc": "", "liked_count": "2689",
+                "comment_count": "2034", "note_url": url}
+        comments = [
+            {"comment_id": "c1", "note_id": "s1", "content": "应该出一个法律app，输入情况自动搜索相关法律条文", "like_count": "3829",
+             "sub_comment_count": "120", "parent_comment_id": ""},
+            {"comment_id": "c2", "note_id": "s1", "content": "滴滴拉屎，在非常急的时候能够租用居民家的厕所", "like_count": "208",
+             "sub_comment_count": "30", "parent_comment_id": ""},
+            {"comment_id": "c3", "note_id": "s1", "content": "记录梦境！", "like_count": "42", "sub_comment_count": "0", "parent_comment_id": ""},
+            # 楼中楼：是在评论别人的点子，不是新点子
+            {"comment_id": "r1", "note_id": "s1", "content": "没盈利没人搞的", "like_count": "1794", "sub_comment_count": "0", "parent_comment_id": "c2"},
+            {"comment_id": "r2", "note_id": "s1", "content": "有安全隐患，来个入室抢劫平台就完蛋了", "like_count": "700", "sub_comment_count": "0",
+             "parent_comment_id": "c2"},
+        ]
+        with open(os.path.join(d, "detail_contents_2026-10-01.jsonl"), "w", encoding="utf-8") as f:
+            f.write(json.dumps(post, ensure_ascii=False) + "\n")
+        with open(os.path.join(d, "detail_comments_2026-10-01.jsonl"), "w", encoding="utf-8") as f:
+            for c in comments:
+                f.write(json.dumps(c, ensure_ascii=False) + "\n")
+        with open(os.path.join(self.tmp.name, "posts_used.txt"), "w", encoding="utf-8") as f:
+            f.write(url + "\n")
+        self.assertEqual(merge.main(self.tmp.name), 0)
+        self.signals = read_csv(os.path.join(self.tmp.name, "需求信号.csv"))
+        with open(os.path.join(self.tmp.name, "summary.md"), encoding="utf-8") as f:
+            self.summary = f.read()
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def test_replies_are_not_ideas(self):
+        texts = [r["内容"] for r in self.signals]
+        self.assertNotIn("没盈利没人搞的", texts)
+        self.assertNotIn("有安全隐患，来个入室抢劫平台就完蛋了", texts)
+        self.assertTrue(texts[0].startswith("应该出一个法律app"))
+
+    def test_generic_solicit_post_ranks_below_its_ideas(self):
+        # 泛泛的征集帖本身只是来源，排在评论区的点子后面
+        kinds = [r["类型"] for r in self.signals]
+        self.assertGreater(kinds.index("帖子"), texts_index(self.signals, "滴滴拉屎，在非常急的时候能够租用居民家的厕所"))
+
+    def test_deep_crawled_post_not_suggested_again(self):
+        self.assertNotIn("值得深挖的帖子", self.summary)
+
+
+def texts_index(rows, text):
+    return [r["内容"] for r in rows].index(text)
 
 
 class DetectTest(unittest.TestCase):
@@ -187,6 +248,8 @@ class DetectTest(unittest.TestCase):
         self.assertNotIn("缺失", self.hits("北京怎么都没有185+啊"))
         self.assertNotIn("求其他平台", self.hits("ui为什么比安卓的好看"))
         self.assertNotIn("付费意愿", self.hits("蹲蹲，留下一个终身pro"))
+        self.assertNotIn("缺失", self.hits("这个视频有一句说得对，就是不赚钱所以没人做，做产品更难得的是商业变现"))
+        self.assertNotIn("求工具", self.hits("有没有人教我，如何用ai编小程序，我说了半天"))
 
     def test_real_demands(self):
         self.assertIn("求工具", self.hits("有没有那种记录&提醒周期性事件的APP，比如我今天换了牙刷"))
@@ -204,6 +267,12 @@ class DetectTest(unittest.TestCase):
         self.assertIn("回应征集", self.hits("滴滴拉屎，在非常急的时候能够租用居民家的厕所", parent=solicit))
         self.assertIn("回应征集", self.hits("记录梦境！", parent=solicit))
         self.assertNotIn("回应征集", self.hits("怎么下载", parent=solicit))
+        # 楼中楼、叫好、开发者推广自己的产品、推荐现成产品，都不算新点子
+        self.assertNotIn("回应征集", self.hits("没盈利没人搞的", "回复", parent=solicit))
+        for t in ["发现宝藏啦！", "这个图怎么做的", "做了个拼豆小工具，一键生成带色号图纸+材料表 有兴趣的可以体验下", "借口生成器我有做",
+                  "我做了一个宠物交友小程序，目前用户1人", "大家好！想请教各位：我公司在制作一个app", "推荐小雀幸app，聊天堪比真人",
+                  "信息差，你真的了解吗？ http://xhslink.com/o/9tAFv5QM6SY"]:
+            self.assertNotIn("回应征集", self.hits(t, parent=solicit), t)
         self.assertNotIn("回应征集", self.hits("记录梦境！", parent={"type": "推广", "title": "我做了一个App"}))
         # 标题没提到产品的征集帖，评论自己要提到产品才算
         loose = {"type": "征集需求", "title": "对的但是没人做"}
@@ -212,6 +281,10 @@ class DetectTest(unittest.TestCase):
     def test_post_type(self):
         self.assertEqual(merge.post_type("明明很需要的APP功能，为什么就是没有人做？", ""), "征集需求")
         self.assertEqual(merge.post_type("有什么产品是需求很大，却没有人做的？", ""), "征集需求")
+        for t in ["有没有一个App，你等了很多年？", "求助全网！！来许愿你的理想APP✨", "谁来，我要是有这个App就好了",
+                  "有没有什么东西，你觉得自己非常需要，可是市场上就是没有或者没有很合适的", "有没有大家需要，还没被发明出来的东西？",
+                  "说说你很想要但现实没有的app"]:
+            self.assertEqual(merge.post_type(t, ""), "征集需求", t)
         self.assertEqual(merge.post_type("求ios细糠推荐！！", ""), "求助")
         self.assertEqual(merge.post_type("急需要开发一个小程序", ""), "求助")
         self.assertEqual(merge.post_type("帮你夺回注意力的武器上线App Store啦", ""), "其他")

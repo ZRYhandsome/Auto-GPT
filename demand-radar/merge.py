@@ -7,7 +7,7 @@
   按帖子汇总.csv 每个帖子的评论区命中了多少需求、有多少人求安卓或鸿蒙版
   全部数据.csv   所有帖子和评论拍平成一张表
   需求信号.xlsx  上面前两张表各占一页（装了 openpyxl 时才生成）
-  summary.md     各平台、各搜索词的命中情况，得分最高的 50 条，值得深挖的帖子
+  summary.md     各平台、各搜索词的命中情况，得分最高的 50 条，值得深挖的帖子，全部命中的原文
 只用 Python 标准库；openpyxl 可选。
 """
 import csv
@@ -34,12 +34,12 @@ OTHER_OS = r"(安卓|android|鸿蒙|华为|荣耀|小米|vivo|oppo|三星|window
 # 需求信号：(名称, 权重, 只看评论, 正则)。一条文本可以命中多个信号。
 SIGNALS = [
     ("求工具", 3, False, re.compile(
-        r"有没有(?!人会|会)(那种|什么|哪个|一款|一个|啥|好用的|靠谱的|免费的)?.{0,20}" + PRODUCT
+        r"有没有(?!人会|会|人教|人能教)(那种|什么|哪个|一款|一个|啥|好用的|靠谱的|免费的)?.{0,20}" + PRODUCT
         + r"|求(推荐|一个|个|款).{0,8}" + PRODUCT + r"|什么(app|软件|工具)(可以|能)|哪个(app|软件|ai).{0,6}(适合|可以|能|好用)", re.I)),
     ("缺失", 3, False, re.compile(
         r"为什么(就是|都|还|一直)?(没有|没人|不能|不支持)|怎么(就是|都|还|一直)?没(有)?人(做|开发)|竟然没有|居然没有|一直没找到|找了(好久|很久|半天|一圈)"
         r"|市面上(都|也)?没有|到现在(都|也)?没有|至今没有|找不到(好用|合适|满意|一个|一款|这样|类似)"
-        r"|没(有)?人(做|开发)(过)?.{0,6}" + PRODUCT, re.I)),
+        r"|没(有)?人(做|开发)(过)?[^，。,.！!？?\s]{0,6}" + PRODUCT, re.I)),
     ("抱怨现有", 2, False, re.compile(
         r"难用|(?<!好用)不好用|垃圾|反人类|广告(太多|好多|满天飞|多到)|开屏广告|广告.{0,12}(忍无可忍|受不了|烦死)|强制(更新|登录|升级)"
         r"|(还|都)?要(开)?会员|要收费|收费了|不免费了|割韭菜|停更|下架了|倒闭了|(停止|暂停)运营|越来越(难用|臃肿|贵)"
@@ -72,21 +72,33 @@ SIGNALS = [
 ANSWER = ("回应征集", 2)
 
 # 帖子类型：先认"征集需求"，再认"求助"，再认"推广"；都不是就算"其他"。
-POST_SOLICIT = re.compile(r"(为什么|怎么)(就是|都|还|一直)?(没有|没)(人)?(做|开发)|没(有)?人做|需求(很大|没人)|有需求的|什么需求|个需求|想要什么|希望有|你希望|最想要|想要的(app|软件)|缺(一个|什么)", re.I)
+POST_SOLICIT = re.compile(r"(为什么|怎么)(就是|都|还|一直)?(没有|没)(人)?(做|开发)|没(有)?人做|需求(很大|没人)|有需求的|什么需求|个需求|想要什么|希望有|你希望|最想要|想要的(app|软件)|缺(一个|什么)"
+                          r"|许愿|理想(的|中的)?(app|软件)|等了(很多|好多|好几|多少)?年|要是有(这个|这样的|这种|个|一个)?.{0,8}就好了|(大家|你)(都)?(很|最|非常)?(想要|需要)"
+                          r"|(很|非常|超级?|真的)需要.{0,16}(没有|没人)|还没(有)?被(发明|做)出来|现实(中|里)?没有|说说你", re.I)
+# 征集帖标题里自带具体点子（"为什么没人做一个老人专用的防诈骗 app"）；没有的就是泛泛地问"大家想要什么"，本身不是需求
+SPECIFIC_IDEA = re.compile(r"(一个|一款|个|款)[^，。,.？?！!]{2,}" + PRODUCT, re.I)
 POST_ASK = re.compile(r"^求|(?<!需)求(推荐|一个|个|款|助)|有没有|有什么(好用|推荐|软件|app)|哪个(app|软件|好用)|推荐一下|跪求|急需|(?<!需)求.{0,6}(开发|app|软件|小程序)"
                       r"|谁能(做|开发|推荐)|招.{0,6}(开发|程序员|技术)", re.I)
 POST_PROMO = re.compile(r"我(们)?(自己)?(独立)?(做|开发|写|搞|设计)(了|出)(一个|个|一款|款)?|上线(啦|了)|上架|开源了|内测|vibe ?coding|宝藏(app|软件|应用)"
                         r"|(app|软件)(分享|推荐)|安利|种草|神器|邀请码|会员码|月入|接单|只做定制|外包|永久会员|天才(app|软件)|发现(一个|一款)|眼前一亮|必备(app|软件)", re.I)
 # 帖子本身的权重：推广帖不是需求，只看它的评论区
 TYPE_WEIGHT = {"征集需求": 1.0, "求助": 1.0, "其他": 0.5, "推广": 0.2}
+GENERIC_WEIGHT = 0.3  # 泛泛的征集帖本身
 # 评论按所属帖子加权：征集帖下的评论就是点子；推广帖下多是对某个现成产品的反馈
 COMMENT_WEIGHT = {"征集需求": 1.2, "求助": 1.0, "其他": 1.0, "推广": 0.7}
 
 # 评论里的引流、接单、发邀请码，不算需求
 AD = re.compile(r"欢迎咨询|长期合作|可以合作|私聊|私信|随时滴滴|滴滴(我|看|私)|接单|全栈|外包|专业对接|价格(都)?好说|感兴趣(的)?(可|欢迎)|有需要(的)?(可以)?(找|联系|滴|私)"
-                r"|我们这边可以|我给你做|我可以(帮你)?做|邀请码|会员码|好友码|进群|加群|群聊|看主页|主页看|vx|wx|微信搜", re.I)
+                r"|我们这边可以|我给你做|我可以(帮你)?做|邀请码|会员码|好友码|进群|加群|群聊|看主页|主页看|vx|wx|微信搜|xhslink|https?://"
+                # 开发者在征集帖下推广自己的产品
+                r"|体验(下|一下)|欢迎(各位|大家)?(试用|体验|使用|下载)|(要不|可以)?来试试|试试我(们)?的|我(们)?(已经|自己)?(做|写|开发)(了|好了|过)(一?个|一款|款)"
+                r"|我(们)?已经做好了|我有做|我(们)?做的|看我(自己)?做的|康康我的|我(们)?(公司)?(在|正在)(做|制作|开发)|我们的能|app ?store ?搜", re.I)
 # 回应征集帖时，这些是在问博主问题，不是在提需求
-ASK_AUTHOR = re.compile(r"怎么下载|叫什么|在哪|哪里下|链接|多少钱|收费|免费|要钱|会员|求带|求图|求资料|求文档|@|博主|作者", re.I)
+ASK_AUTHOR = re.compile(r"怎么下载|叫什么|在哪|哪里下|链接|多少钱|收费|免费|要钱|会员|求带|求图|求资料|求文档|@|博主|作者|怎么(做|弄|画|生成)的|怎么生成|学习一下", re.I)
+# 只是叫好、附和的短评，不是点子
+REACTION = re.compile(r"^(发现宝藏|宝藏|太强了|好强|好棒|厉害|牛|学到了|收藏|码住|mark|好可爱|期待|哈哈|笑死|确实|同意|支持|赞|有道理|说得对|真的|绝了|蹲|看起来|不错)", re.I)
+# 征集帖下推荐现成产品的评论：说明已经有人做了，不算新点子
+RECOMMEND = re.compile(r"(?<![求请])(推荐|安利)|搜.{1,15}(试试|即可|就行|就有)", re.I)
 EMOJI = re.compile(r"\[[^\[\]]{1,8}\]")
 JOKE = re.compile(r"\[doge\]")  # 小红书里带狗头的多半是玩笑
 
@@ -167,7 +179,7 @@ def read_jsonl(path):
 
 def post_type(title, desc):
     # "对的但是没人做！"这种段子也会命中"没人做"，所以还要求标题在说产品、需求或生意
-    if POST_SOLICIT.search(title) and re.search(PRODUCT + "|需求|点子|赛道|生意|项目", title, re.I):
+    if POST_SOLICIT.search(title) and re.search(PRODUCT + "|需求|点子|赛道|生意|项目|东西|发明", title, re.I):
         return "征集需求"
     if POST_ASK.search(title):
         return "求助"
@@ -188,8 +200,12 @@ def detect(text, kind, parent=None):
         if rx.search(text):
             hits.append(name)
             score += weight
-    if is_comment and parent and parent.get("type") == "征集需求" and not AD.search(text) and not ASK_AUTHOR.search(text):
+    # 只有一级评论算回应征集：楼中楼多是在评论别人的点子（"没盈利没人搞的""有安全隐患"）
+    if (kind == "评论" and parent and parent.get("type") == "征集需求"
+            and not AD.search(text) and not ASK_AUTHOR.search(text) and not RECOMMEND.search(text)):
         plain = EMOJI.sub("", text).strip()
+        if len(plain) < 10 and REACTION.search(plain):
+            plain = ""
         # 帖子标题里有"app/软件/产品"时，评论区几乎都在报点子；否则要求评论自己提到产品
         if len(plain) >= 4 and (re.search(PRODUCT, parent.get("title", ""), re.I) or re.search(PRODUCT, plain, re.I)):
             hits.append(ANSWER[0])
@@ -273,6 +289,8 @@ def score_items(items, posts):
         if it["kind"] == "帖子":
             # 帖子：评论多说明话题有共鸣；推广帖本身不是需求，大幅降权
             score = s * TYPE_WEIGHT.get(it["post_type"], 0.5) * (1 + (math.log2(1 + it["replies"]) + 0.5 * math.log2(1 + it["likes"])) / 6)
+            if it["post_type"] == "征集需求" and not SPECIFIC_IDEA.search(it["post_title"]):
+                score *= GENERIC_WEIGHT
         else:
             score = s * COMMENT_WEIGHT.get(it["post_type"], 1.0) * (1 + crowd(it["likes"], it["replies"]) / 4)
         if JOKE.search(it["text"]):
@@ -304,17 +322,26 @@ def summarize_posts(items, posts):
             "hit_comments": len(hits), "other_os": len(other_os), "other_os_likes": sum(c["likes"] for c in other_os),
             "total": total, "top": " | ".join(EMOJI.sub("", c["text"]).replace("\n", " ")[:60] for c in top),
             "url": post["url"], "keyword": "、".join(sorted(posts.get(key, {}).get("keywords", ()))),
+            "post_id": post["post_id"], "hits": sorted(([post] if post["score"] > 0 else []) + hits, key=lambda c: -c["score"]),
         })
     rows.sort(key=lambda r: (-r["total"], -r["replies"]))
     return rows
 
 
-def deep_dive_candidates(post_rows, limit=5):
-    """评论区命中多、但平台上的评论数远多于已抓数量的帖子：值得用深挖模式把评论抓全。"""
-    picks = [r for r in post_rows if r["hit_comments"] >= 2 and r["replies"] >= 3 * max(r["crawled"], 1) and r["url"]
-             and r["post_type"] != "推广"]
-    picks += [r for r in post_rows if r["hit_comments"] >= 3 and r["replies"] >= 3 * max(r["crawled"], 1) and r["url"]
-              and r["post_type"] == "推广" and r not in picks]
+def deep_crawled(run_dir):
+    """深挖模式抓过的帖子链接（radar.sh -d 写在 posts_used.txt 里）。"""
+    path = os.path.join(run_dir, "posts_used.txt")
+    if not os.path.exists(path):
+        return ""
+    with open(path, encoding="utf-8") as f:
+        return f.read()
+
+
+def deep_dive_candidates(post_rows, limit=5, done=""):
+    """评论区命中多、但平台上的评论数远多于已抓数量的帖子：值得用深挖模式把评论抓全。done 里出现过的帖子已经深挖过，不再推荐。"""
+    rows = [r for r in post_rows if r["url"] and r["replies"] >= 3 * max(r["crawled"], 1) and not (r["post_id"] and r["post_id"] in done)]
+    picks = [r for r in rows if r["hit_comments"] >= 2 and r["post_type"] != "推广"]
+    picks += [r for r in rows if r["hit_comments"] >= 3 and r["post_type"] == "推广"]
     return picks[:limit]
 
 
@@ -432,6 +459,20 @@ def write_summary(path, run_dir, items, signal_rows, post_rows, deep):
         for p, rows in by_platform_deep.items():
             lines.append(f'"{here}/radar.sh" -p {p} -d "{",".join(r["url"] for r in rows)}"')
         lines.append("```")
+        lines.append("")
+
+    # 附上全部命中的原文：把这个文件发给别人（或 Claude）分析时，不用再附表格
+    lines.append("## 全部命中（按帖子分组）")
+    lines.append("")
+    for r in [p for p in post_rows if p["hits"]]:
+        title = r["post_title"].replace("\n", " ")[:60]
+        lines.append(f"### {r['platform_name']}·{r['post_type']}：{title}")
+        lines.append(f"帖子赞 {r['likes']}，平台评论 {r['replies']}，已抓 {r['crawled']}，命中 {r['hit_comments']}。{r['url']}")
+        lines.append("")
+        for c in r["hits"]:
+            text = c["text"].replace("\n", " ")[:300]
+            lines.append(f"- [{c['score']}] {c['kind']} · {c['signals']} · 赞 {c['likes']} · 回复 {c['replies']}：{text}")
+        lines.append("")
     with open(path, "w", encoding="utf-8") as f:
         f.write("\n".join(lines) + "\n")
 
@@ -459,7 +500,7 @@ def main(run_dir):
     signal_rows = sorted([r for r in uniq if r["score"] > 0], key=lambda r: (-r["score"], -r["likes"]))
     all_rows = sorted(uniq, key=lambda r: (r["platform_name"], r["post_id"], r["kind"] != "帖子", -r["likes"]))
     post_rows = summarize_posts(uniq, posts)
-    deep = deep_dive_candidates(post_rows)
+    deep = deep_dive_candidates(post_rows, done=deep_crawled(run_dir))
     write_csv(os.path.join(run_dir, "需求信号.csv"), signal_rows)
     write_csv(os.path.join(run_dir, "按帖子汇总.csv"), post_rows, POST_FIELDS)
     write_csv(os.path.join(run_dir, "全部数据.csv"), all_rows)
@@ -470,7 +511,8 @@ def main(run_dir):
     for r in signal_rows[:10]:
         print(f"  [{r['score']}] {r['platform_name']}{r['kind']} {r['signals']} 赞{r['likes']}：{r['text'].replace(chr(10), ' ')[:60]}")
     if deep:
-        print(f"有 {len(deep)} 个帖子值得深挖（评论区命中多，但只抓了一小部分评论），命令见 summary.md 末尾。")
+        print(f"有 {len(deep)} 个帖子值得深挖（评论区命中多，但只抓了一小部分评论），命令见 summary.md。")
+    print(f"想让 Claude 帮你分析，把这个文件发给它就行（含全部命中的原文和点赞数）：{os.path.abspath(os.path.join(run_dir, 'summary.md'))}")
     return 0
 
 
