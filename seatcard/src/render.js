@@ -1,5 +1,6 @@
 // 生成座次图和桌签的 SVG 字符串。座次图用像素坐标，桌签用毫米坐标（打印时 1:1）。
 import { sheetLayout, paginate, faceText, defaultMeasure } from './cards.js';
+import { roleName } from './round.js';
 
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
@@ -15,15 +16,22 @@ const SEAT_W = 104;
 const SEAT_H = 66;
 const GAP = 12;
 
-function seatBox(x, y, seat, { showTitle = true } = {}) {
+// 座位：data-id 供界面点选、拖动互换；selected 时加粗描边
+function seatBox(x, y, seat, { showTitle = true, sub = '', badge = '', selectedId = null, guest = false } = {}) {
   const p = seat.person;
-  const title = showTitle && p.title ? `<text x="${x + SEAT_W / 2}" y="${y + 54}" class="seat-title">${esc(trim(p.title, 8))}</text>` : '';
-  return `<g class="seat" data-name="${esc(p.name)}">
+  const second = sub || (showTitle ? p.title : '');
+  const title = second ? `<text x="${x + SEAT_W / 2}" y="${y + 54}" class="seat-title">${esc(trim(second, 8))}</text>` : '';
+  const cls = ['seat', p.id !== undefined && p.id === selectedId ? 'selected' : '', guest ? 'guest' : ''].filter(Boolean).join(' ');
+  return `<g class="${cls}" data-name="${esc(p.name)}" data-id="${esc(p.id ?? '')}">
   <rect x="${x}" y="${y}" width="${SEAT_W}" height="${SEAT_H}" rx="8" class="seat-box"/>
-  <circle cx="${x + 15}" cy="${y + 15}" r="11" class="seat-badge"/>
-  <text x="${x + 15}" y="${y + 19.5}" class="seat-rank">${seat.rank + 1}</text>
+  <circle cx="${x + 15}" cy="${y + 15}" r="11" class="seat-badge${guest ? ' guest' : ''}"/>
+  <text x="${x + 15}" y="${y + 19.5}" class="seat-rank">${badge || seat.rank + 1}</text>
   <text x="${x + SEAT_W / 2}" y="${y + 37}" class="seat-name">${esc(trim(p.name, 6))}</text>${title}
 </g>`;
+}
+
+function emptySeat(x, y) {
+  return `<g class="seat-empty"><rect x="${x}" y="${y}" width="${SEAT_W}" height="${SEAT_H}" rx="8" class="empty-box"/><text x="${x + SEAT_W / 2}" y="${y + 38}" class="note">空位</text></g>`;
 }
 
 function trim(s, n) {
@@ -33,7 +41,12 @@ function trim(s, n) {
 
 const CHART_STYLE = `<style>
 .seat-box{fill:#fff;stroke:#1f2937;stroke-width:1.4}
+.seat.guest .seat-box{fill:#eff6ff}
+.seat.selected .seat-box{stroke:#b91c1c;stroke-width:3}
+.empty-box{fill:none;stroke:#cbd5e1;stroke-width:1.2;stroke-dasharray:4 3}
+.round-table{fill:#fdf6e3;stroke:#d6b36a;stroke-width:2}
 .seat-badge{fill:#b91c1c}
+.seat-badge.guest{fill:#1d4ed8}
 .seat-rank{fill:#fff;font:600 12px system-ui,sans-serif;text-anchor:middle}
 .seat-name{fill:#111827;font:600 17px "PingFang SC","Microsoft YaHei",sans-serif;text-anchor:middle}
 .seat-title{fill:#6b7280;font:11px "PingFang SC","Microsoft YaHei",sans-serif;text-anchor:middle}
@@ -47,12 +60,14 @@ const CHART_STYLE = `<style>
 /**
  * mirror=false：从台下（或门口）看；mirror=true：从台上（或背对门口）看。
  */
-export function chartSvg(layout, { mirror = false, title = '' } = {}) {
-  if (layout.kind === 'podium') return podiumSvg(layout, mirror, title);
-  return facingSvg(layout, mirror, title);
+export function chartSvg(layout, { mirror = false, title = '', selectedId = null } = {}) {
+  const opts = { selectedId };
+  if (layout.kind === 'podium') return podiumSvg(layout, mirror, title, opts);
+  if (layout.kind === 'round') return roundSvg(layout, title, opts);
+  return facingSvg(layout, mirror, title, opts);
 }
 
-function podiumSvg(layout, mirror, title) {
+function podiumSvg(layout, mirror, title, opts) {
   const maxN = Math.max(1, ...layout.rows.map((r) => r.n));
   const width = Math.max(maxN * (SEAT_W + GAP) - GAP + 80, 420);
   const rowsH = layout.rows.length * (SEAT_H + 26);
@@ -68,7 +83,7 @@ function podiumSvg(layout, mirror, title) {
     const rowW = row.n * (SEAT_W + GAP) - GAP;
     const x0 = (width - rowW) / 2;
     const seats = mirror ? [...row.seats].reverse() : row.seats;
-    seats.forEach((s, i) => parts.push(seatBox(x0 + i * (SEAT_W + GAP), y, s)));
+    seats.forEach((s, i) => parts.push(seatBox(x0 + i * (SEAT_W + GAP), y, s, opts)));
     if (layout.rows.length > 1) parts.push(`<text x="${x0 - 8}" y="${y + SEAT_H / 2 + 4}" class="note" style="text-anchor:end">第${r + 1}排</text>`);
   });
   const by = top + rowsH + 40 + 30;
@@ -77,7 +92,7 @@ function podiumSvg(layout, mirror, title) {
   return wrap(width, height, parts.join('\n'));
 }
 
-function facingSvg(layout, mirror, title) {
+function facingSvg(layout, mirror, title, opts) {
   const xs = [...layout.far, ...layout.near].map((s) => s.x);
   const minX = Math.min(0, ...xs);
   const maxX = Math.max(0, ...xs);
@@ -97,10 +112,10 @@ function facingSvg(layout, mirror, title) {
   const farSeats = mirror ? layout.near : layout.far;
   const nearSeats = mirror ? layout.far : layout.near;
   parts.push(`<text x="${cx}" y="${farY - 8}" class="label">${farLabel}</text>`);
-  farSeats.forEach((s) => parts.push(seatBox(toPx(s.x), farY, s)));
+  farSeats.forEach((s) => parts.push(seatBox(toPx(s.x), farY, s, { ...opts, guest: s.person.side === 'guest' })));
   parts.push(`<rect x="${cx - span / 2 - 10}" y="${tableY}" width="${span + 20}" height="${tableH}" rx="8" class="table"/>`);
   parts.push(`<text x="${cx}" y="${tableY + tableH / 2 + 5}" class="note">会谈桌</text>`);
-  nearSeats.forEach((s) => parts.push(seatBox(toPx(s.x), nearY, s)));
+  nearSeats.forEach((s) => parts.push(seatBox(toPx(s.x), nearY, s, { ...opts, guest: s.person.side === 'guest' })));
   parts.push(`<text x="${cx}" y="${nearY + SEAT_H + 22}" class="label">${nearLabel}</text>`);
   // 门的弧线向上画 26 像素，要和上面"主方（背门）"几个字留出空隙
   const doorY = nearY + SEAT_H + 72;
@@ -113,6 +128,34 @@ function facingSvg(layout, mirror, title) {
   const note = layout.alignFirst ? '两方按同一方向排：1 号对 1 号、2 号对 2 号' : '两方各按自己的朝向排：人数为双数时 1 号会错开半个座位';
   parts.push(`<text x="${cx}" y="${doorY + 42}" class="note">${note}</text>`);
   return wrap(width, doorY + 60, parts.join('\n'));
+}
+
+function roundSvg(layout, title, opts) {
+  const n = layout.n;
+  // 座位排在圆周上，半径随人数变大，保证座位不重叠
+  const R = Math.max(150, (n * (SEAT_W + 16)) / (2 * Math.PI) + 30);
+  const top = title ? 70 : 34;
+  const width = 2 * R + SEAT_W + 80;
+  const cx = width / 2;
+  const cy = top + SEAT_H / 2 + R;
+  const parts = [];
+  if (title) parts.push(`<text x="${cx}" y="34" class="label" style="font-size:20px">${esc(title)}</text>`);
+  parts.push(`<circle cx="${cx}" cy="${cy}" r="${R - SEAT_H / 2 - 16}" class="round-table"/>`);
+  parts.push(`<text x="${cx}" y="${cy - 6}" class="label">${layout.scheme === 'single' ? '主人居中' : '主陪面门 · 副陪背门'}</text>`);
+  parts.push(`<text x="${cx}" y="${cy + 16}" class="note">${layout.rule === 'right' ? '以右为尊：主宾在主陪右手' : '以左为尊：主宾在主陪左手'}</text>`);
+  for (const s of layout.seats) {
+    const a = -Math.PI / 2 + (2 * Math.PI * s.seat) / n;
+    const x = cx + R * Math.cos(a) - SEAT_W / 2;
+    const y = cy + R * Math.sin(a) - SEAT_H / 2;
+    if (!s.person) { parts.push(emptySeat(x, y)); continue; }
+    const role = roleName(s.side, s.rank, layout.scheme);
+    parts.push(seatBox(x, y, s, { ...opts, showTitle: false, sub: role, badge: s.seat === 0 ? '主' : '', guest: s.side === 'guest' }));
+  }
+  const doorY = cy + R + SEAT_H / 2 + 34;
+  parts.push(`<path d="M ${cx - 26} ${doorY} h 52 M ${cx - 26} ${doorY} a 26 26 0 0 1 26 -26" class="door"/>`);
+  parts.push(`<text x="${cx}" y="${doorY + 20}" class="note">门（主位正对门口）</text>`);
+  if (layout.overflow) parts.push(`<text x="${cx}" y="${doorY + 40}" class="note" style="fill:#b45309">人数超过设定的每桌人数，已自动加座</text>`);
+  return wrap(width, doorY + (layout.overflow ? 56 : 36), parts.join('\n'));
 }
 
 function wrap(w, h, body) {

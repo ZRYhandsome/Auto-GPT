@@ -106,7 +106,7 @@ test('导出 CSV：带 BOM，按排和座位输出', () => {
   const rows = layoutRows(podium(mk(['张三', '李四', '王五'])));
   assert.deepEqual(rows.map((r) => [r.seat, r.rank, r.name]), [[1, 3, '王五'], [2, 1, '张三'], [3, 2, '李四']]);
   const csv = toCsv(rows);
-  assert.ok(csv.startsWith('﻿排/方'));
+  assert.ok(csv.startsWith('\ufeff排,座位（从台下看，从左数）'));
   assert.ok(csv.includes('第1排,2,1,张三'));
 });
 
@@ -138,4 +138,13 @@ test('字号：长名字自动缩小，不会超出版心；两字名加宽字�
   const withSub = faceText({ name: '张三', title: '局长' }, face, { faceW: 297, sub: 'title' });
   assert.ok(withSub.subSize > 0 && withSub.subBaseline > withSub.nameBaseline);
   assert.ok(withSub.subBaseline < face.h);
+});
+
+test('解析：表格标题行、序号列、带空格的表头', () => {
+  const a = parseRoster('2026年经济形势分析会参会人员名单\n序号\t姓 名\t职务（职级）\t单位\n1\t王建华\t副市长\t市政府\n2\t陈  平\t局长\t教育局');
+  assert.deepEqual(a.people.map((p) => [p.name, p.title, p.unit]), [['王建华', '副市长', '市政府'], ['陈平', '局长', '教育局']]);
+  const b = parseRoster('全市安全生产工作会议出席领导名单\n1\t王建华\t副市长\n2\t李明\t局长\n3、\t赵国强\t处长');
+  assert.deepEqual(b.people.map((p) => [p.name, p.title]), [['王建华', '副市长'], ['李明', '局长'], ['赵国强', '处长']]);
+  const c = parseRoster('张三\n李四');
+  assert.deepEqual(c.people.map((p) => p.name), ['张三', '李四'], '一列名字不受影响');
 });

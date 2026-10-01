@@ -1,3 +1,5 @@
+import { roleName } from './round.js';
+
 // 排座规则。位次 rank 从 0 开始（0 = 1 号位）。
 //
 // "左""右"一律以就座的人自己的朝向为准，这正是大家最容易搞混的地方
@@ -75,12 +77,16 @@ export function facing(hosts, guests, { rule = 'left', alignFirst = true } = {})
   return { kind: 'facing', rule, alignFirst, far: place(guests, true), near: place(hosts, false) };
 }
 
-/** 导出成表格行：排 / 座位（从台下或门口看，从左数）/ 位次 / 姓名 / 职务 / 单位 / 方。 */
+/** 导出成表格行：排或方 / 座位（从台下或门口看从左数；圆桌从主位起顺时针数）/ 位次 / 姓名 / 职务 / 单位。 */
 export function layoutRows(layout) {
   const out = [];
   if (layout.kind === 'podium') {
     for (const row of layout.rows) {
       row.seats.forEach((s, i) => out.push({ group: `第${row.row + 1}排`, seat: i + 1, rank: s.rank + 1, ...pick(s.person) }));
+    }
+  } else if (layout.kind === 'round') {
+    for (const s of layout.seats) {
+      if (s.person) out.push({ group: s.side === 'guest' ? '客方' : '主方', seat: s.seat + 1, rank: roleName(s.side, s.rank, layout.scheme), ...pick(s.person) });
     }
   } else {
     const add = (label, seats) => seats.forEach((s, i) => out.push({ group: label, seat: i + 1, rank: s.rank + 1, ...pick(s.person) }));
@@ -94,8 +100,10 @@ function pick(p) {
   return { name: p.name, title: p.title || '', unit: p.unit || '' };
 }
 
-export function toCsv(rows) {
+export function toCsv(rows, kind = 'podium') {
   const esc = (v) => (/[",\n]/.test(String(v)) ? `"${String(v).replace(/"/g, '""')}"` : String(v));
-  const head = ['排/方', '座位（从左数）', '位次', '姓名', '职务', '单位'];
-  return '﻿' + [head, ...rows.map((r) => [r.group, r.seat, r.rank, r.name, r.title, r.unit])].map((r) => r.map(esc).join(',')).join('\r\n');
+  const head = kind === 'round'
+    ? ['主/客', '座位（主位为 1，顺时针数）', '称呼', '姓名', '职务', '单位']
+    : [kind === 'podium' ? '排' : '主/客', kind === 'podium' ? '座位（从台下看，从左数）' : '座位（从门口看，从左数）', '位次', '姓名', '职务', '单位'];
+  return '\ufeff' + [head, ...rows.map((r) => [r.group, r.seat, r.rank, r.name, r.title, r.unit])].map((r) => r.map(esc).join(',')).join('\r\n');
 }
