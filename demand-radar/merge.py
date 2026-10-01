@@ -62,6 +62,10 @@ SIGNALS = [
         r"|下载不了|能(用|装|下))[^，。,.]{0,6}" + OTHER_OS
         + r"|" + OTHER_OS + r"[^，。,.]{0,8}(在哪|呢|吗|嘛|么|快|什么时候|啥时候|版本|蹲|求|等|没有|没找到|搜不到|下载不了|能用|可以|会做|出(吗|嘛|么|没)|上线|[!！?？])"
         r"|(降低|放宽|降到).{0,8}(版本|系统|ios)|(出|开发|做|有)(个)?(英文|中文|繁体)版", re.I)),
+    # 教程、模板帖下的"求模板""怎么批量做"：说明大家手头没有趁手的工具
+    ("求模板", 2, True, re.compile(
+        r"(?<!需)求(个|一个|一份|一下|分享)?(模板|模版|文档|电子版|表格|源文件|素材|背景)|(?<!需)求分享|^.{0,8}(怎么|如何)(获取|领取)"
+        r"|(发|分享)(个|一下|一份)?(电子版|模板|模版|文档|文件)|有(没有)?(这个|这种)?(模板|模版|电子版)|(怎么|如何)批量|做(一百|几百|上百)份", re.I)),
     ("附和", 1, True, re.compile(r"^\s*(\+1|＋1|同求|同问|蹲|我也(想要|需要|是|在找|想)|求求了|一样|me too|太需要了)", re.I)),
     ("找人开发", 2, False, re.compile(
         r"(找人|找个人|求人|求大佬|求大神|谁会|有没有会|有没有人会|需要找).{0,6}(开发|做|写|设计)|(想|需要|急需|要)(开发|做)(一个|个).{0,10}(小程序|app|软件|网站|系统)"
@@ -88,7 +92,7 @@ GENERIC_WEIGHT = 0.3  # 泛泛的征集帖本身
 COMMENT_WEIGHT = {"征集需求": 1.2, "求助": 1.0, "其他": 1.0, "推广": 0.7}
 
 # 评论里的引流、接单、发邀请码，不算需求
-AD = re.compile(r"欢迎咨询|长期合作|可以合作|私聊|私信|随时滴滴|滴滴(我|看|私)|接单|全栈|外包|专业对接|价格(都)?好说|感兴趣(的)?(可|欢迎)|有需要(的)?(可以)?(找|联系|滴|私)"
+AD = re.compile(r"笔记同款|拍(这个|链接)|自动发|自取|欢迎咨询|长期合作|可以合作|私聊|私信|随时滴滴|滴滴(我|看|私)|接单|全栈|外包|专业对接|价格(都)?好说|感兴趣(的)?(可|欢迎)|有需要(的)?(可以)?(找|联系|滴|私)"
                 r"|我们这边可以|我给你做|我可以(帮你)?做|邀请码|会员码|好友码|进群|加群|群聊|看主页|主页看|vx|wx|微信搜|xhslink|https?://"
                 # 开发者在征集帖下推广自己的产品
                 r"|体验(下|一下)|欢迎(各位|大家)?(试用|体验|使用|下载)|(要不|可以)?来试试|试试我(们)?的|我(们)?(已经|自己)?(做|写|开发)(了|好了|过)(一?个|一款|款)"
@@ -248,6 +252,7 @@ def load(run_dir):
             items.append({
                 "platform": platform, "kind": "帖子", "text": text, "likes": to_int(first(d, "liked_count", "voteup_count")),
                 "replies": to_int(first(d, "comment_count", "comments_count", "video_comment", "total_replay_num")),
+                "collects": to_int(first(d, "collected_count", "collect_count", "favorite_count")),
                 "post_title": title, "post_type": ptype, "url": url, "keyword": keyword,
                 "time": to_time(first(d, "time", "create_time", "created_time", "publish_time", "create_date_time")),
                 "id": pid, "post_id": pid,
@@ -324,10 +329,15 @@ def summarize_posts(items, posts):
         other_os = [c for c in hits if "求其他平台" in c["signals"]]
         top = sorted(hits, key=lambda c: -c["score"])[:3]
         total = round(sum(c["score"] for c in hits) + post["score"], 1)
+        # 同一句短话被很多人重复评论，多半是博主说"评论 XX 领模板"：每一条都是一个想要这个文件的人
+        said = Counter(re.sub(r"\s+", "", EMOJI.sub("", c["text"])) for c in comments)
+        keyword_asks = sum(n for t, n in said.items() if n >= 3 and 0 < len(t) <= 20)
         rows.append({
             "platform_name": post["platform_name"], "platform": post["platform"], "post_title": post["post_title"],
             "post_type": post["post_type"], "likes": post["likes"], "replies": post["replies"], "crawled": len(comments),
             "hit_comments": len(hits), "other_os": len(other_os), "other_os_likes": sum(c["likes"] for c in other_os),
+            "collects": post.get("collects", 0), "template_asks": sum(1 for c in hits if "求模板" in c["signals"]),
+            "keyword_asks": keyword_asks,
             "total": total, "top": " | ".join(EMOJI.sub("", c["text"]).replace("\n", " ")[:60] for c in top),
             "url": post["url"], "keyword": "、".join(sorted(posts.get(key, {}).get("keywords", ()))),
             "post_id": post["post_id"], "hits": sorted(([post] if post["score"] > 0 else []) + hits, key=lambda c: -c["score"]),
@@ -358,7 +368,8 @@ FIELDS = [("platform_name", "平台"), ("kind", "类型"), ("signals", "需求�
           ("keyword", "搜索词"), ("time", "时间")]
 POST_FIELDS = [("platform_name", "平台"), ("post_title", "帖子"), ("post_type", "帖子类型"), ("total", "信号总分"),
                ("hit_comments", "命中评论"), ("crawled", "已抓评论"), ("replies", "平台评论数"), ("other_os", "求其他平台"),
-               ("other_os_likes", "求其他平台点赞"), ("likes", "帖子点赞"), ("top", "代表评论"), ("url", "链接"),
+               ("other_os_likes", "求其他平台点赞"), ("likes", "帖子点赞"), ("collects", "帖子收藏"), ("template_asks", "求模板"),
+               ("keyword_asks", "口令评论"), ("top", "代表评论"), ("url", "链接"),
                ("keyword", "搜索词")]
 
 
@@ -443,6 +454,19 @@ def write_summary(path, run_dir, items, signal_rows, post_rows, deep):
             lines.append(f"  - 所属帖子（{r['post_type']}）：{r['post_title'][:60]} {r['url']}")
         elif r["url"]:
             lines.append(f"  - {r['post_type']}帖 {r['url']}")
+    lines.append("")
+
+    lines.append("## 热度最高的帖子")
+    lines.append("")
+    lines.append("不管评论区有没有命中，按点赞加收藏排。用具体话题（比如\"桌签\"\"座次表\"）验证需求时主要看这里：")
+    lines.append("教程帖收藏多、评论区有人求模板或按口令领文件，说明大家手头没有趁手的工具。")
+    lines.append("")
+    lines.append("| 帖子 | 类型 | 赞 | 收藏 | 平台评论数 | 求模板 / 口令评论 / 已抓 |")
+    lines.append("|---|---|---|---|---|---|")
+    for r in sorted(post_rows, key=lambda p: (-(p["likes"] + p["collects"]), -(p["template_asks"] + p["keyword_asks"])))[:20]:
+        title = r["post_title"].replace("\n", " ").replace("|", "/")[:30]
+        lines.append(f"| [{title}]({r['url']}) | {r['post_type']} | {r['likes']} | {r['collects']} | {r['replies']} | "
+                     f"{r['template_asks']} / {r['keyword_asks']} / {r['crawled']} |")
     lines.append("")
 
     lines.append("## 评论区需求最多的帖子")

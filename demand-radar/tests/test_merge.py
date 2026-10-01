@@ -248,6 +248,50 @@ def texts_index(rows, text):
     return [r["内容"] for r in rows].index(text)
 
 
+class TopicRunTest(unittest.TestCase):
+    """用具体话题验证需求（比如搜"桌签"）：看教程帖的热度、求模板和按口令领文件的评论。"""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        d = os.path.join(self.tmp.name, "xhs", "jsonl")
+        os.makedirs(d)
+        posts = [{"note_id": "t1", "title": "高手10秒制作会议席位牌", "desc": "", "liked_count": "3000", "collected_count": "5200",
+                  "comment_count": "800", "note_url": "https://www.xiaohongshu.com/explore/t1"},
+                 {"note_id": "t2", "title": "一张图看懂饭局座次", "desc": "", "liked_count": "50", "collected_count": "20",
+                  "comment_count": "3", "note_url": "https://www.xiaohongshu.com/explore/t2"}]
+        texts = ["求模板", "怎么批量啊", "会议席位牌", "会议席位牌", "会议 席位牌", "会议席位牌[派对R]", "学到了",
+                 "可编辑名字牌模板，笔记同款可直接拍自动发"]
+        comments = [{"comment_id": f"c{i}", "note_id": "t1", "content": t, "like_count": "1", "sub_comment_count": "0",
+                     "parent_comment_id": ""} for i, t in enumerate(texts)]
+        comments.append({"comment_id": "x1", "note_id": "t2", "content": "主客都是双数怎么排？", "like_count": "3",
+                         "sub_comment_count": "0", "parent_comment_id": ""})
+        with open(os.path.join(d, "search_contents_2026-10-01.jsonl"), "w", encoding="utf-8") as f:
+            for p in posts:
+                f.write(json.dumps(p, ensure_ascii=False) + "\n")
+        with open(os.path.join(d, "search_comments_2026-10-01.jsonl"), "w", encoding="utf-8") as f:
+            for c in comments:
+                f.write(json.dumps(c, ensure_ascii=False) + "\n")
+        self.assertEqual(merge.main(self.tmp.name), 0)
+        self.posts = {r["帖子"]: r for r in read_csv(os.path.join(self.tmp.name, "按帖子汇总.csv"))}
+        with open(os.path.join(self.tmp.name, "summary.md"), encoding="utf-8") as f:
+            self.summary = f.read()
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def test_template_and_keyword_asks_counted(self):
+        p = self.posts["高手10秒制作会议席位牌"]
+        self.assertEqual(p["求模板"], "2")  # 求模板、怎么批量；卖模板的评论不算
+        self.assertEqual(p["口令评论"], "4")  # 四条"会议席位牌"，空格和表情不影响
+        self.assertEqual(p["帖子收藏"], "5200")
+
+    def test_hot_posts_listed_even_without_hits(self):
+        self.assertIn("## 热度最高的帖子", self.summary)
+        hot = self.summary.split("## 热度最高的帖子")[1].split("\n## ")[0]
+        self.assertIn("| 3000 | 5200 | 800 | 2 / 4 / 8 |", hot)
+        self.assertIn("一张图看懂饭局座次", hot)
+
+
 class DetectTest(unittest.TestCase):
     """真实跑出来的误报和漏报，防止改正则时退回去。"""
 
@@ -264,6 +308,8 @@ class DetectTest(unittest.TestCase):
         self.assertNotIn("缺失", self.hits("这个视频有一句说得对，就是不赚钱所以没人做，做产品更难得的是商业变现"))
         self.assertNotIn("求工具", self.hits("有没有人教我，如何用ai编小程序，我说了半天"))
         self.assertNotIn("付费意愿", self.hits("一般人说的需求都是伪需求，就是没人愿意付费的需求，都想白嫖"))
+        self.assertNotIn("求模板", self.hits("找个ai帮你建一个需求文档，你把你所有的需求跟他说清楚"))
+        self.assertNotIn("求模板", self.hits("就说原型设计出来的坑位使用状态，怎么获取，对接什么厂商"))
 
     def test_real_demands(self):
         self.assertIn("求工具", self.hits("有没有那种记录&提醒周期性事件的APP，比如我今天换了牙刷"))
