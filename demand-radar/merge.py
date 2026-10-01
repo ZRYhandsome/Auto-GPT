@@ -82,7 +82,7 @@ POST_ASK = re.compile(r"^求|(?<!需)求(推荐|一个|个|款|助)|有没有|�
 POST_PROMO = re.compile(r"我(们)?(自己)?(独立)?(做|开发|写|搞|设计)(了|出)(一个|个|一款|款)?|上线(啦|了)|上架|开源了|内测|vibe ?coding|宝藏(app|软件|应用)"
                         r"|(app|软件)(分享|推荐)|安利|种草|神器|邀请码|会员码|月入|接单|只做定制|外包|永久会员|天才(app|软件)|发现(一个|一款)|眼前一亮|必备(app|软件)", re.I)
 # 帖子本身的权重：推广帖不是需求，只看它的评论区
-TYPE_WEIGHT = {"征集需求": 1.0, "求助": 1.0, "其他": 0.5, "推广": 0.2}
+TYPE_WEIGHT = {"征集需求": 1.0, "求助": 1.0, "其他": 0.5, "推广": 0.1}
 GENERIC_WEIGHT = 0.3  # 泛泛的征集帖本身
 # 评论按所属帖子加权：征集帖下的评论就是点子；推广帖下多是对某个现成产品的反馈
 COMMENT_WEIGHT = {"征集需求": 1.2, "求助": 1.0, "其他": 1.0, "推广": 0.7}
@@ -278,6 +278,11 @@ def crowd(likes, replies):
     return math.log2(1 + likes) + 0.5 * math.log2(1 + replies)
 
 
+def strength(s):
+    """信号分开平方：命中的信号多，往往只是话说得长，不该压过点赞。"2 赞的长评论"排在"208 赞的一句话"前面就是这么来的。"""
+    return math.sqrt(s / 2)
+
+
 def score_items(items, posts):
     for it in items:
         parent = posts.get((it["platform"], it["post_id"]))
@@ -288,11 +293,11 @@ def score_items(items, posts):
             continue
         if it["kind"] == "帖子":
             # 帖子：评论多说明话题有共鸣；推广帖本身不是需求，大幅降权
-            score = s * TYPE_WEIGHT.get(it["post_type"], 0.5) * (1 + (math.log2(1 + it["replies"]) + 0.5 * math.log2(1 + it["likes"])) / 6)
+            score = strength(s) * TYPE_WEIGHT.get(it["post_type"], 0.5) * (1 + (math.log2(1 + it["replies"]) + 0.5 * math.log2(1 + it["likes"])) / 3)
             if it["post_type"] == "征集需求" and not SPECIFIC_IDEA.search(it["post_title"]):
                 score *= GENERIC_WEIGHT
         else:
-            score = s * COMMENT_WEIGHT.get(it["post_type"], 1.0) * (1 + crowd(it["likes"], it["replies"]) / 4)
+            score = strength(s) * COMMENT_WEIGHT.get(it["post_type"], 1.0) * (1 + crowd(it["likes"], it["replies"]) / 2)
         if JOKE.search(it["text"]):
             score *= 0.6
         it["score"] = round(score, 1)

@@ -195,7 +195,10 @@ class DeepRunTest(unittest.TestCase):
              "sub_comment_count": "120", "parent_comment_id": ""},
             {"comment_id": "c2", "note_id": "s1", "content": "滴滴拉屎，在非常急的时候能够租用居民家的厕所", "like_count": "208",
              "sub_comment_count": "30", "parent_comment_id": ""},
-            {"comment_id": "c3", "note_id": "s1", "content": "记录梦境！", "like_count": "42", "sub_comment_count": "0", "parent_comment_id": ""},
+            {"comment_id": "c3", "note_id": "s1", "content": "记录梦境！", "like_count": "42", "sub_comment_count": "28", "parent_comment_id": ""},
+            # 话说得长、命中的信号多，但只有 2 赞
+            {"comment_id": "c4", "note_id": "s1", "content": "有没有一种APP，可以检测自己的脾气或者失去理智程度的？", "like_count": "2",
+             "sub_comment_count": "3", "parent_comment_id": ""},
             # 楼中楼：是在评论别人的点子，不是新点子
             {"comment_id": "r1", "note_id": "s1", "content": "没盈利没人搞的", "like_count": "1794", "sub_comment_count": "0", "parent_comment_id": "c2"},
             {"comment_id": "r2", "note_id": "s1", "content": "有安全隐患，来个入室抢劫平台就完蛋了", "like_count": "700", "sub_comment_count": "0",
@@ -221,6 +224,12 @@ class DeepRunTest(unittest.TestCase):
         self.assertNotIn("没盈利没人搞的", texts)
         self.assertNotIn("有安全隐患，来个入室抢劫平台就完蛋了", texts)
         self.assertTrue(texts[0].startswith("应该出一个法律app"))
+
+    def test_likes_outweigh_wording(self):
+        # 征集帖下每条一级评论都是点子，谁排前面主要看点赞和回复，不看措辞
+        wordy = texts_index(self.signals, "有没有一种APP，可以检测自己的脾气或者失去理智程度的？")
+        self.assertLess(texts_index(self.signals, "滴滴拉屎，在非常急的时候能够租用居民家的厕所"), wordy)
+        self.assertLess(texts_index(self.signals, "记录梦境！"), wordy)
 
     def test_generic_solicit_post_ranks_below_its_ideas(self):
         # 泛泛的征集帖本身只是来源，排在评论区的点子后面

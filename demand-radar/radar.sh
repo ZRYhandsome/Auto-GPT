@@ -46,8 +46,15 @@ done
 
 [[ -x "$PY" ]] || { echo "没找到 MediaCrawler 的运行环境：$PY。请先运行 setup_mac.sh。"; exit 1; }
 
+# 在 Mac 上把 summary.md 放进剪贴板，直接粘贴给 Claude 就行
+copy_summary() {
+  [[ "$(uname)" == "Darwin" && -f "$1/summary.md" ]] || return 0
+  pbcopy < "$1/summary.md" && echo "summary.md 已复制到剪贴板，直接粘贴给 Claude 即可。"
+  return 0
+}
+
 if [[ -n "$MERGE_ONLY" ]]; then
-  "$PY" "$RADAR_HOME/merge.py" "$MERGE_ONLY"
+  "$PY" "$RADAR_HOME/merge.py" "$MERGE_ONLY" && copy_summary "$MERGE_ONLY"
   exit $?
 fi
 
@@ -99,7 +106,7 @@ done
 
 echo
 echo "================ 合并与打分 ================"
-"$PY" "$RADAR_HOME/merge.py" "$OUT"
+"$PY" "$RADAR_HOME/merge.py" "$OUT" && copy_summary "$OUT"
 echo
 echo "完成的平台：${DONE[*]:-无}"
 [[ ${#FAILED[@]} -gt 0 ]] && echo "失败的平台：${FAILED[*]}（常见原因：没扫码登录、触发验证码、网络问题，重跑这个平台即可）"
