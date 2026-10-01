@@ -76,6 +76,7 @@ git -C ~/demand-radar-kit pull && bash ~/demand-radar-kit/demand-radar/setup_mac
 ## 常见问题
 
 - **一直要扫码或提示登录失败：** 在弹出的窗口里手动完成验证后重跑。登录信息存在 `~/demand-radar/MediaCrawler/browser_data/`，删掉对应平台的文件夹即可重新登录。
+- **报错 `Page.goto: Timeout 30000ms exceeded`（打开首页超时）：** 网络慢，或首页有资源一直加载不完。新版最多等 90 秒，页面已经打开就继续跑。还是失败的话，直接重跑同一条命令。
 - **日志里有 `--- Logging error ---`：** 旧版的问题，不影响抓取。MediaCrawler 会把整页搜索结果写进日志，一行几十 KB，经 `tee` 写日志时会失败。新版把每条日志截到 300 字，数据照常完整写进 jsonl。要看完整日志就设置 `RADAR_LOG_FULL=1`。
 - **小红书搜索排序：** 默认用综合排序。MediaCrawler 原本按最热排序，搜出来多是高赞的推广帖和段子。想换回去就设置 `RADAR_XHS_SORT=popularity_descending`，按最新排序用 `time_descending`。
 - **被限流或封号：** 用小号登录；把 `-n` 和 `-c` 调小；加长间隔，例如 `RADAR_SLEEP_SEC=5 ~/demand-radar/radar.sh`。
@@ -90,7 +91,7 @@ git -C ~/demand-radar-kit pull && bash ~/demand-radar-kit/demand-radar/setup_mac
 |---|---|
 | `setup_mac.sh` | 一键安装 |
 | `radar.sh` | 批量运行多个平台，然后合并打分 |
-| `run_mc.py` | MediaCrawler 启动包装：自己开独立浏览器窗口、小红书用综合排序、截短日志，不改 MediaCrawler 源码 |
+| `run_mc.py` | MediaCrawler 启动包装：自己开独立浏览器窗口、小红书用综合排序、截短日志、打开网页多等一会儿，不改 MediaCrawler 源码 |
 | `merge.py` | 合并各平台 jsonl 结果、识别需求信号、打分并输出表格 |
 | `keywords.txt` | 默认关键词 |
 | `tests/test_merge.py` | 用模拟的 7 个平台数据和真实跑出来的误报、漏报测试 merge.py：`python3 -m unittest discover tests` |

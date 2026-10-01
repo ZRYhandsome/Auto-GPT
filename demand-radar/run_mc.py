@@ -13,6 +13,9 @@
 4. 每条日志截到 300 字。MediaCrawler 会把整页搜索结果写进日志，一行几十 KB，
    日志没法看，还会刷出"--- Logging error ---"。数据照常完整写进 jsonl。
    想看完整日志就设置 RADAR_LOG_FULL=1。
+5. 打开网页时多等一会儿。MediaCrawler 打开平台首页要等页面完全加载，最多 30 秒。
+   小红书首页偶尔有资源一直加载不完，页面其实已经能用，却直接超时退出。
+   这里放宽到 90 秒；仍超时、但页面已经解析出来时，记一条警告后继续。
 """
 import logging
 import os
@@ -26,6 +29,7 @@ sys.path.insert(0, HERE)
 import config  # noqa: E402  MediaCrawler 的配置模块
 
 LOG_LIMIT = 300
+NAV_TIMEOUT_MS = 90_000
 
 
 def shorten_logs(limit=LOG_LIMIT):
@@ -49,6 +53,34 @@ def shorten_logs(limit=LOG_LIMIT):
         handler.addFilter(Shorten())
 
 
+async def _page_usable(page):
+    """导航超时后，页面是否已经打开并解析出来（只是还有资源没加载完）。"""
+    try:
+        return page.url.startswith("http") and await page.evaluate("document.readyState") != "loading"
+    except Exception:
+        return False
+
+
+def tolerate_slow_pages(timeout_ms=NAV_TIMEOUT_MS):
+    from playwright.async_api import Page
+    from playwright.async_api import TimeoutError as PlaywrightTimeout
+    from tools import utils
+
+    original_goto = Page.goto
+
+    async def goto(self, url, **kwargs):
+        kwargs.setdefault("timeout", timeout_ms)
+        try:
+            return await original_goto(self, url, **kwargs)
+        except PlaywrightTimeout as err:
+            if kwargs.get("wait_until", "load") not in ("load", "networkidle") or not await _page_usable(self):
+                raise err
+            utils.logger.warning(f"[需求雷达] {url} 等了 {kwargs['timeout'] // 1000} 秒还有资源没加载完，页面已经打开，继续运行")
+            return None
+
+    Page.goto = goto
+
+
 def main():
     config.CDP_CONNECT_EXISTING = os.environ.get("RADAR_CONNECT_EXISTING", "0") == "1"
     config.AUTO_CLOSE_BROWSER = True
@@ -61,6 +93,8 @@ def main():
 
     if os.environ.get("RADAR_SLEEP_SEC"):
         config.CRAWLER_MAX_SLEEP_SEC = float(os.environ["RADAR_SLEEP_SEC"])
+
+    tolerate_slow_pages()
 
     if os.environ.get("RADAR_DRY_RUN") == "1":
         # 自检用：只打印生效的配置，不启动浏览器
