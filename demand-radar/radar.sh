@@ -9,7 +9,8 @@
 #   -c  每条帖子最多抓多少条一级评论，默认 20
 #   -s  同时抓楼中楼回复（更慢）
 #   -d  深挖：不搜索，只把指定帖子的评论抓全。链接用英文逗号分隔，summary.md 里会给出现成命令。
-#       只能指定一个平台（默认 xhs）；默认每帖 300 条一级评论，并抓楼中楼
+#       只能指定一个平台（默认 xhs）；默认每帖 300 条一级评论，不抓楼中楼。
+#       加 -s 也抓楼中楼，但 MediaCrawler 会把楼中楼算进这 300 条里，热门评论的回复会占掉大半
 #   -m  不抓取，只对已有的输出目录重新做合并和打分
 # 例子：
 #   radar.sh -p xhs -n 20 -c 10
@@ -39,7 +40,7 @@ while getopts "p:k:n:c:sd:m:h" opt; do
     s) SUB=yes ;;
     d) DETAIL="$OPTARG" ;;
     m) MERGE_ONLY="$OPTARG" ;;
-    *) sed -n '2,17p' "$0"; exit 0 ;;
+    *) sed -n '2,18p' "$0"; exit 0 ;;
   esac
 done
 
@@ -53,13 +54,13 @@ fi
 if [[ -n "$DETAIL" ]]; then
   [[ "$P_SET" == yes ]] || PLATFORMS="xhs"
   [[ "$(wc -w <<<"$PLATFORMS")" -eq 1 ]] || { echo "深挖模式一次只能指定一个平台，例如 -p xhs"; exit 1; }
+  # 不默认抓楼中楼：MediaCrawler 把回复也算进评论上限，一条热门评论的上百条回复会挤掉后面的点子
   [[ "$C_SET" == yes ]] || COMMENTS=300
-  SUB=yes
   MODE_ARGS=(--type detail --specified_id "$DETAIL")
   OUT="$RADAR_HOME/runs/$(date +%Y%m%d-%H%M%S)-deep"
   mkdir -p "$OUT"
   printf '%s\n' "$DETAIL" | tr ',' '\n' > "$OUT/posts_used.txt"
-  echo "深挖帖子：$(wc -l < "$OUT/posts_used.txt" | tr -d ' ') 个，每帖最多 $COMMENTS 条一级评论，含楼中楼"
+  echo "深挖帖子：$(wc -l < "$OUT/posts_used.txt" | tr -d ' ') 个，每帖最多 $COMMENTS 条评论$([[ "$SUB" == yes ]] && echo "（含楼中楼）" || echo "，不含楼中楼")"
 else
   if [[ -z "$KEYWORDS" ]]; then
     KW_FILE="$RADAR_HOME/keywords.txt"

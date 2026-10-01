@@ -448,7 +448,7 @@ def write_summary(path, run_dir, items, signal_rows, post_rows, deep):
         here = os.path.dirname(os.path.abspath(__file__))
         lines.append("## 值得深挖的帖子")
         lines.append("")
-        lines.append("这些帖子评论区命中多，但平台上的评论远多于这次抓到的。用深挖模式把评论和楼中楼抓全：")
+        lines.append("这些帖子评论区命中多，但平台上的评论远多于这次抓到的。用深挖模式把一级评论抓全：")
         lines.append("")
         by_platform_deep = defaultdict(list)
         for r in deep:
