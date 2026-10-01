@@ -1,0 +1,1096 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>座次桌签</title>
+<meta name="description" content="粘贴名单，自动排会议座次，一键打印双面桌签。名单只在本机浏览器里处理。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%23b91c1c%22%2F%3E%3Cpath%20d%3D%22M14%2040%20L32%2018%20L50%2040%20Z%22%20fill%3D%22%23fff%22%2F%3E%3Crect%20x%3D%2212%22%20y%3D%2240%22%20width%3D%2240%22%20height%3D%226%22%20rx%3D%222%22%20fill%3D%22%23fde68a%22%2F%3E%3C%2Fsvg%3E">
+<style>
+:root {
+  --bg: #f6f5f2;
+  --panel: #ffffff;
+  --text: #1f2328;
+  --muted: #6b7280;
+  --line: #e5e1d8;
+  --accent: #b91c1c;
+  --accent-text: #ffffff;
+  --chip: #f3efe6;
+  --focus: #2563eb;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #17181a;
+    --panel: #212327;
+    --text: #e8e6e1;
+    --muted: #a3a3a3;
+    --line: #34373d;
+    --accent: #ef4444;
+    --accent-text: #111;
+    --chip: #2b2e33;
+    --focus: #60a5fa;
+  }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font: 15px/1.6 -apple-system, "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+}
+.app { max-width: 1120px; margin: 0 auto; padding: 24px 16px 48px; }
+.top h1 { margin: 0 0 4px; font-size: 26px; letter-spacing: 0.04em; }
+.lead { margin: 0 0 16px; color: var(--muted); }
+.card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 18px 20px 20px;
+  margin: 0 0 16px;
+}
+h2 { margin: 0 0 12px; font-size: 18px; display: flex; align-items: center; gap: 8px; }
+.num {
+  display: inline-grid; place-items: center;
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--accent); color: var(--accent-text); font-size: 13px;
+}
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media (max-width: 820px) { .grid-2 { grid-template-columns: 1fr; } }
+.lbl { display: block; color: var(--muted); font-size: 13px; margin-bottom: 6px; }
+textarea {
+  width: 100%; min-height: 220px; resize: vertical;
+  font: 14px/1.6 ui-monospace, "SF Mono", Menlo, "PingFang SC", monospace;
+  color: var(--text); background: var(--bg);
+  border: 1px solid var(--line); border-radius: 8px; padding: 10px;
+  tab-size: 12;
+}
+textarea.short { min-height: 90px; }
+.row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 10px; }
+.row.between { justify-content: space-between; margin-top: 0; }
+button {
+  font: inherit; font-size: 14px;
+  border: 1px solid var(--line); background: var(--chip); color: var(--text);
+  border-radius: 8px; padding: 6px 12px; cursor: pointer;
+}
+button:hover { border-color: var(--muted); }
+button.primary { background: var(--accent); color: var(--accent-text); border-color: var(--accent); font-weight: 600; }
+button.ghost { background: transparent; }
+button:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+select, .num-input, .text-input {
+  font: inherit; font-size: 14px; color: var(--text); background: var(--bg);
+  border: 1px solid var(--line); border-radius: 6px; padding: 4px 6px;
+}
+.num-input { width: 64px; }
+.text-input { width: 220px; }
+.muted { color: var(--muted); }
+.small { font-size: 12.5px; }
+.check { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; margin: 8px 0 0; }
+.more { margin-top: 12px; }
+.more summary { cursor: pointer; color: var(--muted); font-size: 13px; }
+.people { list-style: none; margin: 10px 0 0; padding: 0; max-height: 360px; overflow: auto; border: 1px solid var(--line); border-radius: 8px; }
+.people li { display: grid; grid-template-columns: 34px 1fr auto auto; gap: 8px; align-items: center; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+.people li:last-child { border-bottom: 0; }
+.people .rank { color: var(--accent); font-weight: 700; text-align: right; }
+.people .who b { font-size: 15px; }
+.people .who span { color: var(--muted); font-size: 12.5px; margin-left: 6px; }
+.people .tier { font-size: 11.5px; color: var(--muted); background: var(--chip); border-radius: 10px; padding: 1px 8px; }
+.people .ctl { display: flex; gap: 4px; }
+.people .ctl button { padding: 1px 7px; font-size: 13px; }
+.people .side { padding: 2px 4px; font-size: 13px; }
+.people .empty { display: block; padding: 18px; color: var(--muted); text-align: center; }
+.people .group { display: block; padding: 6px 10px; background: var(--chip); color: var(--muted); font-size: 12.5px; font-weight: 600; }
+.tabs { display: flex; gap: 6px; margin-bottom: 12px; }
+.tab { background: transparent; }
+.tab[aria-selected="true"] { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
+.options { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; font-size: 14px; }
+.options label { display: inline-flex; align-items: center; gap: 6px; }
+body[data-mode="podium"] .facing-only, body[data-mode="facing"] .podium-only { display: none !important; }
+body:not([data-preset="custom"]) .custom-only { display: none !important; }
+.chart { margin-top: 14px; overflow: auto; border: 1px solid var(--line); border-radius: 8px; background: #fff; padding: 8px; }
+.chart svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+.chart .empty { color: #6b7280; padding: 30px; text-align: center; }
+.card-preview { display: flex; gap: 12px; overflow: auto; padding: 10px; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; }
+.card-preview .sheet { flex: 0 0 auto; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.18); }
+.card-preview .sheet svg { display: block; width: 100%; height: 100%; }
+.card-preview .more-pages { align-self: center; color: var(--muted); font-size: 13px; padding: 0 12px; }
+.foot { margin-top: 8px; }
+#print-root { display: none; }
+
+@media print {
+  body { background: #fff; }
+  .app { display: none !important; }
+  #print-root { display: block !important; }
+  #print-root .print-page { page-break-after: always; break-after: page; overflow: hidden; }
+  #print-root .print-page:last-child { page-break-after: auto; break-after: auto; }
+  #print-root .print-page svg { display: block; }
+}
+
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <header class="top">
+    <div>
+      <h1>座次桌签</h1>
+      <p class="lead">粘贴名单 → 自动排座次 → 一键打印双面桌签。名单只在这台电脑的浏览器里处理，不上传。</p>
+    </div>
+  </header>
+
+  <section class="card" id="step-roster">
+    <h2><span class="num">1</span>名单</h2>
+    <div class="grid-2">
+      <div>
+        <label for="roster" class="lbl">从 Excel 复制"姓名、职务、单位"三列直接粘贴；也可以一行一个，用逗号或空格隔开。会谈排座再加一列"主 / 客"。</label>
+        <textarea id="roster" spellcheck="false" placeholder="姓名&#9;职务&#9;单位&#10;张建国&#9;党组书记、局长&#9;市财政局&#10;李  明&#9;副局长&#9;市财政局"></textarea>
+        <div class="row">
+          <button type="button" id="btn-sample" class="ghost">填入示例</button>
+          <button type="button" id="btn-sample-talk" class="ghost">填入会谈示例</button>
+          <button type="button" id="btn-clear" class="ghost">清空</button>
+          <span id="parse-msg" class="muted"></span>
+        </div>
+        <details class="more">
+          <summary>单位顺序（可选）</summary>
+          <label for="units" class="lbl">同一档职务里，按这里的单位顺序排。一行一个单位。</label>
+          <textarea id="units" class="short" spellcheck="false" placeholder="市委办公室&#10;市政府办公室&#10;市财政局"></textarea>
+        </details>
+      </div>
+      <div>
+        <div class="row between">
+          <strong>位次（可上下调整）</strong>
+          <span class="row">
+            <button type="button" id="btn-autosort">按职务自动排序</button>
+            <button type="button" id="btn-pasteorder" class="ghost">恢复粘贴顺序</button>
+          </span>
+        </div>
+        <label class="check"><input type="checkbox" id="party-first" checked> 书记排在同级行政正职前（党政惯例）</label>
+        <ol id="people" class="people" aria-label="位次"></ol>
+        <p class="muted small">职务分档：书记 → 正职 → 副书记 → 副职 → 其他职务；写了"正处""副科"等级别的按级别排。自动排序只是起点，以本单位惯例为准。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" id="step-seats">
+    <h2><span class="num">2</span>座次</h2>
+    <div class="tabs" role="tablist">
+      <button type="button" role="tab" class="tab" data-mode="podium" aria-selected="true">主席台</button>
+      <button type="button" role="tab" class="tab" data-mode="facing" aria-selected="false">会见会谈（主客对坐）</button>
+    </div>
+    <div class="options">
+      <label>尊位
+        <select id="rule">
+          <option value="left">以左为尊（党政机关）</option>
+          <option value="right">以右为尊（商务、涉外）</option>
+        </select>
+      </label>
+      <label class="podium-only">每排最多 <input type="number" id="per-row" min="0" max="40" value="0" class="num-input"> 人<span class="muted">（0 为不限）</span></label>
+      <label class="check facing-only"><input type="checkbox" id="align-first" checked> 两方 1 号对 1 号、2 号对 2 号</label>
+      <label>图的视角
+        <select id="view">
+          <option value="front">从台下 / 门口看</option>
+          <option value="back">从台上 / 背对门口看</option>
+        </select>
+      </label>
+      <label>会议名称 <input type="text" id="meeting-title" placeholder="可选，会印在座次图上" class="text-input"></label>
+    </div>
+    <div id="chart" class="chart" aria-live="polite"></div>
+    <div class="row">
+      <button type="button" id="btn-print-chart">打印座次图</button>
+      <button type="button" id="btn-png" class="ghost">下载座次图 PNG</button>
+      <button type="button" id="btn-csv" class="ghost">下载座次表 CSV</button>
+    </div>
+  </section>
+
+  <section class="card" id="step-cards">
+    <h2><span class="num">3</span>双面桌签</h2>
+    <div class="options">
+      <label>版式
+        <select id="preset"></select>
+      </label>
+      <label class="custom-only">每面 宽 <input type="number" id="custom-w" min="40" max="297" value="200" class="num-input"> × 高 <input type="number" id="custom-h" min="20" max="148" value="90" class="num-input"> 毫米</label>
+      <label>字体 <select id="font"></select></label>
+      <label class="check"><input type="checkbox" id="bold" checked> 加粗</label>
+      <label>颜色
+        <select id="color">
+          <option value="#000000">黑色</option>
+          <option value="#c00000">红色</option>
+        </select>
+      </label>
+      <label>第二行
+        <select id="sub">
+          <option value="none">不印</option>
+          <option value="title">印职务</option>
+          <option value="unit">印单位</option>
+        </select>
+      </label>
+      <label class="check"><input type="checkbox" id="widen" checked> 两字名加宽字距</label>
+      <label class="check"><input type="checkbox" id="guides" checked> 印折线和裁切线</label>
+    </div>
+    <p class="muted small" id="card-info"></p>
+    <div id="card-preview" class="card-preview"></div>
+    <div class="row">
+      <button type="button" id="btn-print-cards" class="primary">打印桌签（可另存为 PDF）</button>
+      <span class="muted small">打印设置里选"实际大小 / 100%"，不要选"适合页面"；对折后上下两面都是正的。</span>
+    </div>
+  </section>
+
+  <footer class="foot muted small">
+    <p>左右以就座者自己的朝向为准：以左为尊时 2 号坐在 1 号左手，从台下看则在 1 号右边。人数为双数时 1、2 号同时居中，2 号仍在 1 号左手。会谈时客方坐面门一侧；门在侧面时，以进门方向看客方坐右侧。各地各单位惯例不同，以本单位要求为准。</p>
+    <p>所有内容只在浏览器里处理，不联网、不上传；名单只在本机浏览器里保存，方便下次打开。</p>
+  </footer>
+</div>
+<div id="print-root" aria-hidden="true"></div>
+<script>
+"use strict";
+const __mod_parse = (() => {
+// 名单解析：把从 Excel、Word、微信里复制来的名单拆成 { name, title, unit, side }。
+// 支持的写法：
+//   张三<Tab>局长<Tab>财政局          （从 Excel 复制，最常见）
+//   张三，局长，财政局 / 张三、局长      （中英文逗号、顿号、分号）
+//   张 三  局长  财政局               （空格分隔；两字名中间常加空格对齐，会自动合并）
+// 第一行如果是"姓名 职务 单位"这样的表头，按表头识别列；第四列"主/客"用于会谈排座。
+
+const HEADER = {
+  name: /^(姓名|名字|人员|领导)$/,
+  title: /^(职务|职位|职称|头衔|职级)$/,
+  unit: /^(单位|部门|工作单位|所在单位)$/,
+  side: /^(主客|主\/客|方|身份|类别|主方客方)$/,
+};
+const CJK1 = /^[一-鿿]$/;
+
+function splitLine(line) {
+  if (line.includes('\t')) return line.split('\t').map((s) => s.trim());
+  if (/[，,、;；|｜]/.test(line)) return line.split(/[，,、;；|｜]/).map((s) => s.trim());
+  const parts = line.trim().split(/\s+/);
+  // "张 三 局长"：前两段都是单个汉字，是被空格隔开的两字名
+  if (parts.length >= 2 && CJK1.test(parts[0]) && CJK1.test(parts[1])) parts.splice(0, 2, parts[0] + parts[1]);
+  return parts;
+}
+
+function normalizeSide(v) {
+  const s = String(v || '').trim();
+  if (/^(客|客方|来宾|宾|对方|外方|客人)$/.test(s)) return 'guest';
+  if (/^(主|主方|我方|东道主|中方)$/.test(s)) return 'host';
+  return '';
+}
+
+function cleanName(s) {
+  return String(s || '').replace(/[\s　]+/g, '');
+}
+
+function parseRoster(text) {
+  const lines = String(text || '').split(/\r?\n/).map((l) => l.replace(/ /g, ' ')).filter((l) => l.trim());
+  const warnings = [];
+  if (!lines.length) return { people: [], warnings };
+  let cols = { name: 0, title: 1, unit: 2, side: 3 };
+  let start = 0;
+  const head = splitLine(lines[0]);
+  if (head.some((h) => HEADER.name.test(h))) {
+    cols = { name: -1, title: -1, unit: -1, side: -1 };
+    head.forEach((h, i) => { for (const k of Object.keys(HEADER)) if (cols[k] < 0 && HEADER[k].test(h)) cols[k] = i; });
+    start = 1;
+  }
+  const people = [];
+  const seen = new Map();
+  for (let i = start; i < lines.length; i++) {
+    const parts = splitLine(lines[i]);
+    const pick = (k) => (cols[k] >= 0 && cols[k] < parts.length ? parts[cols[k]] : '');
+    const name = cleanName(pick('name'));
+    if (!name) continue;
+    let unit = pick('unit');
+    let side = normalizeSide(pick('side'));
+    // 没有表头时，第三列也可能直接写了"主/客"
+    if (!side && cols.side === 3 && normalizeSide(unit) && parts.length === 3) { side = normalizeSide(unit); unit = ''; }
+    const person = { id: people.length, name, title: pick('title'), unit, side: side || 'host', order: people.length };
+    if (seen.has(name)) warnings.push(`第 ${i + 1} 行的"${name}"和前面重名，请确认是不是重复粘贴了`);
+    seen.set(name, true);
+    people.push(person);
+  }
+  return { people, warnings };
+}
+
+return { normalizeSide, cleanName, parseRoster };
+})();
+
+const __mod_rank = (() => {
+// 按职务粗排位次。规则写得很直白，排完可以手动上下调：
+//   1. 职务里写了级别（正厅、副处、正科……）的按级别，排在最前；
+//   2. 地方党政领导（省、市、县、区、乡镇的书记、正副职，人大、政协负责人）排在部门领导前：
+//      副市长是副厅级，市里的局长是正处级；
+//   3. 部门领导按层级：部、厅 > 局 > 处 > 科 > 股，同层级正职在副职前；
+//      主任、经理、院长、校长等看不出层级的，按局一级算；
+//   4. 再往后是秘书长、助理、调研员等其他职务，最后是没写职务的；
+//   5. 分数相同时：先按"单位顺序"（如果填了），再把书记排在同单位行政正职前（可关），最后按粘贴顺序。
+// "党组书记、局长"这种兼任，取其中最高的一个。
+
+// "副处长""副科长"是职务不是级别，所以级别词后面不能跟"长""员"
+const lv = (word, alt) => new RegExp(`${word}(级|(?![长员]))|${alt}`);
+const LEVELS = [
+  [lv('正部', '省部级正职'), -10, '正部级'], [lv('副部', '省部级副职'), -9, '副部级'],
+  [lv('正厅', '厅局级正职'), -8, '正厅级'], [lv('副厅', '厅局级副职'), -7, '副厅级'],
+  [lv('正处', '县处级正职'), -6, '正处级'], [lv('副处', '县处级副职'), -5, '副处级'],
+  [lv('正科', '乡科级正职'), -4, '正科级'], [lv('副科', '乡科级副职'), -3, '副科级'],
+];
+const PLACE = '(省|市|州|盟|县|区|旗|镇|乡)';
+const LOCAL_SECRETARY = new RegExp(`${PLACE}委(副)?书记$`);
+const LOCAL_HEAD = new RegExp(`^(常务)?(副)?${PLACE}长$`);
+const LOCAL_CONGRESS = /(人大(常委会)?(副)?主任|政协(副)?主席)$/;
+const LOCAL_DISCIPLINE = new RegExp(`${PLACE}(纪委|监委)(副)?书记$`);
+// "销售总监""部门经理"在总经理、副总经理之后，按其他职务算
+const OTHER = /(秘书长|助理|调研员|巡视员|总师|总经济师|总会计师|总工程师|主任科员|科员|干事|专员|委员|成员|(?<!总)经理|总监|(团委|团工委|支部|总支|工会)(副)?(书记|主席))$/;
+const LADDER = [[/(部长|厅长)$/, 0], [/局长$/, 1], [/处长$/, 2], [/科长$/, 3], [/股长$/, 4]];
+const LADDER_NAME = ['部厅', '局', '处', '科', '股'];
+const HEAD = /(长|主任|董事长|总经理|主席|会长|理事长|总裁|行长|社长|所长|馆长|院长|校长|站长|队长|主编|主委|政委)$/;
+
+function roleScore(role, partyFirst) {
+  const r = role.trim();
+  if (!r) return { score: 50, label: '未识别', party: false };
+  const deputy = /副/.test(r);
+  if (LOCAL_DISCIPLINE.test(r)) return { score: 3, label: '地方副职', party: false };
+  if (LOCAL_SECRETARY.test(r)) return deputy ? { score: 2, label: '地方副书记', party: false } : { score: 0, label: '地方书记', party: true };
+  if (LOCAL_HEAD.test(r) || LOCAL_CONGRESS.test(r)) return deputy ? { score: 3, label: '地方副职', party: false } : { score: 1, label: '地方正职', party: false };
+  if (OTHER.test(r)) return { score: 30, label: '其他职务', party: false };
+  if (/(纪委|纪检|纪工委|监委)(副)?书记$/.test(r)) return { score: 13, label: '副职', party: false };
+  if (/书记$/.test(r)) return { score: 12 + (deputy ? 1 : 0), label: deputy ? '副书记' : '书记', party: !deputy && partyFirst };
+  for (const [rx, step] of LADDER) {
+    if (rx.test(r)) return { score: 10 + step * 2 + (deputy ? 1 : 0), label: `${deputy ? '副职' : '正职'}·${LADDER_NAME[step]}`, party: false };
+  }
+  if (HEAD.test(r)) return { score: 12 + (deputy ? 1 : 0), label: deputy ? '副职' : '正职', party: false };
+  return { score: 40, label: '未识别', party: false };
+}
+
+function rankOf(title, { partyFirst = true } = {}) {
+  const t = String(title || '');
+  for (const [rx, level, label] of LEVELS) if (rx.test(t)) return { score: level, label, party: false };
+  const roles = t.split(/[、,，/／;；\s]+/).filter(Boolean);
+  let best = roleScore('', partyFirst);
+  for (const r of roles) {
+    const s = roleScore(r, partyFirst);
+    if (s.score < best.score || (s.score === best.score && s.party)) best = s;
+  }
+  return best;
+}
+
+function sortByRank(people, { unitOrder = [], partyFirst = true } = {}) {
+  const unitIdx = new Map();
+  unitOrder.map((u) => u.trim()).filter(Boolean).forEach((u, i) => { if (!unitIdx.has(u)) unitIdx.set(u, i); });
+  const unitKey = (p) => (unitIdx.has(p.unit) ? unitIdx.get(p.unit) : unitOrder.length);
+  return people
+    .map((p) => ({ p, r: rankOf(p.title, { partyFirst }) }))
+    .sort((a, b) => a.r.score - b.r.score
+      || unitKey(a.p) - unitKey(b.p)
+      || (a.p.unit && a.p.unit === b.p.unit ? Number(b.r.party) - Number(a.r.party) : 0)
+      || a.p.order - b.p.order)
+    .map((x) => x.p);
+}
+
+return { rankOf, sortByRank };
+})();
+
+const __mod_layout = (() => {
+// 排座规则。位次 rank 从 0 开始（0 = 1 号位）。
+//
+// "左""右"一律以就座的人自己的朝向为准，这正是大家最容易搞混的地方
+// （评论区常问"是拍照人的左边还是被拍照人的左边"）。
+//   以左为尊（党政机关惯例）：2 号在 1 号左手，3 号在 1 号右手，依次左右交替；
+//     人数为双数时，1、2 号同时居中，2 号仍在 1 号左手。
+//   以右为尊（商务、涉外惯例）：左右对调。
+// 主席台从台下看过去，左右正好反过来：以左为尊、7 人时，台下看到的是 7 5 3 1 2 4 6。
+
+/** 一排 n 个座位里，第 k 个人坐在哪：返回就座者视角下从左数的下标（0..n-1）。 */
+function centerOrder(n, rule = 'left') {
+  const pos = [];
+  if (n % 2 === 1) {
+    const c = (n - 1) / 2;
+    for (let k = 0; k < n; k++) {
+      const step = Math.ceil(k / 2);
+      pos.push(k === 0 ? c : k % 2 === 1 ? c - step : c + step);
+    }
+  } else {
+    const m = n / 2; // 居中两座里靠右的一个（就座者视角）
+    for (let k = 0; k < n; k++) {
+      if (k === 0) pos.push(m);
+      else if (k === 1) pos.push(m - 1);
+      else {
+        const j = k - 2;
+        const step = Math.floor(j / 2) + 1;
+        pos.push(j % 2 === 0 ? m + step : m - 1 - step);
+      }
+    }
+  }
+  return rule === 'right' ? pos.map((p) => n - 1 - p) : pos;
+}
+
+function chunk(arr, size) {
+  const out = [];
+  for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
+  return out;
+}
+
+/**
+ * 主席台。people 已按位次排好；perRow 为每排最多人数，多出来的排到第二排、第三排。
+ * 返回 rows[0] 为第一排（靠台口）；每个座位的 x 为"从台下看，从左数"的下标。
+ */
+function podium(people, { rule = 'left', perRow = 0 } = {}) {
+  const size = perRow > 0 ? perRow : Math.max(people.length, 1);
+  let rankBase = 0;
+  const rows = chunk(people, size).map((group, r) => {
+    const n = group.length;
+    const pos = centerOrder(n, rule);
+    const seats = group.map((person, k) => ({ person, rank: rankBase + k, x: n - 1 - pos[k] }));
+    seats.sort((a, b) => a.x - b.x);
+    rankBase += n;
+    return { row: r, n, seats };
+  });
+  return { kind: 'podium', rule, rows };
+}
+
+/**
+ * 会见、会谈的长桌对坐。门在下方：主方背门坐近门一侧，客方面门坐远端（"面门为上"）。
+ * x 为以桌子中线为 0 的横坐标（从门口看过去，左负右正），可能是 0.5 的倍数。
+ * alignFirst：两方都按同一个方向排，让 1 号对 1 号、2 号对 2 号。
+ *   不对齐时各自按自己的朝向排，人数为双数时两方 1 号会错开半个座位。
+ */
+function facing(hosts, guests, { rule = 'left', alignFirst = true } = {}) {
+  const place = (group, facingDoor) => {
+    const n = group.length;
+    const pos = centerOrder(n, rule);
+    const mid = (n - 1) / 2;
+    return group.map((person, k) => {
+      // 背门（面朝里）的人，自己的左手就是从门口看的左边；面门的人正好相反
+      const x = facingDoor && !alignFirst ? mid - pos[k] : pos[k] - mid;
+      return { person, rank: k, x };
+    }).sort((a, b) => a.x - b.x);
+  };
+  return { kind: 'facing', rule, alignFirst, far: place(guests, true), near: place(hosts, false) };
+}
+
+/** 导出成表格行：排 / 座位（从台下或门口看，从左数）/ 位次 / 姓名 / 职务 / 单位 / 方。 */
+function layoutRows(layout) {
+  const out = [];
+  if (layout.kind === 'podium') {
+    for (const row of layout.rows) {
+      row.seats.forEach((s, i) => out.push({ group: `第${row.row + 1}排`, seat: i + 1, rank: s.rank + 1, ...pick(s.person) }));
+    }
+  } else {
+    const add = (label, seats) => seats.forEach((s, i) => out.push({ group: label, seat: i + 1, rank: s.rank + 1, ...pick(s.person) }));
+    add('客方（面门）', layout.far);
+    add('主方（背门）', layout.near);
+  }
+  return out;
+}
+
+function pick(p) {
+  return { name: p.name, title: p.title || '', unit: p.unit || '' };
+}
+
+function toCsv(rows) {
+  const esc = (v) => (/[",\n]/.test(String(v)) ? `"${String(v).replace(/"/g, '""')}"` : String(v));
+  const head = ['排/方', '座位（从左数）', '位次', '姓名', '职务', '单位'];
+  return '﻿' + [head, ...rows.map((r) => [r.group, r.seat, r.rank, r.name, r.title, r.unit])].map((r) => r.map(esc).join(',')).join('\r\n');
+}
+
+return { centerOrder, podium, facing, layoutRows, toCsv };
+})();
+
+const __mod_cards = (() => {
+// 桌签版式与字号。单位一律为毫米。
+//
+// 双面桌签的做法：一张纸上下两面，上面一面的字倒过来印，对折立起后两边都是正的。
+// 这正是 Word 里最折腾人的一步（"文字旋转不过来""保存以后就没有翻转了"），这里直接画好。
+
+const A4 = { w: 210, h: 297 };
+
+const PRESETS = {
+  'a4-fold2': { label: 'A4 横向对折（一页一人，最常用）', faceW: 297, faceH: 105, faces: 2 },
+  'a4-fold3': { label: 'A4 三折三角立牌（一页一人）', faceW: 297, faceH: 70, faces: 3 },
+  'card-200x100': { label: '台卡插页 200×100（一页一人）', faceW: 200, faceH: 100, faces: 2 },
+  'card-180x70': { label: '小号台卡 180×70（一页两人）', faceW: 180, faceH: 70, faces: 2 },
+};
+
+/**
+ * 计算一页纸怎么摆：每张桌签纸 sheet = faceW × (faceH × faces)，在 A4 竖放或横放里排尽量多张。
+ * 返回 { page:{w,h,landscape}, sheet:{w,h}, slots:[{x,y}], faces:[{y,h,flip,blank}] }
+ */
+function sheetLayout({ faceW, faceH, faces = 2 }) {
+  const sheet = { w: faceW, h: faceH * faces };
+  const fit = (pw, ph) => Math.floor(pw / sheet.w) * Math.floor(ph / sheet.h);
+  const portrait = fit(A4.w, A4.h);
+  const landscape = fit(A4.h, A4.w);
+  if (!portrait && !landscape) throw new Error(`桌签 ${faceW}×${faceH * faces} 毫米放不进一张 A4 纸`);
+  const useLandscape = landscape > portrait;
+  const page = useLandscape ? { w: A4.h, h: A4.w, landscape: true } : { w: A4.w, h: A4.h, landscape: false };
+  const cols = Math.floor(page.w / sheet.w);
+  const rowsN = Math.floor(page.h / sheet.h);
+  const offX = (page.w - cols * sheet.w) / 2;
+  const offY = (page.h - rowsN * sheet.h) / 2;
+  const slots = [];
+  for (let r = 0; r < rowsN; r++) for (let c = 0; c < cols; c++) slots.push({ x: offX + c * sheet.w, y: offY + r * sheet.h });
+  // 两面：上面倒印、下面正印；三折：第一面倒印、第二面正印、第三面留作底座
+  const faceList = [];
+  for (let i = 0; i < faces; i++) faceList.push({ y: i * faceH, h: faceH, flip: i === 0, blank: faces === 3 && i === 2 });
+  return { page, sheet, slots, faces: faceList };
+}
+
+/** 把名单分页：每页放 slots.length 张。 */
+function paginate(people, perPage) {
+  const pages = [];
+  for (let i = 0; i < people.length; i += perPage) pages.push(people.slice(i, i + perPage));
+  return pages;
+}
+
+/**
+ * 名字字号：在宽 boxW、高 boxH 的框里尽量大。
+ * measure(text) 返回字号为 1 时文字的宽度（不含字距）；spacing 为字距（em）。
+ * 两字名默认加宽字距，看起来和三字名一样匀称；四字以上自动缩小，不会溢出。
+ */
+function fitFontSize(text, { boxW, boxH, spacing = 0, measure = defaultMeasure }) {
+  const n = [...text].length;
+  const widthPerSize = measure(text) + spacing * Math.max(n - 1, 0);
+  if (widthPerSize <= 0) return boxH;
+  return Math.min(boxW / widthPerSize, boxH);
+}
+
+/** 没有浏览器时的近似：汉字和全角字符宽 1em，其余 0.55em。 */
+function defaultMeasure(text) {
+  let w = 0;
+  for (const ch of text) w += /[⺀-鿿＀-￯]/.test(ch) ? 1 : 0.55;
+  return w;
+}
+
+function nameSpacing(name, { widenTwo = true } = {}) {
+  return widenTwo && [...name].length === 2 ? 0.8 : 0.08;
+}
+
+/** 一面桌签里名字和副标题（职务或单位）的位置和字号。 */
+function faceText(person, face, { faceW, sub = 'none', measure = defaultMeasure, widenTwo = true } = {}) {
+  const subText = sub === 'title' ? person.title : sub === 'unit' ? person.unit : '';
+  const marginX = faceW * 0.08;
+  const boxW = faceW - marginX * 2;
+  // 名字高度约占一面的一半（A4 对折时约 52 毫米，和常见教程里的 140 号字相当）
+  const nameBoxH = face.h * (subText ? 0.42 : 0.5);
+  const spacing = nameSpacing(person.name, { widenTwo });
+  const nameSize = fitFontSize(person.name, { boxW, boxH: nameBoxH, spacing, measure });
+  const out = { name: person.name, nameSize, spacing, sub: subText || '', subSize: 0 };
+  if (subText) out.subSize = fitFontSize(subText, { boxW, boxH: face.h * 0.13, spacing: 0.05, measure });
+  // 竖直方向：名字和副标题作为一组居中，略微下沉（立起来时视线略高于桌面）
+  const gap = subText ? face.h * 0.06 : 0;
+  const blockH = nameSize + (subText ? gap + out.subSize : 0);
+  const top = (face.h - blockH) / 2 + face.h * 0.02;
+  out.nameBaseline = top + nameSize * 0.88;
+  out.subBaseline = subText ? top + nameSize + gap + out.subSize * 0.88 : 0;
+  return out;
+}
+
+return { A4, PRESETS, sheetLayout, paginate, fitFontSize, defaultMeasure, nameSpacing, faceText };
+})();
+
+const __mod_render = (() => {
+// 生成座次图和桌签的 SVG 字符串。座次图用像素坐标，桌签用毫米坐标（打印时 1:1）。
+const { sheetLayout, paginate, faceText, defaultMeasure } = __mod_cards;
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+const FONTS = {
+  song: { label: '宋体', css: '"Songti SC","STSong","SimSun","Noto Serif CJK SC","Source Han Serif SC",serif' },
+  xbs: { label: '小标宋（有则用）', css: '"FZXiaoBiaoSong-B05S","方正小标宋简体","FZXBSJW--GB1-0","STZhongsong","Songti SC","SimSun",serif' },
+  hei: { label: '黑体', css: '"PingFang SC","Heiti SC","Microsoft YaHei","SimHei","Noto Sans CJK SC",sans-serif' },
+  kai: { label: '楷体', css: '"Kaiti SC","STKaiti","KaiTi","KaiTi_GB2312",serif' },
+};
+
+// ---------- 座次图 ----------
+const SEAT_W = 104;
+const SEAT_H = 66;
+const GAP = 12;
+
+function seatBox(x, y, seat, { showTitle = true } = {}) {
+  const p = seat.person;
+  const title = showTitle && p.title ? `<text x="${x + SEAT_W / 2}" y="${y + 54}" class="seat-title">${esc(trim(p.title, 8))}</text>` : '';
+  return `<g class="seat" data-name="${esc(p.name)}">
+  <rect x="${x}" y="${y}" width="${SEAT_W}" height="${SEAT_H}" rx="8" class="seat-box"/>
+  <circle cx="${x + 15}" cy="${y + 15}" r="11" class="seat-badge"/>
+  <text x="${x + 15}" y="${y + 19.5}" class="seat-rank">${seat.rank + 1}</text>
+  <text x="${x + SEAT_W / 2}" y="${y + 37}" class="seat-name">${esc(trim(p.name, 6))}</text>${title}
+</g>`;
+}
+
+function trim(s, n) {
+  const a = [...String(s)];
+  return a.length > n ? a.slice(0, n - 1).join('') + '…' : a.join('');
+}
+
+const CHART_STYLE = `<style>
+.seat-box{fill:#fff;stroke:#1f2937;stroke-width:1.4}
+.seat-badge{fill:#b91c1c}
+.seat-rank{fill:#fff;font:600 12px system-ui,sans-serif;text-anchor:middle}
+.seat-name{fill:#111827;font:600 17px "PingFang SC","Microsoft YaHei",sans-serif;text-anchor:middle}
+.seat-title{fill:#6b7280;font:11px "PingFang SC","Microsoft YaHei",sans-serif;text-anchor:middle}
+.stage{fill:#fef3c7;stroke:#d97706}
+.table{fill:#f3f4f6;stroke:#9ca3af}
+.label{fill:#374151;font:600 14px "PingFang SC","Microsoft YaHei",sans-serif;text-anchor:middle}
+.note{fill:#6b7280;font:12px "PingFang SC","Microsoft YaHei",sans-serif;text-anchor:middle}
+.door{fill:none;stroke:#6b7280;stroke-width:2}
+</style>`;
+
+/**
+ * mirror=false：从台下（或门口）看；mirror=true：从台上（或背对门口）看。
+ */
+function chartSvg(layout, { mirror = false, title = '' } = {}) {
+  if (layout.kind === 'podium') return podiumSvg(layout, mirror, title);
+  return facingSvg(layout, mirror, title);
+}
+
+function podiumSvg(layout, mirror, title) {
+  const maxN = Math.max(1, ...layout.rows.map((r) => r.n));
+  const width = Math.max(maxN * (SEAT_W + GAP) - GAP + 80, 420);
+  const rowsH = layout.rows.length * (SEAT_H + 26);
+  const top = title ? 64 : 34;
+  const height = top + 40 + rowsH + 70;
+  const parts = [];
+  if (title) parts.push(`<text x="${width / 2}" y="30" class="label" style="font-size:20px">${esc(title)}</text>`);
+  // 主席台在上方，第一排离台下最近，画在最下面
+  parts.push(`<rect x="20" y="${top}" width="${width - 40}" height="${rowsH + 40}" rx="10" class="stage"/>`);
+  parts.push(`<text x="${width / 2}" y="${top + 24}" class="label">主席台</text>`);
+  layout.rows.forEach((row, r) => {
+    const y = top + 36 + (layout.rows.length - 1 - r) * (SEAT_H + 26);
+    const rowW = row.n * (SEAT_W + GAP) - GAP;
+    const x0 = (width - rowW) / 2;
+    const seats = mirror ? [...row.seats].reverse() : row.seats;
+    seats.forEach((s, i) => parts.push(seatBox(x0 + i * (SEAT_W + GAP), y, s)));
+    if (layout.rows.length > 1) parts.push(`<text x="${x0 - 8}" y="${y + SEAT_H / 2 + 4}" class="note" style="text-anchor:end">第${r + 1}排</text>`);
+  });
+  const by = top + rowsH + 40 + 30;
+  parts.push(`<text x="${width / 2}" y="${by}" class="label">${mirror ? '↓ 本图为从台上往台下看' : '↑ 本图为从台下看主席台'}</text>`);
+  parts.push(`<text x="${width / 2}" y="${by + 22}" class="note">${layout.rule === 'left' ? '以左为尊：2 号在 1 号左手（以台上就座者自己的左右为准）' : '以右为尊：2 号在 1 号右手（以台上就座者自己的左右为准）'}</text>`);
+  return wrap(width, height, parts.join('\n'));
+}
+
+function facingSvg(layout, mirror, title) {
+  const xs = [...layout.far, ...layout.near].map((s) => s.x);
+  const minX = Math.min(0, ...xs);
+  const maxX = Math.max(0, ...xs);
+  const span = (maxX - minX + 1) * (SEAT_W + GAP);
+  const width = Math.max(span + 120, 460);
+  const top = title ? 64 : 30;
+  const cx = width / 2;
+  const toPx = (x) => cx + (mirror ? -x : x) * (SEAT_W + GAP) - SEAT_W / 2;
+  const parts = [];
+  if (title) parts.push(`<text x="${cx}" y="30" class="label" style="font-size:20px">${esc(title)}</text>`);
+  const farY = top + 26;
+  const tableY = farY + SEAT_H + 12;
+  const tableH = 46;
+  const nearY = tableY + tableH + 12;
+  const farLabel = mirror ? '主方（背门）' : '客方（面门）';
+  const nearLabel = mirror ? '客方（面门）' : '主方（背门）';
+  const farSeats = mirror ? layout.near : layout.far;
+  const nearSeats = mirror ? layout.far : layout.near;
+  parts.push(`<text x="${cx}" y="${farY - 8}" class="label">${farLabel}</text>`);
+  farSeats.forEach((s) => parts.push(seatBox(toPx(s.x), farY, s)));
+  parts.push(`<rect x="${cx - span / 2 - 10}" y="${tableY}" width="${span + 20}" height="${tableH}" rx="8" class="table"/>`);
+  parts.push(`<text x="${cx}" y="${tableY + tableH / 2 + 5}" class="note">会谈桌</text>`);
+  nearSeats.forEach((s) => parts.push(seatBox(toPx(s.x), nearY, s)));
+  parts.push(`<text x="${cx}" y="${nearY + SEAT_H + 22}" class="label">${nearLabel}</text>`);
+  const doorY = nearY + SEAT_H + 44;
+  if (mirror) {
+    parts.push(`<text x="${cx}" y="${farY - 30}" class="note">门在这一侧（图的上方）</text>`);
+  } else {
+    parts.push(`<path d="M ${cx - 26} ${doorY} h 52 M ${cx - 26} ${doorY} a 26 26 0 0 1 26 -26" class="door"/>`);
+    parts.push(`<text x="${cx}" y="${doorY + 20}" class="note">门（本图为从门口看进去）</text>`);
+  }
+  const note = layout.alignFirst ? '两方按同一方向排：1 号对 1 号、2 号对 2 号' : '两方各按自己的朝向排：人数为双数时 1 号会错开半个座位';
+  parts.push(`<text x="${cx}" y="${doorY + 42}" class="note">${note}</text>`);
+  return wrap(width, doorY + 60, parts.join('\n'));
+}
+
+function wrap(w, h, body) {
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" font-family="PingFang SC, Microsoft YaHei, sans-serif">${CHART_STYLE}<rect width="${w}" height="${h}" fill="#fff"/>${body}</svg>`;
+}
+
+// ---------- 桌签 ----------
+
+/**
+ * 返回 { page, pages:[svg字符串] }。每页是一张 A4，单位毫米。
+ * opts: preset({faceW,faceH,faces}), font(css), bold, color, sub('none'|'title'|'unit'), widenTwo, guides, measure
+ */
+function cardPages(people, opts) {
+  const layout = sheetLayout(opts.preset);
+  const { page, sheet, slots, faces } = layout;
+  const measure = opts.measure || defaultMeasure;
+  const weight = opts.bold ? 700 : 400;
+  const pages = paginate(people, slots.length).map((group) => {
+    const parts = [];
+    group.forEach((person, i) => {
+      const { x, y } = slots[i];
+      if (opts.guides) parts.push(`<rect x="${x}" y="${y}" width="${sheet.w}" height="${sheet.h}" fill="none" stroke="#c8c8c8" stroke-width="0.2" stroke-dasharray="1.5 1.5"/>`);
+      faces.forEach((face, fi) => {
+        const fy = y + face.y;
+        if (opts.guides && fi > 0) parts.push(`<line x1="${x}" y1="${fy}" x2="${x + sheet.w}" y2="${fy}" stroke="#b0b0b0" stroke-width="0.25" stroke-dasharray="3 2"/>`);
+        if (face.blank) return;
+        const t = faceText(person, face, { faceW: sheet.w, sub: opts.sub, measure, widenTwo: opts.widenTwo });
+        const g = [];
+        g.push(spacedText(t.name, x + sheet.w / 2, fy + t.nameBaseline, t.nameSize, t.spacing, measure, opts, weight));
+        if (t.sub) g.push(spacedText(t.sub, x + sheet.w / 2, fy + t.subBaseline, t.subSize, 0.05, measure, opts, 400));
+        const cx = x + sheet.w / 2;
+        const cy = fy + face.h / 2;
+        parts.push(face.flip ? `<g transform="rotate(180 ${cx} ${cy})">${g.join('')}</g>` : g.join(''));
+      });
+    });
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${page.w} ${page.h}" width="${page.w}mm" height="${page.h}mm"><rect width="${page.w}" height="${page.h}" fill="#fff"/>${parts.join('\n')}</svg>`;
+  });
+  return { page, perPage: slots.length, pages };
+}
+
+// 逐字定位，不依赖浏览器对 letter-spacing 的实现，保证居中
+function spacedText(text, cx, baseline, size, spacing, measure, opts, weight) {
+  const chars = [...text];
+  const widths = chars.map((c) => measure(c) * size);
+  const total = widths.reduce((a, b) => a + b, 0) + spacing * size * Math.max(chars.length - 1, 0);
+  let x = cx - total / 2;
+  const out = chars.map((c, i) => {
+    const mid = x + widths[i] / 2;
+    x += widths[i] + spacing * size;
+    return `<text x="${mid.toFixed(2)}" y="${baseline.toFixed(2)}" text-anchor="middle">${esc(c)}</text>`;
+  });
+  return `<g font-family='${opts.font}' font-size="${size.toFixed(2)}" font-weight="${weight}" fill="${opts.color || '#000'}">${out.join('')}</g>`;
+}
+
+return { FONTS, chartSvg, cardPages };
+})();
+
+const __mod_app = (() => {
+const { parseRoster } = __mod_parse;
+const { sortByRank, rankOf } = __mod_rank;
+const { podium, facing, layoutRows, toCsv } = __mod_layout;
+const { PRESETS } = __mod_cards;
+const { chartSvg, cardPages, FONTS } = __mod_render;
+const $ = (sel) => document.querySelector(sel);
+const STORE_KEY = 'seatcard.v1';
+
+const SAMPLE = `姓名\t职务\t单位
+王建华\t副市长\t市人民政府
+陈  平\t局长\t市教育局
+刘晓梅\t副局长\t市财政局
+赵国强\t党组书记、局长\t市财政局
+孙  伟\t副局长\t市教育局
+周文静\t预算科科长\t市财政局
+吴志刚\t党组成员、副局长\t市财政局`;
+
+const SAMPLE_TALK = `姓名\t职务\t单位\t主客
+李卫东\t董事长\t远航科技有限公司\t客
+张  敏\t副总经理\t远航科技有限公司\t客
+何晓峰\t销售总监\t远航科技有限公司\t客
+钱国平\t区长\t高新区管委会\t主
+郑丽华\t副区长\t高新区管委会\t主
+冯  涛\t招商局局长\t高新区管委会\t主`;
+
+const state = {
+  text: '', units: '', partyFirst: true, sortMode: 'auto', seq: [], people: [],
+  mode: 'podium', rule: 'left', perRow: 0, alignFirst: true, view: 'front', title: '',
+  preset: 'a4-fold2', customW: 200, customH: 90, font: 'song', bold: true, color: '#000000', sub: 'none', widen: true, guides: true,
+};
+
+function load() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORE_KEY) || 'null');
+    if (saved && typeof saved === 'object') Object.assign(state, saved, { people: [], seq: [] });
+  } catch (e) { /* 隐私模式等情况下读不到，就用默认值 */ }
+}
+
+function save() {
+  try {
+    const { people, seq, ...rest } = state;
+    rest.seqNames = ordered().map((p) => p.name);
+    localStorage.setItem(STORE_KEY, JSON.stringify(rest));
+  } catch (e) { /* 存不了也不影响使用 */ }
+}
+
+function unitOrder() {
+  return state.units.split(/\r?\n/).map((s) => s.trim()).filter(Boolean);
+}
+
+function reparse({ keepOrder = true } = {}) {
+  const { people, warnings } = parseRoster(state.text);
+  const prev = keepOrder ? (state.seq.length ? ordered().map((p) => p.name) : state.seqNames || []) : [];
+  state.people = people;
+  if (state.sortMode === 'paste') {
+    state.seq = people.map((p) => p.id);
+  } else if (state.sortMode === 'manual' && prev.length) {
+    const byName = new Map(people.map((p) => [p.name, p]));
+    const kept = prev.filter((n) => byName.has(n)).map((n) => byName.get(n).id);
+    const rest = people.filter((p) => !kept.includes(p.id)).map((p) => p.id);
+    state.seq = [...kept, ...rest];
+  } else {
+    state.seq = sortByRank(people, { unitOrder: unitOrder(), partyFirst: state.partyFirst }).map((p) => p.id);
+  }
+  const msg = people.length ? `识别到 ${people.length} 人` : '';
+  $('#parse-msg').textContent = [msg, ...warnings].filter(Boolean).join('；');
+}
+
+function ordered() {
+  const byId = new Map(state.people.map((p) => [p.id, p]));
+  return state.seq.map((id) => byId.get(id)).filter(Boolean);
+}
+
+function currentLayout() {
+  const list = ordered();
+  if (state.mode === 'podium') return podium(list, { rule: state.rule, perRow: Number(state.perRow) || 0 });
+  return facing(list.filter((p) => p.side !== 'guest'), list.filter((p) => p.side === 'guest'), { rule: state.rule, alignFirst: state.alignFirst });
+}
+
+// ---------- 名单 ----------
+function renderPeople() {
+  const ol = $('#people');
+  const list = ordered();
+  if (!list.length) {
+    ol.innerHTML = '<li class="empty">左边粘贴名单后，这里显示排好的位次</li>';
+    return;
+  }
+  // 会谈时主客两方分开列、各自编号
+  const counters = { host: 0, guest: 0 };
+  const groups = state.mode === 'facing'
+    ? [['客方（面门）', list.filter((p) => p.side === 'guest')], ['主方（背门）', list.filter((p) => p.side !== 'guest')]]
+    : [['', list]];
+  ol.innerHTML = groups.map(([label, members]) => (label ? `<li class="group">${label}${members.length ? '' : '：还没有人，在名单里加一列"主 / 客"或在下面切换'}</li>` : '') + members.map((p, i) => {
+    const n = state.mode === 'facing' ? ++counters[p.side === 'guest' ? 'guest' : 'host'] : i + 1;
+    const tier = rankOf(p.title, { partyFirst: state.partyFirst }).label;
+    const side = state.mode === 'facing'
+      ? `<select class="side" data-id="${p.id}" aria-label="${esc(p.name)} 属于哪一方"><option value="host"${p.side !== 'guest' ? ' selected' : ''}>主方</option><option value="guest"${p.side === 'guest' ? ' selected' : ''}>客方</option></select>`
+      : `<span class="tier">${tier}</span>`;
+    return `<li data-id="${p.id}"><span class="rank">${n}</span><span class="who"><b>${esc(p.name)}</b><span>${esc([p.title, p.unit].filter(Boolean).join(' · '))}</span></span>${side}<span class="ctl"><button type="button" data-move="-1" data-id="${p.id}" aria-label="上移 ${esc(p.name)}">↑</button><button type="button" data-move="1" data-id="${p.id}" aria-label="下移 ${esc(p.name)}">↓</button></span></li>`;
+  }).join('')).join('');
+}
+
+function esc(s) {
+  return String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+}
+
+// ---------- 座次图 ----------
+function renderChart() {
+  const box = $('#chart');
+  const layout = currentLayout();
+  const empty = layout.kind === 'podium' ? !layout.rows.length || !layout.rows[0].seats.length : !layout.near.length && !layout.far.length;
+  if (empty) {
+    box.innerHTML = '<div class="empty">还没有名单</div>';
+    return;
+  }
+  if (layout.kind === 'facing' && !layout.far.length) {
+    box.innerHTML = `<div class="empty">会谈排座需要分出主方和客方：在名单里加一列"主 / 客"，或在右边的位次列表里逐个选。</div>` + chartSvg(layout, { mirror: state.view === 'back', title: state.title });
+    return;
+  }
+  box.innerHTML = chartSvg(layout, { mirror: state.view === 'back', title: state.title });
+}
+
+// ---------- 桌签 ----------
+const measureCache = new Map();
+function makeMeasure(fontCss, weight) {
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  ctx.font = `${weight} 100px ${fontCss}`;
+  return (text) => {
+    const key = `${fontCss}|${weight}|${text}`;
+    if (!measureCache.has(key)) measureCache.set(key, ctx.measureText(text).width / 100);
+    return measureCache.get(key);
+  };
+}
+
+function presetObj() {
+  if (state.preset === 'custom') {
+    const w = Math.min(Math.max(Number(state.customW) || 200, 40), 297);
+    const h = Math.min(Math.max(Number(state.customH) || 90, 20), 148);
+    return { faceW: w, faceH: h, faces: 2 };
+  }
+  return PRESETS[state.preset];
+}
+
+function cardOpts() {
+  const font = FONTS[state.font] || FONTS.song;
+  const weight = state.bold ? 700 : 400;
+  return {
+    preset: presetObj(), font: font.css, bold: state.bold, color: state.color, sub: state.sub,
+    widenTwo: state.widen, guides: state.guides, measure: makeMeasure(font.css, weight),
+  };
+}
+
+function renderCards() {
+  const list = ordered();
+  const box = $('#card-preview');
+  const info = $('#card-info');
+  if (!list.length) {
+    box.innerHTML = '<div class="more-pages">粘贴名单后在这里预览</div>';
+    info.textContent = '';
+    return;
+  }
+  let result;
+  try {
+    result = cardPages(list, cardOpts());
+  } catch (e) {
+    box.innerHTML = `<div class="more-pages">${esc(e.message)}</div>`;
+    info.textContent = '';
+    return;
+  }
+  const { page, perPage, pages } = result;
+  info.textContent = `共 ${list.length} 人，${pages.length} 页 A4（${page.landscape ? '横放' : '竖放'}，每页 ${perPage} 人）。上半面的字是倒着印的，对折立起后两边都是正的。`;
+  const h = 300;
+  const w = (h * page.w) / page.h;
+  const shown = pages.slice(0, 3).map((svg) => `<div class="sheet" style="width:${w}px;height:${h}px">${svg}</div>`).join('');
+  box.innerHTML = shown + (pages.length > 3 ? `<div class="more-pages">还有 ${pages.length - 3} 页</div>` : '');
+}
+
+// ---------- 打印与导出 ----------
+function printPages(svgs, page) {
+  const root = $('#print-root');
+  root.innerHTML = svgs.map((svg) => `<div class="print-page" style="width:${page.w}mm;height:${page.h}mm">${svg}</div>`).join('');
+  let style = document.getElementById('print-page-size');
+  if (!style) {
+    style = document.createElement('style');
+    style.id = 'print-page-size';
+    document.head.appendChild(style);
+  }
+  style.textContent = `@page { size: ${page.w}mm ${page.h}mm; margin: 0; }`;
+  const cleanup = () => { root.innerHTML = ''; window.removeEventListener('afterprint', cleanup); };
+  window.addEventListener('afterprint', cleanup);
+  window.print();
+}
+
+function chartPrintSvg() {
+  const svg = chartSvg(currentLayout(), { mirror: state.view === 'back', title: state.title });
+  // 横放 A4，留 10 毫米边
+  return `<div style="width:297mm;height:210mm;display:flex;align-items:center;justify-content:center">${svg.replace('<svg ', '<svg style="max-width:277mm;max-height:190mm;width:auto;height:auto" ')}</div>`;
+}
+
+function download(name, blob) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+}
+
+function exportPng() {
+  const svg = chartSvg(currentLayout(), { mirror: state.view === 'back', title: state.title });
+  const m = svg.match(/viewBox="0 0 ([\d.]+) ([\d.]+)"/);
+  const [w, h] = m ? [Number(m[1]), Number(m[2])] : [800, 400];
+  const img = new Image();
+  const url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml;charset=utf-8' }));
+  img.onload = () => {
+    const scale = 2;
+    const canvas = document.createElement('canvas');
+    canvas.width = w * scale;
+    canvas.height = h * scale;
+    const ctx = canvas.getContext('2d');
+    ctx.scale(scale, scale);
+    ctx.drawImage(img, 0, 0, w, h);
+    URL.revokeObjectURL(url);
+    canvas.toBlob((blob) => download(`${state.title || '座次图'}.png`, blob), 'image/png');
+  };
+  img.src = url;
+}
+
+// ---------- 事件 ----------
+function renderAll() {
+  document.body.dataset.mode = state.mode;
+  document.body.dataset.preset = state.preset;
+  document.querySelectorAll('.tab').forEach((t) => t.setAttribute('aria-selected', String(t.dataset.mode === state.mode)));
+  renderPeople();
+  renderChart();
+  renderCards();
+  save();
+}
+
+let timer = 0;
+function later(fn) {
+  clearTimeout(timer);
+  timer = setTimeout(fn, 180);
+}
+
+function bindInput(sel, key, { number = false, check = false, reparse: rp = false } = {}) {
+  const el = $(sel);
+  if (check) el.checked = Boolean(state[key]);
+  else el.value = state[key];
+  el.addEventListener(check || el.tagName === 'SELECT' ? 'change' : 'input', () => {
+    state[key] = check ? el.checked : number ? Number(el.value) : el.value;
+    if (rp) reparse();
+    later(renderAll);
+  });
+}
+
+function init() {
+  load();
+  $('#preset').innerHTML = Object.entries(PRESETS).map(([k, p]) => `<option value="${k}">${p.label}</option>`).join('') + '<option value="custom">自定义尺寸</option>';
+  $('#font').innerHTML = Object.entries(FONTS).map(([k, f]) => `<option value="${k}">${f.label}</option>`).join('');
+  $('#roster').value = state.text;
+  $('#units').value = state.units;
+  $('#roster').addEventListener('input', () => { state.text = $('#roster').value; later(() => { reparse(); renderAll(); }); });
+  $('#units').addEventListener('input', () => { state.units = $('#units').value; later(() => { if (state.sortMode === 'auto') reparse({ keepOrder: false }); renderAll(); }); });
+  bindInput('#party-first', 'partyFirst', { check: true });
+  $('#party-first').addEventListener('change', () => { if (state.sortMode === 'auto') { reparse({ keepOrder: false }); renderAll(); } });
+  bindInput('#rule', 'rule');
+  bindInput('#per-row', 'perRow', { number: true });
+  bindInput('#align-first', 'alignFirst', { check: true });
+  bindInput('#view', 'view');
+  bindInput('#meeting-title', 'title');
+  bindInput('#preset', 'preset');
+  bindInput('#custom-w', 'customW', { number: true });
+  bindInput('#custom-h', 'customH', { number: true });
+  bindInput('#font', 'font');
+  bindInput('#bold', 'bold', { check: true });
+  bindInput('#color', 'color');
+  bindInput('#sub', 'sub');
+  bindInput('#widen', 'widen', { check: true });
+  bindInput('#guides', 'guides', { check: true });
+
+  const fill = (text) => { state.text = text; $('#roster').value = text; state.sortMode = 'auto'; reparse({ keepOrder: false }); renderAll(); };
+  $('#btn-sample').addEventListener('click', () => { state.mode = 'podium'; fill(SAMPLE); });
+  $('#btn-sample-talk').addEventListener('click', () => { state.mode = 'facing'; fill(SAMPLE_TALK); });
+  $('#btn-clear').addEventListener('click', () => fill(''));
+  $('#btn-autosort').addEventListener('click', () => { state.sortMode = 'auto'; reparse({ keepOrder: false }); renderAll(); });
+  $('#btn-pasteorder').addEventListener('click', () => { state.sortMode = 'paste'; reparse({ keepOrder: false }); renderAll(); });
+  $('#people').addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-move]');
+    if (!btn) return;
+    const id = Number(btn.dataset.id);
+    const i = state.seq.indexOf(id);
+    const step = Number(btn.dataset.move);
+    let j = i + step;
+    if (state.mode === 'facing') {
+      // 会谈时只和同一方的人换位
+      const sideOf = (x) => (state.people.find((p) => p.id === x)?.side === 'guest' ? 'guest' : 'host');
+      while (j >= 0 && j < state.seq.length && sideOf(state.seq[j]) !== sideOf(id)) j += step;
+    }
+    if (i < 0 || j < 0 || j >= state.seq.length) return;
+    [state.seq[i], state.seq[j]] = [state.seq[j], state.seq[i]];
+    state.sortMode = 'manual';
+    renderAll();
+    const again = document.querySelector(`#people button[data-id="${id}"][data-move="${btn.dataset.move}"]`);
+    if (again) again.focus();
+  });
+  $('#people').addEventListener('change', (e) => {
+    const sel = e.target.closest('select.side');
+    if (!sel) return;
+    const p = state.people.find((x) => x.id === Number(sel.dataset.id));
+    if (p) p.side = sel.value;
+    // 主客写回名单文本不现实，记在本地即可；重新粘贴名单时以名单里的"主/客"列为准
+    renderAll();
+  });
+  document.querySelectorAll('.tab').forEach((t) => t.addEventListener('click', () => { state.mode = t.dataset.mode; renderAll(); }));
+  $('#btn-print-chart').addEventListener('click', () => { if (ordered().length) printPages([chartPrintSvg()], { w: 297, h: 210 }); });
+  $('#btn-png').addEventListener('click', () => { if (ordered().length) exportPng(); });
+  $('#btn-csv').addEventListener('click', () => {
+    if (!ordered().length) return;
+    download(`${state.title || '座次表'}.csv`, new Blob([toCsv(layoutRows(currentLayout()))], { type: 'text/csv;charset=utf-8' }));
+  });
+  $('#btn-print-cards').addEventListener('click', () => {
+    if (!ordered().length) return;
+    const { page, pages } = cardPages(ordered(), cardOpts());
+    printPages(pages, page);
+  });
+  reparse();
+  renderAll();
+}
+
+init();
+
+return {  };
+})();
+</script>
+</body>
+</html>
