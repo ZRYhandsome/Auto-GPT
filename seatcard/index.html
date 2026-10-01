@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>座次桌签</title>
+<meta name="description" content="粘贴名单，自动排会议座次，一键打印双面桌签。名单只在本机浏览器里处理。">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app" id="app">
+  <header class="top">
+    <div>
+      <h1>座次桌签</h1>
+      <p class="lead">粘贴名单 → 自动排座次 → 一键打印双面桌签。名单只在这台电脑的浏览器里处理，不上传。</p>
+    </div>
+  </header>
+
+  <section class="card" id="step-roster">
+    <h2><span class="num">1</span>名单</h2>
+    <div class="grid-2">
+      <div>
+        <label for="roster" class="lbl">从 Excel 复制"姓名、职务、单位"三列直接粘贴；也可以一行一个，用逗号或空格隔开。会谈排座再加一列"主 / 客"。</label>
+        <textarea id="roster" spellcheck="false" placeholder="姓名&#9;职务&#9;单位&#10;张建国&#9;党组书记、局长&#9;市财政局&#10;李  明&#9;副局长&#9;市财政局"></textarea>
+        <div class="row">
+          <button type="button" id="btn-sample" class="ghost">填入示例</button>
+          <button type="button" id="btn-sample-talk" class="ghost">填入会谈示例</button>
+          <button type="button" id="btn-clear" class="ghost">清空</button>
+          <span id="parse-msg" class="muted"></span>
+        </div>
+        <details class="more">
+          <summary>单位顺序（可选）</summary>
+          <label for="units" class="lbl">同一档职务里，按这里的单位顺序排。一行一个单位。</label>
+          <textarea id="units" class="short" spellcheck="false" placeholder="市委办公室&#10;市政府办公室&#10;市财政局"></textarea>
+        </details>
+      </div>
+      <div>
+        <div class="row between">
+          <strong>位次（可上下调整）</strong>
+          <span class="row">
+            <button type="button" id="btn-autosort">按职务自动排序</button>
+            <button type="button" id="btn-pasteorder" class="ghost">恢复粘贴顺序</button>
+          </span>
+        </div>
+        <label class="check"><input type="checkbox" id="party-first" checked> 书记排在同级行政正职前（党政惯例）</label>
+        <ol id="people" class="people" aria-label="位次"></ol>
+        <p class="muted small">职务分档：书记 → 正职 → 副书记 → 副职 → 其他职务；写了"正处""副科"等级别的按级别排。自动排序只是起点，以本单位惯例为准。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" id="step-seats">
+    <h2><span class="num">2</span>座次</h2>
+    <div class="tabs" role="tablist">
+      <button type="button" role="tab" class="tab" data-mode="podium" aria-selected="true">主席台</button>
+      <button type="button" role="tab" class="tab" data-mode="facing" aria-selected="false">会见会谈（主客对坐）</button>
+    </div>
+    <div class="options">
+      <label>尊位
+        <select id="rule">
+          <option value="left">以左为尊（党政机关）</option>
+          <option value="right">以右为尊（商务、涉外）</option>
+        </select>
+      </label>
+      <label class="podium-only">每排最多 <input type="number" id="per-row" min="0" max="40" value="0" class="num-input"> 人<span class="muted">（0 为不限）</span></label>
+      <label class="check facing-only"><input type="checkbox" id="align-first" checked> 两方 1 号对 1 号、2 号对 2 号</label>
+      <label>图的视角
+        <select id="view">
+          <option value="front">从台下 / 门口看</option>
+          <option value="back">从台上 / 背对门口看</option>
+        </select>
+      </label>
+      <label>会议名称 <input type="text" id="meeting-title" placeholder="可选，会印在座次图上" class="text-input"></label>
+    </div>
+    <div id="chart" class="chart" aria-live="polite"></div>
+    <div class="row">
+      <button type="button" id="btn-print-chart">打印座次图</button>
+      <button type="button" id="btn-png" class="ghost">下载座次图 PNG</button>
+      <button type="button" id="btn-csv" class="ghost">下载座次表 CSV</button>
+    </div>
+  </section>
+
+  <section class="card" id="step-cards">
+    <h2><span class="num">3</span>双面桌签</h2>
+    <div class="options">
+      <label>版式
+        <select id="preset"></select>
+      </label>
+      <label class="custom-only">每面 宽 <input type="number" id="custom-w" min="40" max="297" value="200" class="num-input"> × 高 <input type="number" id="custom-h" min="20" max="148" value="90" class="num-input"> 毫米</label>
+      <label>字体 <select id="font"></select></label>
+      <label class="check"><input type="checkbox" id="bold" checked> 加粗</label>
+      <label>颜色
+        <select id="color">
+          <option value="#000000">黑色</option>
+          <option value="#c00000">红色</option>
+        </select>
+      </label>
+      <label>第二行
+        <select id="sub">
+          <option value="none">不印</option>
+          <option value="title">印职务</option>
+          <option value="unit">印单位</option>
+        </select>
+      </label>
+      <label class="check"><input type="checkbox" id="widen" checked> 两字名加宽字距</label>
+      <label class="check"><input type="checkbox" id="guides" checked> 印折线和裁切线</label>
+    </div>
+    <p class="muted small" id="card-info"></p>
+    <div id="card-preview" class="card-preview"></div>
+    <div class="row">
+      <button type="button" id="btn-print-cards" class="primary">打印桌签（可另存为 PDF）</button>
+      <span class="muted small">打印设置里选"实际大小 / 100%"，不要选"适合页面"；对折后上下两面都是正的。</span>
+    </div>
+  </section>
+
+  <footer class="foot muted small">
+    <p>左右以就座者自己的朝向为准：以左为尊时 2 号坐在 1 号左手，从台下看则在 1 号右边。人数为双数时 1、2 号同时居中，2 号仍在 1 号左手。会谈时客方坐面门一侧；门在侧面时，以进门方向看客方坐右侧。各地各单位惯例不同，以本单位要求为准。</p>
+    <p>所有内容只在浏览器里处理，不联网、不上传；名单只在本机浏览器里保存，方便下次打开。</p>
+  </footer>
+</div>
+<div id="print-root" aria-hidden="true"></div>
+<script type="module" src="src/app.js"></script>
+</body>
+</html>
