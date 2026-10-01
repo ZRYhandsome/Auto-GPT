@@ -688,7 +688,8 @@ function facingSvg(layout, mirror, title) {
   parts.push(`<text x="${cx}" y="${tableY + tableH / 2 + 5}" class="note">会谈桌</text>`);
   nearSeats.forEach((s) => parts.push(seatBox(toPx(s.x), nearY, s)));
   parts.push(`<text x="${cx}" y="${nearY + SEAT_H + 22}" class="label">${nearLabel}</text>`);
-  const doorY = nearY + SEAT_H + 44;
+  // 门的弧线向上画 26 像素，要和上面"主方（背门）"几个字留出空隙
+  const doorY = nearY + SEAT_H + 72;
   if (mirror) {
     parts.push(`<text x="${cx}" y="${farY - 30}" class="note">门在这一侧（图的上方）</text>`);
   } else {
