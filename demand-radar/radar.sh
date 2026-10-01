@@ -49,7 +49,7 @@ done
 # 在 Mac 上把 summary.md 放进剪贴板，直接粘贴给 Claude 就行
 copy_summary() {
   [[ "$(uname)" == "Darwin" && -f "$1/summary.md" ]] || return 0
-  pbcopy < "$1/summary.md" && echo "summary.md 已复制到剪贴板，直接粘贴给 Claude 即可。"
+  pbcopy < "$1/summary.md" && echo "summary.md 已复制到剪贴板。现在就去和 Claude 的对话框里按 ⌘V 粘贴；中间别再复制终端里的内容，否则剪贴板会被覆盖。"
   return 0
 }
 
