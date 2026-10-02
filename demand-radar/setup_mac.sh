@@ -97,18 +97,75 @@ elif ! cmp -s "$KW" "$KIT_DIR/keywords.txt"; then
 fi
 cp "$KIT_DIR/keywords.txt" "$KW_DEFAULT"
 
+say "安装需求雷达软件"
+# 软件本体整个替换；设置、关键词组存在 $RADAR_HOME/app_settings.json，不受影响
+rm -rf "$RADAR_HOME/app"
+cp -R "$KIT_DIR/app" "$RADAR_HOME/app"
+find "$RADAR_HOME/app" -name "__pycache__" -type d -prune -exec rm -rf {} + 2>/dev/null || true
+# pywebview：用独立窗口打开软件（装不上就用浏览器打开，功能一样）；trafilatura：抓任意网页时提取正文
+if uv pip install --python "$MC_DIR/.venv/bin/python" pywebview trafilatura >/dev/null 2>&1 \
+   || uv pip install --python "$MC_DIR/.venv/bin/python" --index-url https://pypi.org/simple pywebview trafilatura >/dev/null 2>&1; then
+  ok "独立窗口组件已装好"
+else
+  warn "pywebview 没装上，软件会在浏览器里打开，功能不受影响"
+fi
+
+# 在"应用程序"里放一个能双击打开的 需求雷达.app（启动台、聚焦搜索都能找到）
+if [[ "$(uname)" == "Darwin" ]]; then
+  APP="$HOME/Applications/需求雷达.app"
+  rm -rf "$APP"
+  mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
+  cat > "$APP/Contents/Info.plist" <<PLIST
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+  <key>CFBundleName</key><string>需求雷达</string>
+  <key>CFBundleDisplayName</key><string>需求雷达</string>
+  <key>CFBundleIdentifier</key><string>cn.demandradar.app</string>
+  <key>CFBundleExecutable</key><string>radar</string>
+  <key>CFBundleIconFile</key><string>icon</string>
+  <key>CFBundlePackageType</key><string>APPL</string>
+  <key>CFBundleShortVersionString</key><string>0.3.0</string>
+  <key>LSMinimumSystemVersion</key><string>11.0</string>
+  <key>NSHighResolutionCapable</key><true/>
+</dict></plist>
+PLIST
+  cat > "$APP/Contents/MacOS/radar" <<LAUNCH
+#!/bin/bash
+# 需求雷达启动器：用 MediaCrawler 的 Python 运行软件。从启动台打开时 PATH 很短，补上 Homebrew 的路径（抖音、知乎的签名要用 node）
+export RADAR_HOME="$RADAR_HOME"
+export PATH="\$HOME/.local/bin:/opt/homebrew/bin:/usr/local/bin:\$PATH"
+cd "$RADAR_HOME/app" || exit 1
+exec "$MC_DIR/.venv/bin/python" server.py >> "$RADAR_HOME/app.log" 2>&1
+LAUNCH
+  chmod +x "$APP/Contents/MacOS/radar"
+  # 图标：用系统自带的 sips 和 iconutil 把 PNG 做成 icns
+  ICONSET="$(mktemp -d)/icon.iconset"
+  mkdir -p "$ICONSET"
+  for sz in 16 32 128 256 512; do
+    sips -z $sz $sz "$RADAR_HOME/app/icon.png" --out "$ICONSET/icon_${sz}x${sz}.png" >/dev/null 2>&1 || true
+    sips -z $((sz * 2)) $((sz * 2)) "$RADAR_HOME/app/icon.png" --out "$ICONSET/icon_${sz}x${sz}@2x.png" >/dev/null 2>&1 || true
+  done
+  iconutil -c icns "$ICONSET" -o "$APP/Contents/Resources/icon.icns" 2>/dev/null || cp "$RADAR_HOME/app/icon.png" "$APP/Contents/Resources/icon.png"
+  touch "$APP"
+  ok "已放进「应用程序」：$APP"
+fi
+
 say "自检"
 if (cd "$MC_DIR" && RADAR_DRY_RUN=1 .venv/bin/python run_mc.py >/dev/null 2>&1); then ok "包装脚本正常"; else die "包装脚本自检失败"; fi
 if (cd "$MC_DIR" && .venv/bin/python -c "import main" >/dev/null 2>&1); then ok "MediaCrawler 依赖齐全"; else die "MediaCrawler 导入失败，请在 $MC_DIR 里运行 .venv/bin/python -c 'import main' 查看报错"; fi
+if (cd "$RADAR_HOME/app" && "$MC_DIR/.venv/bin/python" -c "import server, run_source" >/dev/null 2>&1); then ok "需求雷达软件正常"; else die "需求雷达软件自检失败，请在 $RADAR_HOME/app 里运行 $MC_DIR/.venv/bin/python server.py 查看报错"; fi
 
 cat <<EOF
 
-全部装好了。接下来：
+全部装好了。
 
-  1. 按需修改关键词：open -e "$RADAR_HOME/keywords.txt"
-  2. 先试一个平台：   "$RADAR_HOME/radar.sh" -p xhs -n 20 -c 10
-     会弹出一个 Chrome 窗口，用手机上的小红书 App 扫码登录。登录只需一次，之后会记住。
-  3. 跑全部平台：     "$RADAR_HOME/radar.sh"
+  打开软件：在启动台里点"需求雷达"，或者在终端运行  open ~/Applications/需求雷达.app
+           选平台、填关键词、点"开始采集"就行。国内平台第一次会弹出 Chrome 窗口，用手机 App 扫码登录。
 
-结果在 $RADAR_HOME/runs/ 下按时间分文件夹，主要看 需求信号.xlsx 和 summary.md。
+  也还可以用命令行：
+    "$RADAR_HOME/radar.sh" -p xhs -n 20 -c 10
+
+结果都在 $RADAR_HOME/runs/ 下按时间分文件夹，软件和命令行跑出来的都能在软件里看到。
 EOF
+if [[ "$(uname)" == "Darwin" && -d "$HOME/Applications/需求雷达.app" ]]; then open "$HOME/Applications/需求雷达.app"; fi

@@ -1,8 +1,35 @@
 # 需求雷达
 
-在你自己的电脑上，按关键词抓小红书、知乎、抖音、B站、微博、贴吧的帖子和评论，自动挑出"有没有 app 可以""为什么没人做""同求""谁做我第一个买"这类需求信号，按热度排好序。
+在你自己的电脑上，按关键词或链接抓小红书、抖音、B站、知乎、微博、贴吧、快手的帖子和评论，也能抓 App Store 评论、GitHub Issues、Hacker News、Reddit 和任意网页。所有来源合在一起，自动挑出"有没有 app 可以""为什么没人做""谁做我第一个买""is there an app""I'd pay for this"这类需求信号，按热度排好序。
 
-底层抓取用开源项目 [MediaCrawler](https://github.com/NanmiCoder/MediaCrawler)，它用真实 Chrome 浏览器和你自己的登录状态访问页面。需求雷达负责安装、批量运行、合并各平台结果和打分。MediaCrawler 的许可证只允许学习和个人研究使用，不允许商用。
+有两种用法：**需求雷达软件**（有窗口，点点鼠标就行，推荐），以及原来的命令行 `radar.sh`。两者的结果放在同一个文件夹里，互相都能看到。
+
+国内平台的抓取用开源项目 [MediaCrawler](https://github.com/NanmiCoder/MediaCrawler)。它用真实 Chrome 浏览器和你自己的登录状态访问页面，许可证只允许学习和个人研究使用，不允许商用。各平台的用户协议大多不欢迎自动采集：只用于自己做研究，每次抓几十条，别开太快。
+
+## 需求雷达软件
+
+| 页面 | 能做什么 |
+|---|---|
+| 新建采集 | 三种抓法：按关键词搜索、贴链接深挖（帖子评论抓全，或者抓任意网页的正文）、抓某个作者的帖子。平台可以多选，按顺序一个个抓。贴链接会自动认出是哪个平台。常用关键词可以存成"关键词组"，点一下就填进去。 |
+| 采集任务 | 排队执行，一次跑一个。每个平台的进度（抓了几条帖子、几条评论）实时更新；等扫码、遇到滑块验证时会提示你去 Chrome 窗口里操作。可以随时停止，已经抓到的照样保存、打分。 |
+| 结果 | 跑完自动打分。"需求信号""按帖子汇总""全部数据"三张表，可以按平台、信号类型、点赞数筛选，按任意一列排序，点"打开 ↗"看原帖。"复制给 Claude"把 summary.md 放进剪贴板；"用 Excel 打开"直接打开需求信号.xlsx。 |
+| 搜全部数据 | 在所有采集过的帖子和评论里找一句话，比如某个 App 的名字。 |
+| 平台与登录 | 每个平台的登录状态和上次成功采集的时间；"重新登录"（换账号、被限制时用）；不用登录的来源可以"检查连接"。 |
+| 设置 | 请求间隔、代理、GitHub Token、App Store 地区、Reddit 默认版块、小红书排序、默认抓多少、关键词组。 |
+
+**新加的不用登录的来源：**
+
+| 来源 | 抓什么 | 说明 |
+|---|---|---|
+| App Store 评论 | 按关键词找 App，抓评分和评论（评论开头标着几星） | 国内直连。苹果的评论接口据报 2026 年 8 月起可能返回空，取不到会自动换网页版接口，两个都不行时日志里会写明。 |
+| GitHub Issues | 按 👍 数排的功能请求和抱怨 | 关键词可以用 GitHub 搜索语法，比如 `dark mode label:enhancement`。不填 Token 每小时 60 次。 |
+| Hacker News | 帖子和评论，还会直接搜命中关键词的评论 | 需要代理。评论没有公开点赞数。 |
+| Reddit | 指定版块里的帖子和评论 | 需要代理。Reddit 自己的接口不登录已经用不了，改走公开存档 Arctic Shift（数据会晚一点）。关键词写成 `r/SaaS alternative to` 只搜那个版块，不写就搜设置里的默认版块。 |
+| 任意网页 | 贴链接抓正文 | 要登录或全靠脚本渲染的页面抓不到。 |
+
+这几个来源都是按接口文档写的，还没在真实网络上跑过：第一次用之前，先到"平台与登录"点"全部检查一遍"。哪个连不上，把提示发给我。
+
+**打开软件：** 装好以后在启动台里点"需求雷达"，或者在终端运行 `open ~/Applications/需求雷达.app`。软件在一个独立窗口里打开；没装上窗口组件时会在浏览器里打开，功能一样，这时左下角有"关闭需求雷达"。正在采集时关窗口会先问你。
 
 ## 安装（macOS）
 
@@ -15,7 +42,7 @@ cd ~/demand-radar-kit && git sparse-checkout set demand-radar
 bash ~/demand-radar-kit/demand-radar/setup_mac.sh
 ```
 
-装好后所有东西都在 `~/demand-radar`。脚本可以重复运行，重跑会把 MediaCrawler 更新到最新版。
+装好后所有东西都在 `~/demand-radar`，"应用程序"里会多一个"需求雷达"，装完会自动打开。脚本可以重复运行，重跑会把 MediaCrawler 和软件都更新到最新版；你的设置、关键词组和采集结果不受影响。
 
 **升级需求雷达：**
 
@@ -25,7 +52,7 @@ git -C ~/demand-radar-kit pull && bash ~/demand-radar-kit/demand-radar/setup_mac
 
 没改过 `keywords.txt` 的话，会顺带换成新版默认关键词；改过就保留你的。
 
-## 使用
+## 命令行用法
 
 ```bash
 ~/demand-radar/radar.sh -p xhs -n 20 -c 10     # 先只试小红书
@@ -76,7 +103,9 @@ git -C ~/demand-radar-kit pull && bash ~/demand-radar-kit/demand-radar/setup_mac
 
 ## 常见问题
 
-- **一直要扫码或提示登录失败：** 在弹出的窗口里手动完成验证后重跑。登录信息存在 `~/demand-radar/MediaCrawler/browser_data/`，删掉对应平台的文件夹即可重新登录。
+- **一直要扫码或提示登录失败：** 在弹出的窗口里手动完成验证后重跑。软件里到"平台与登录"点"重新登录"；命令行用户删掉 `~/demand-radar/MediaCrawler/browser_data/` 下对应平台的文件夹。
+- **软件打不开、窗口一闪就没：** 看 `~/demand-radar/app.log` 的最后几行；也可以在终端运行 `cd ~/demand-radar/app && ../MediaCrawler/.venv/bin/python server.py` 直接看报错。
+- **Reddit、Hacker News 连不上：** 国内要开代理。软件默认用系统代理；代理软件没有设成系统代理时，在"设置 → 代理"里填地址，比如 `http://127.0.0.1:7890`。
 - **报错 `Page.goto: Timeout 30000ms exceeded`（打开首页超时）：** 网络慢，或首页有资源一直加载不完。新版最多等 90 秒，页面已经打开就继续跑。还是失败的话，直接重跑同一条命令。
 - **日志里有 `--- Logging error ---`：** 旧版的问题，不影响抓取。MediaCrawler 会把整页搜索结果写进日志，一行几十 KB，经 `tee` 写日志时会失败。新版把每条日志截到 300 字，数据照常完整写进 jsonl。要看完整日志就设置 `RADAR_LOG_FULL=1`。
 - **小红书搜索排序：** 默认用综合排序。MediaCrawler 原本按最热排序，搜出来多是高赞的推广帖和段子。想换回去就设置 `RADAR_XHS_SORT=popularity_descending`，按最新排序用 `time_descending`。
@@ -93,6 +122,11 @@ git -C ~/demand-radar-kit pull && bash ~/demand-radar-kit/demand-radar/setup_mac
 | `setup_mac.sh` | 一键安装 |
 | `radar.sh` | 批量运行多个平台，然后合并打分 |
 | `run_mc.py` | MediaCrawler 启动包装：自己开独立浏览器窗口、小红书用综合排序、截短日志、打开网页多等一会儿，不改 MediaCrawler 源码 |
-| `merge.py` | 合并各平台 jsonl 结果、识别需求信号、打分并输出表格 |
+| `merge.py` | 合并各平台 jsonl 结果、识别中英文需求信号、打分并输出表格 |
+| `app/server.py` | 需求雷达软件：只在本机运行的小服务（只用 Python 标准库），加网页界面 `app/web/`；有 pywebview 时用独立窗口 |
+| `app/jobs.py` | 采集任务：排队、逐个平台运行、进度和日志、停止、跑完自动打分；也列出命令行跑出来的结果 |
+| `app/sources/` | 不用登录的来源（App Store、GitHub、Hacker News、Reddit、任意网页），写出和 MediaCrawler 一样格式的 jsonl |
+| `app/run_source.py` | 运行一个不用登录的来源，参数和 MediaCrawler 一样 |
 | `keywords.txt` | 默认关键词 |
-| `tests/test_merge.py` | 用模拟的 7 个平台数据和真实跑出来的误报、漏报测试 merge.py：`python3 -m unittest discover tests` |
+| `tests/test_merge.py` | 用模拟的 7 个平台数据和真实跑出来的误报、漏报测试 merge.py |
+| `tests/test_app.py` | 软件的测试：各来源的解析（录好的接口数据）、用假的 MediaCrawler 跑完整任务、停止、本机服务接口和安全检查。全部测试：`python3 -m unittest discover tests` |
