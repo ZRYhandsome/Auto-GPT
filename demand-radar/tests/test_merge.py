@@ -371,5 +371,30 @@ class HelperTest(unittest.TestCase):
         self.assertEqual(merge.to_time(0), "")
 
 
+
+class EnglishSignalTest(unittest.TestCase):
+    """Reddit、Hacker News、GitHub 和英文 App Store 评论里的需求说法。"""
+
+    def test_english_phrases(self):
+        cases = {
+            "Is there an app that reminds me to water plants?": "求工具",
+            "Why isn't there a simple way to split rent": "缺失",
+            "I'd happily pay for this": "付费意愿",
+            "I wish there was a tool for invoices": "想要",
+            "This app has too many ads now": "抱怨现有",
+        }
+        for text, signal in cases.items():
+            hits, _ = merge.detect(text, "评论", {"type": "其他", "title": ""})
+            self.assertIn(signal, hits, text)
+        self.assertIn("改进建议", merge.detect("Please add dark mode", "评论")[0])
+        self.assertEqual(merge.detect("Great article, thanks for sharing", "评论")[0], [])
+
+    def test_english_post_types(self):
+        self.assertEqual(merge.post_type("Show HN: I built a habit tracker", ""), "推广")
+        self.assertEqual(merge.post_type("What app do you wish existed?", ""), "征集需求")
+        self.assertEqual(merge.post_type("Is there an app for tracking chores", ""), "求助")
+        self.assertTrue(merge.AD.search("Shameless plug: check out my app"))
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -23,10 +23,13 @@ from datetime import datetime
 PLATFORM_NAMES = {
     "xhs": "小红书", "douyin": "抖音", "dy": "抖音", "bili": "B站", "bilibili": "B站",
     "weibo": "微博", "wb": "微博", "tieba": "贴吧", "zhihu": "知乎", "kuaishou": "快手", "ks": "快手",
+    # 需求雷达软件里的免登录数据源
+    "appstore": "App Store", "reddit": "Reddit", "hn": "Hacker News", "github": "GitHub", "web": "网页",
 }
 # radar.sh -p 用的平台简称（MediaCrawler 的输出目录名 → 命令行参数）
 PLATFORM_ARGS = {"xhs": "xhs", "douyin": "dy", "dy": "dy", "bili": "bili", "bilibili": "bili", "weibo": "wb",
-                 "wb": "wb", "tieba": "tieba", "zhihu": "zhihu", "kuaishou": "ks", "ks": "ks"}
+                 "wb": "wb", "tieba": "tieba", "zhihu": "zhihu", "kuaishou": "ks", "ks": "ks",
+                 "appstore": "appstore", "reddit": "reddit", "hn": "hn", "github": "github", "web": "web"}
 
 PRODUCT = r"(app|软件|工具|小程序|网站|插件|平台|应用|神器|系统|功能|产品)"
 OTHER_OS = r"(安卓|android|鸿蒙|华为|荣耀|小米|vivo|oppo|三星|windows|win版|电脑版|电脑端|pc版|mac|ipad|平板|网页版|watch|手表|ios|苹果|iphone|全平台)"
@@ -35,42 +38,56 @@ OTHER_OS = r"(安卓|android|鸿蒙|华为|荣耀|小米|vivo|oppo|三星|window
 SIGNALS = [
     ("求工具", 3, False, re.compile(
         r"有没有(?!人会|会|人教|人能教)(那种|什么|哪个|一款|一个|啥|好用的|靠谱的|免费的)?.{0,20}" + PRODUCT
-        + r"|求(推荐|一个|个|款).{0,8}" + PRODUCT + r"|什么(app|软件|工具)(可以|能)|哪个(app|软件|ai).{0,6}(适合|可以|能|好用)", re.I)),
+        + r"|求(推荐|一个|个|款).{0,8}" + PRODUCT + r"|什么(app|软件|工具)(可以|能)|哪个(app|软件|ai).{0,6}(适合|可以|能|好用)"
+        r"|\bis there (an?|any) (app|tool|software|website|extension|service|way)\b|\b(an?|any) (app|tool|software) (that|which|to|for)\b"
+        r"|\blooking for (an?|some) (app|tool|software)|\b(recommend|suggest)\w* (an?|some|any) (app|tool|software)", re.I)),
     ("缺失", 3, False, re.compile(
         r"为什么(就是|都|还|一直)?(没有|没人|不能|不支持)|怎么(就是|都|还|一直)?没(有)?人(做|开发)|竟然没有|居然没有|一直没找到|找了(好久|很久|半天|一圈)"
         r"|市面上(都|也)?没有|到现在(都|也)?没有|至今没有|找不到(好用|合适|满意|一个|一款|这样|类似)"
-        r"|没(有)?人(做|开发)(过)?[^，。,.！!？?\s]{0,6}" + PRODUCT, re.I)),
+        r"|没(有)?人(做|开发)(过)?[^，。,.！!？?\s]{0,6}" + PRODUCT
+        + r"|\bwhy (is there no|isn'?t there|doesn'?t anyone|hasn'?t anyone)\b|\b(there'?s|there is) no (good |decent |simple )?(app|tool|software|way)\b"
+        r"|\bcan'?t find (an?|any|a good) (app|tool|software)\b|\bnothing (like this|out there)\b|\bno one (has )?(built|made)\b", re.I)),
     ("抱怨现有", 2, False, re.compile(
         r"难用|(?<!好用)不好用|垃圾|反人类|广告(太多|好多|满天飞|多到)|开屏广告|广告.{0,12}(忍无可忍|受不了|烦死)|强制(更新|登录|升级)"
         r"|(还|都)?要(开)?会员|要收费|收费了|不免费了|割韭菜|停更|下架了|倒闭了|(停止|暂停)运营|越来越(难用|臃肿|贵)"
-        r"|bug(一堆|较多|太多|很多)", re.I)),
+        r"|bug(一堆|较多|太多|很多)"
+        r"|\btoo many ads\b|\bsubscription (model|only|fee)|\bpaywall|\bunusable\b|\bterrible (app|ux|ui|experience)\b|\bworst app\b"
+        r"|\bkeeps crashing\b|\bso buggy\b|\bbloated\b", re.I)),
     ("痛点", 1, False, re.compile(
         r"(每次|总是|老是|经常)(都)?(会)?(忘|记不住|记不得|不记得|找不到)|记不住|记不得|太麻烦|好麻烦|很麻烦|麻烦死|费劲|浪费(好多)?时间"
-        r"|(只能|现在都|一直)(自己)?(拿|用)(备忘录|excel|表格|笔记|截图)|手动(记|整理|统计|复制)", re.I)),
+        r"|(只能|现在都|一直)(自己)?(拿|用)(备忘录|excel|表格|笔记|截图)|手动(记|整理|统计|复制)"
+        r"|\bevery (single )?time i\b|\bso tedious\b|\bwaste of time\b|\bmanually\b", re.I)),
     ("付费意愿", 4, False, re.compile(
         r"(?<!不)(?<!没人)(?<!没有人)愿意(付费|花钱|掏钱|买|出钱)|付费(也行|也可以|都行|支持)|已付费|可付费|花钱(也行|都行|也愿意)|多少钱都"
-        r"|谁做.{0,6}(我)?(买|用|付)|第一个(买|用|付费)|能做出来.{0,6}(买|付)|早鸟", re.I)),
+        r"|谁做.{0,6}(我)?(买|用|付)|第一个(买|用|付费)|能做出来.{0,6}(买|付)|早鸟"
+        r"|\b(i'?d|i would|would) (happily |gladly |definitely |totally )?pay\b|\btake my money\b|\bwilling to pay\b", re.I)),
     ("想要", 2, False, re.compile(
         r"(要是|如果).{0,25}(就好了|多好|该多好|就更好|就更完美|就完美)|希望(能|可以)?有(个|一个|一款)|好想要|想要(一?个|一款)"
         r"|(太|超级?|非常|真的?|很|好)需要(这个|这种|这样)?|我也需要|应该(出|有|做)(一个|个|一款)|能不能有(一个|个)"
-        r"|谁能(做|开发|搞)(一个|个)?|求(大佬|大神)?(开发|做)(一个|个)", re.I)),
+        r"|谁能(做|开发|搞)(一个|个)?|求(大佬|大神)?(开发|做)(一个|个)"
+        r"|\bi wish (there (was|were)|someone|it|i could|they)\b|\bsomeone (should|needs to|please) (make|build|create)\b"
+        r"|\bwould (love|kill for) (an?|a way|to have)\b|\bit would be (nice|great|amazing) to have\b", re.I)),
     ("改进建议", 1, True, re.compile(
         r"能不能|能否|可不可以|可以(加|出|增加|支持|添加|设计)|有没有可能(加|出|做)|(以后|后续|之后)(会|能)(提供|出|加|支持|有)"
-        r"|希望.{0,12}(可以|能|加|增加|添加|支持|出)|建议(加|增加|出|做)|会考虑(增加|加|出)|能(把|加|出).{0,20}(吗|么|嘛)", re.I)),
+        r"|希望.{0,12}(可以|能|加|增加|添加|支持|出)|建议(加|增加|出|做)|会考虑(增加|加|出)|能(把|加|出).{0,20}(吗|么|嘛)"
+        r"|\bplease add\b|\bfeature request\b|\bwould be (nice|great|helpful) if\b|\bshould (add|support|allow)\b|\bwish it (had|could|would)\b|\bcan you add\b", re.I)),
     ("求其他平台", 2, True, re.compile(
         r"(蹲|求|等|待|期待|坐等|想要|什么时候|啥时候|何时|会(做|出|有)|出个|做个|搞个|有没有|在哪|快(上|出)|支持|没有|没找到|搜不到"
         r"|下载不了|能(用|装|下))[^，。,.]{0,6}" + OTHER_OS
         + r"|" + OTHER_OS + r"[^，。,.]{0,8}(在哪|呢|吗|嘛|么|快|什么时候|啥时候|版本|蹲|求|等|没有|没找到|搜不到|下载不了|能用|可以|会做|出(吗|嘛|么|没)|上线|[!！?？])"
-        r"|(降低|放宽|降到).{0,8}(版本|系统|ios)|(出|开发|做|有)(个)?(英文|中文|繁体)版", re.I)),
+        r"|(降低|放宽|降到).{0,8}(版本|系统|ios)|(出|开发|做|有)(个)?(英文|中文|繁体)版"
+        r"|\b(android|windows|linux|web|desktop) (version|app|port|support)\b", re.I)),
     # 教程、模板帖下的"求模板""怎么批量做"：说明大家手头没有趁手的工具
     ("求模板", 2, True, re.compile(
         r"(?<!需)求(个|一个|一份|一下|分享)?(模板|模版|文档|电子版|表格|源文件|素材|背景)|(?<!需)求分享|^.{0,8}(怎么|如何)(获取|领取)"
         r"|(发|分享)(个|一下|一份)?(电子版|模板|模版|文档|文件)|有(没有)?(这个|这种)?(模板|模版|电子版)|(怎么|如何)批量|做(一百|几百|上百)份", re.I)),
-    ("附和", 1, True, re.compile(r"^\s*(\+1|＋1|同求|同问|蹲|我也(想要|需要|是|在找|想)|求求了|一样|me too|太需要了)", re.I)),
+    ("附和", 1, True, re.compile(r"^\s*(\+1|＋1|同求|同问|蹲|我也(想要|需要|是|在找|想)|求求了|一样|me too|太需要了)"
+                               r"|^\s*(this|same( here)?|seconded|i second this)\s*[.!]*\s*$", re.I)),
     ("找人开发", 2, False, re.compile(
         r"(找人|找个人|求人|求大佬|求大神|谁会|有没有会|有没有人会|需要找).{0,6}(开发|做|写|设计)|(想|需要|急需|要)(开发|做)(一个|个).{0,10}(小程序|app|软件|网站|系统)"
         r"|(开发|做)(一个|个)?.{0,8}(多少钱|怎么收费|大概要)|求.{0,4}(小程序|app|软件|系统)开发|有没有接的|礼貌问价|招.{0,6}(开发|程序员|技术)"
-        r"|能做.{0,12}(小程序|app|软件|系统)吗", re.I)),
+        r"|能做.{0,12}(小程序|app|软件|系统)吗"
+        r"|\b(looking for|need|hire|hiring) (a |an )?(developer|dev|programmer)\b|\bhow much (would it|does it) cost to (build|make|develop)\b", re.I)),
 ]
 # 评论区回答"你想要什么 app"时，往往只写一个点子，没有求助的字眼。这类评论单独记一个信号。
 ANSWER = ("回应征集", 2)
@@ -78,13 +95,16 @@ ANSWER = ("回应征集", 2)
 # 帖子类型：先认"征集需求"，再认"求助"，再认"推广"；都不是就算"其他"。
 POST_SOLICIT = re.compile(r"(为什么|怎么)(就是|都|还|一直)?(没有|没)(人)?(做|开发)|没(有)?人做|需求(很大|没人)|有需求的|什么需求|个需求|想要什么|希望有|你希望|最想要|想要的(app|软件)|缺(一个|什么)"
                           r"|许愿|理想(的|中的)?(app|软件)|等了(很多|好多|好几|多少)?年|要是有(这个|这样的|这种|个|一个)?.{0,8}就好了|(大家|你)(都)?(很|最|非常)?(想要|需要)"
-                          r"|(很|非常|超级?|真的)需要.{0,16}(没有|没人)|还没(有)?被(发明|做)出来|现实(中|里)?没有|说说你", re.I)
+                          r"|(很|非常|超级?|真的)需要.{0,16}(没有|没人)|还没(有)?被(发明|做)出来|现实(中|里)?没有|说说你"
+                          r"|\bwhat (app|tool|software|product)s? do you wish\b|\bwhat do you wish (existed|someone would build)\b|\bapp ideas?\b|\bsomebody make this\b", re.I)
 # 征集帖标题里自带具体点子（"为什么没人做一个老人专用的防诈骗 app"）；没有的就是泛泛地问"大家想要什么"，本身不是需求
 SPECIFIC_IDEA = re.compile(r"(一个|一款|个|款)[^，。,.？?！!]{2,}" + PRODUCT, re.I)
 POST_ASK = re.compile(r"^求|(?<!需)求(推荐|一个|个|款|助)|有没有|有什么(好用|推荐|软件|app)|哪个(app|软件|好用)|推荐一下|跪求|急需|(?<!需)求.{0,6}(开发|app|软件|小程序)"
-                      r"|谁能(做|开发|推荐)|招.{0,6}(开发|程序员|技术)", re.I)
+                      r"|谁能(做|开发|推荐)|招.{0,6}(开发|程序员|技术)"
+                      r"|\bis there (an?|any) (app|tool|software)|\blooking for (an?|some) (app|tool|software)|\bask hn: (is there|what|how)", re.I)
 POST_PROMO = re.compile(r"我(们)?(自己)?(独立)?(做|开发|写|搞|设计)(了|出)(一个|个|一款|款)?|上线(啦|了)|上架|开源了|内测|vibe ?coding|宝藏(app|软件|应用)"
-                        r"|(app|软件)(分享|推荐)|安利|种草|神器|邀请码|会员码|月入|接单|只做定制|外包|永久会员|天才(app|软件)|发现(一个|一款)|眼前一亮|必备(app|软件)", re.I)
+                        r"|(app|软件)(分享|推荐)|安利|种草|神器|邀请码|会员码|月入|接单|只做定制|外包|永久会员|天才(app|软件)|发现(一个|一款)|眼前一亮|必备(app|软件)"
+                        r"|\bshow hn\b|\bi (built|made|created|launched)\b|\bwe (built|made|launched)\b|\bjust launched\b|\bintroducing\b", re.I)
 # 帖子本身的权重：推广帖不是需求，只看它的评论区
 TYPE_WEIGHT = {"征集需求": 1.0, "求助": 1.0, "其他": 0.5, "推广": 0.1}
 GENERIC_WEIGHT = 0.3  # 泛泛的征集帖本身
@@ -96,7 +116,8 @@ AD = re.compile(r"笔记同款|拍(这个|链接)|自动发|自取|欢迎咨询|
                 r"|我们这边可以|我给你做|我可以(帮你)?做|邀请码|会员码|好友码|进群|加群|群聊|看主页|主页看|vx|wx|微信搜|xhslink|https?://"
                 # 开发者在征集帖下推广自己的产品
                 r"|体验(下|一下)|欢迎(各位|大家)?(试用|体验|使用|下载)|(要不|可以)?来试试|试试我(们)?的|我(们)?(已经|自己)?(做|写|开发)(了|好了|过)(一?个|一款|款)"
-                r"|我(们)?已经做好了|我有做|我(们)?做的|看我(自己)?做的|康康我的|我(们)?(公司)?(在|正在)(做|制作|开发)|我们的能|app ?store ?搜", re.I)
+                r"|我(们)?已经做好了|我有做|我(们)?做的|看我(自己)?做的|康康我的|我(们)?(公司)?(在|正在)(做|制作|开发)|我们的能|app ?store ?搜"
+                r"|\bshameless plug\b|\bcheck out (my|our)\b|\b(i|we) (built|made) (this|one|a tool|an app)\b", re.I)
 # 回应征集帖时，这些是在问博主问题，不是在提需求
 ASK_AUTHOR = re.compile(r"怎么下载|叫什么|在哪|哪里下|链接|多少钱|收费|免费|要钱|会员|求带|求图|求资料|求文档|@|博主|作者|怎么(做|弄|画|生成)的|怎么生成|学习一下", re.I)
 # 只是叫好、附和的短评，不是点子
