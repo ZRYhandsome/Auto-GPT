@@ -27,7 +27,7 @@ import catalog  # noqa: E402
 from jobs import JobManager  # noqa: E402
 from outreach import Outreach  # noqa: E402
 
-VERSION = "0.4.0"
+VERSION = "0.4.1"
 HOME = os.environ.get("RADAR_HOME") or os.path.dirname(APP_DIR)
 WEB_DIR = os.path.join(APP_DIR, "web")
 IS_MAC = sys.platform == "darwin"
@@ -212,7 +212,7 @@ class App:
         last_ok = {}
         for j in self.jobs.list():
             for s in j.get("steps", []):
-                if s.get("state") == "done" and (s.get("posts") or s.get("comments") or j.get("legacy")):
+                if s.get("state") in ("done", "partial") and (s.get("posts") or s.get("comments") or j.get("legacy")):
                     last_ok.setdefault(s["platform"], j.get("created", ""))
         platforms = []
         settings = self.settings.get()
@@ -485,7 +485,7 @@ def make_handler(app, port_ref):
                     if m.group(1) == "probe":
                         return self._json(app.probe(m.group(2)))
                     return self._json({"ok": app.clear_login(m.group(2))})
-                m = re.fullmatch(r"/api/jobs/([\w-]+)/(stop|rerun|rescore|delete|open|open-file|copy-summary)", path)
+                m = re.fullmatch(r"/api/jobs/([\w-]+)/(stop|rerun|resume|rescore|delete|open|open-file|copy-summary)", path)
                 if m:
                     jid, act = m.groups()
                     job = app.jobs.get(jid)
@@ -495,6 +495,8 @@ def make_handler(app, port_ref):
                         return self._json({"ok": app.jobs.stop(jid)})
                     if act == "rerun":
                         return self._json(app.jobs.create(job["spec"]))
+                    if act == "resume":
+                        return self._json(app.jobs.resume(jid))
                     if act == "rescore":
                         r = app.jobs.rescore(jid)
                         return self._json(r) if r else self._error("任务还在运行")

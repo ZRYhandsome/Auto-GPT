@@ -140,6 +140,7 @@ git -C ~/demand-radar-kit pull && bash ~/demand-radar-kit/demand-radar/setup_mac
 - **报错 `Page.goto: Timeout 30000ms exceeded`（打开首页超时）：** 网络慢，或首页有资源一直加载不完。新版最多等 90 秒，页面已经打开就继续跑。还是失败的话，直接重跑同一条命令。
 - **日志里有 `--- Logging error ---`：** 旧版的问题，不影响抓取。MediaCrawler 会把整页搜索结果写进日志，一行几十 KB，经 `tee` 写日志时会失败。新版把每条日志截到 300 字，数据照常完整写进 jsonl。要看完整日志就设置 `RADAR_LOG_FULL=1`。
 - **小红书搜索排序：** 默认用综合排序。MediaCrawler 原本按最热排序，搜出来多是高赞的推广帖和段子。想换回去就设置 `RADAR_XHS_SORT=popularity_descending`，按最新排序用 `time_descending`。
+- **任务显示"没抓完"，或者报 `tenacity.RetryError ... raised KeyError`：** 小红书（或别的平台）中途拦住了请求，多半是一次抓得太多、太快，触发了验证或限流。新版遇到这种情况会停手，已经抓到的都保存、打分，并写明哪些关键词没抓完；过半小时到一小时，在任务页点"接着抓剩下的 N 个关键词"。不容易被拦的抓法：每帖评论 50 条以内，关键词多就分几次抓，请求间隔调到 5 秒左右。某一条帖子出错只会跳过这一条，不会让整次采集停下。
 - **被限流或封号：** 用小号登录；把 `-n` 和 `-c` 调小；加长间隔，例如 `RADAR_SLEEP_SEC=5 ~/demand-radar/radar.sh`。
 - **依赖安装很慢或失败：** MediaCrawler 默认用清华镜像，脚本连不上时会自动改用官方 PyPI。
 - **想用日常 Chrome 的登录状态：** 按 MediaCrawler 文档给日常 Chrome 开启远程调试，再运行 `RADAR_CONNECT_EXISTING=1 ~/demand-radar/radar.sh`。
@@ -152,7 +153,7 @@ git -C ~/demand-radar-kit pull && bash ~/demand-radar-kit/demand-radar/setup_mac
 |---|---|
 | `setup_mac.sh` | 一键安装 |
 | `radar.sh` | 批量运行多个平台，然后合并打分 |
-| `run_mc.py` | MediaCrawler 启动包装：自己开独立浏览器窗口、小红书用综合排序、截短日志、打开网页多等一会儿，不改 MediaCrawler 源码 |
+| `run_mc.py` | MediaCrawler 启动包装：自己开独立浏览器窗口、小红书用综合排序、截短日志、打开网页多等一会儿、一条请求失败不拖垮整次采集，不改 MediaCrawler 源码 |
 | `merge.py` | 合并各平台 jsonl 结果、识别中英文需求信号、打分并输出表格 |
 | `app/server.py` | 需求雷达软件：只在本机运行的小服务（只用 Python 标准库），加网页界面 `app/web/`；有 pywebview 时用独立窗口 |
 | `app/jobs.py` | 采集任务：排队、逐个平台运行、进度和日志、停止、跑完自动打分；也列出命令行跑出来的结果 |
@@ -163,4 +164,5 @@ git -C ~/demand-radar-kit pull && bash ~/demand-radar-kit/demand-radar/setup_mac
 | `tests/test_merge.py` | 用模拟的 7 个平台数据和真实跑出来的误报、漏报测试 merge.py |
 | `tests/test_sources.py` | YouTube、X 数据源、作者字段和 signals.jsonl 的测试 |
 | `tests/test_outreach.py` | 线索与回复的测试：用假的 Claude 客户端和假的 Reddit / X 接口，不联网 |
+| `tests/test_run_mc.py` | 用假的 MediaCrawler 测包装脚本：一条帖子出错只跳过这条，被平台拦住时停手、保存、报出没抓完的关键词 |
 | `tests/test_app.py` | 软件的测试：各来源的解析（录好的接口数据）、用假的 MediaCrawler 跑完整任务、停止、本机服务接口和安全检查。全部测试：`python3 -m unittest discover tests` |

@@ -128,7 +128,7 @@ button.chip:hover:not(:disabled) { border-color: var(--line-strong); background:
 .status.running, .status.queued { background: var(--accent-weak); color: var(--accent); }
 .status.done { background: var(--ok-weak); color: var(--ok); }
 .status.failed { background: var(--bad-weak); color: var(--bad); }
-.status.stopped, .status.interrupted { background: var(--warn-weak); color: var(--warn); }
+.status.stopped, .status.interrupted, .status.partial { background: var(--warn-weak); color: var(--warn); }
 .status.running::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; animation: pulse 1.2s infinite; }
 @keyframes pulse { 50% { opacity: .25; } }
 .empty { padding: 50px 20px; text-align: center; color: var(--muted); }
@@ -141,6 +141,8 @@ button.chip:hover:not(:disabled) { border-color: var(--line-strong); background:
 .stp .msg { font-size: 12.5px; }
 .stp .msg.hint { color: var(--warn); font-weight: 600; }
 .stp .msg.err { color: var(--bad); }
+.stp .msg.warn { color: var(--warn); }
+.stp .msg .raw { display: block; margin-top: 3px; color: var(--muted); font-size: 12px; word-break: break-all; }
 .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin: 6px 0 12px; flex-wrap: wrap; }
 .tabs button { border: 0; border-radius: 0; background: none; padding: 8px 12px; color: var(--muted); border-bottom: 2px solid transparent; }
 .tabs button.on { color: var(--text); font-weight: 600; border-bottom-color: var(--accent); }

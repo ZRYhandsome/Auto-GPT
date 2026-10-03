@@ -132,7 +132,7 @@ if [[ "$(uname)" == "Darwin" ]]; then
   <key>CFBundleExecutable</key><string>radar</string>
   <key>CFBundleIconFile</key><string>icon</string>
   <key>CFBundlePackageType</key><string>APPL</string>
-  <key>CFBundleShortVersionString</key><string>0.4.0</string>
+  <key>CFBundleShortVersionString</key><string>0.4.1</string>
   <key>LSMinimumSystemVersion</key><string>11.0</string>
   <key>NSHighResolutionCapable</key><true/>
 </dict></plist>

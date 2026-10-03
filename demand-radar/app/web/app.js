@@ -49,8 +49,8 @@ function toast(msg, bad = false) {
   setTimeout(() => el.remove(), Math.max(bad ? 7000 : 3500, String(msg).length * 90)); // 长消息多停一会儿
 }
 
-const STATUS = { queued: '排队中', running: '采集中', done: '完成', failed: '失败', stopped: '已停止', interrupted: '中断了' };
-const STEP = { waiting: '等待', running: '采集中', done: '完成', failed: '失败', stopped: '已停止', skipped: '跳过', interrupted: '中断了' };
+const STATUS = { queued: '排队中', running: '采集中', done: '完成', partial: '没抓完', failed: '失败', stopped: '已停止', interrupted: '中断了' };
+const STEP = { waiting: '等待', running: '采集中', done: '完成', partial: '没抓完', failed: '失败', stopped: '已停止', skipped: '跳过', interrupted: '中断了' };
 const pname = (id) => STATE?.platforms.find((p) => p.id === id)?.name || id;
 const plat = (id) => STATE?.platforms.find((p) => p.id === id);
 
@@ -250,14 +250,21 @@ function viewNew() {
     if (!sel.length || !units) { $('#estimate').textContent = ''; return; }
     const browser = sel.filter((p) => p.kind === 'browser').length;
     const secs = units * (browser * (6 + c / 10) + (sel.length - browser) * (2 + c / 50));
-    $('#estimate').textContent = `大约 ${units * sel.length} 条帖子、最多 ${units * sel.length * c} 条评论，预计 ${secs < 90 ? '1–2 分钟' : `${Math.round(secs / 60)} 分钟左右`}。平台限流时会慢一些。`;
+    let text = `大约 ${units * sel.length} 条帖子、最多 ${units * sel.length * c} 条评论，预计 ${secs < 90 ? '1–2 分钟' : `${Math.round(secs / 60)} 分钟左右`}。平台限流时会慢一些。`;
+    // 国内平台一次抓太多容易被要求验证、被限流：中途被拦住，后面的关键词就抓不到了
+    if (browser && draft.mode === 'search' && (c > 100 || units * c > 6000)) {
+      text += ` ⚠️ 小红书、抖音这类平台一次抓这么多容易被拦住：每帖评论建议 50 以内，关键词多就分几次抓。`;
+    }
+    $('#estimate').textContent = text;
   }
 
   $('#modes').addEventListener('click', (e) => {
     const b = e.target.closest('[data-mode]');
     if (!b) return;
     draft.mode = b.dataset.mode;
-    if (draft.mode !== 'search' && draft.comments < 100) { draft.comments = 300; $('#comments').value = 300; }
+    if (draft.mode !== 'search' && draft.comments < 100) { draft.comments = 300; draft.autoComments = true; $('#comments').value = 300; }
+    // 深挖时自动调成的 300 条，换回搜索时改回默认值：搜索每帖 300 条很容易被平台拦住
+    if (draft.mode === 'search' && draft.autoComments) { draft.comments = STATE.settings.default_comments; draft.autoComments = false; $('#comments').value = draft.comments; }
     renderMode();
   });
   main.querySelector('section:nth-of-type(2)').addEventListener('click', (e) => {
@@ -269,7 +276,7 @@ function viewNew() {
     else draft.platforms = draft.platforms.includes(id) ? draft.platforms.filter((x) => x !== id) : [...draft.platforms, id];
     renderPlatforms();
   });
-  ['notes', 'comments'].forEach((k) => $('#' + k).addEventListener('input', (e) => { draft[k] = +e.target.value; estimate(); }));
+  ['notes', 'comments'].forEach((k) => $('#' + k).addEventListener('input', (e) => { draft[k] = +e.target.value; if (k === 'comments') draft.autoComments = false; estimate(); }));
   $('#sub').addEventListener('change', (e) => { draft.sub = e.target.checked; });
   $('#label').addEventListener('input', (e) => { draft.label = e.target.value; });
   $('#start').addEventListener('click', async () => {
@@ -325,6 +332,9 @@ async function viewJobs() {
 }
 
 // ---------- 任务详情 ----------
+// 没抓完的关键词个数（几个平台合在一起去重）
+const remainingCount = (job) => new Set(Object.values(job.remaining || {}).flat()).size;
+
 async function viewJob(id) {
   let job;
   try { job = await api(`/api/jobs/${encodeURIComponent(id)}`); } catch (e) { main.innerHTML = `<div class="page empty">${esc(e.message)}</div>`; return; }
@@ -346,13 +356,22 @@ async function viewJob(id) {
       : `<button data-a="copy" class="primary" ${job.totals?.posts || job.totals?.comments ? '' : 'disabled'}>复制给 Claude</button>
          ${job.totals?.signals ? '<button data-a="leads" title="把这次的需求信号导入「线索与回复」，让 AI 判断谁需要你的产品">从这里找线索</button>' : ''}
          <button data-a="xlsx">用 Excel 打开</button><button data-a="open">打开文件夹</button>
+         ${remainingCount(job) ? `<button data-a="resume" class="primary" title="新建一次采集，只抓上次没抓完的关键词">接着抓剩下的 ${remainingCount(job)} 个关键词</button>` : ''}
          <button data-a="rerun">再跑一次</button><button data-a="rescore" title="改了打分规则后，用已有数据重新打分">重新打分</button>
          <button data-a="delete" class="danger">删除</button>`;
     $('#steps').innerHTML = (job.steps || []).map((st) => {
+      const left = (job.remaining || {})[st.platform] || [];
+      const extra = [
+        st.detail ? `<span class="raw" title="原始报错">原始报错：${esc(st.detail)}</span>` : '',
+        left.length ? `<span class="raw">没抓完的关键词：${esc(left.join('、'))}</span>` : '',
+        st.skipped ? `<span class="raw">有 ${st.skipped} 条帖子没抓到，已跳过</span>` : '',
+      ].join('');
       const msg = st.state === 'running' && st.hint ? `<span class="msg hint">${esc(st.hint)}</span>`
-        : st.error ? `<span class="msg err" title="${esc(st.error)}">${esc(st.error.slice(0, 160))}</span>`
-          : st.partial ? '<span class="msg muted">中途停了，已抓到的照样保存</span>' : '<span></span>';
-      return `<div class="stp"><b>${esc(pname(st.platform))}</b><span class="status ${st.state === 'done' ? 'done' : st.state === 'failed' ? 'failed' : st.state === 'running' ? 'running' : 'stopped'}">${STEP[st.state] || st.state}</span>${msg}<span class="cnt">${st.posts || 0} 帖 · ${st.comments || 0} 评</span></div>`;
+        : st.error ? `<span class="msg ${st.state === 'partial' ? 'warn' : 'err'}">${esc(st.error)}${extra}</span>`
+          : st.partial ? `<span class="msg muted">中途停了，已抓到的照样保存${extra}</span>`
+            : extra ? `<span class="msg muted">${extra}</span>` : '<span></span>';
+      const cls = { done: 'done', failed: 'failed', running: 'running', partial: 'partial' }[st.state] || 'stopped';
+      return `<div class="stp"><b>${esc(pname(st.platform))}</b><span class="status ${cls}">${STEP[st.state] || st.state}</span>${msg}<span class="cnt">${st.posts || 0} 帖 · ${st.comments || 0} 评</span></div>`;
     }).join('');
     const t = job.totals || {};
     $('#jnote').innerHTML = !busy && (t.items != null)
@@ -415,6 +434,7 @@ async function viewJob(id) {
       }
       if (a === 'rescore') { job = await api(`${path}/rescore`, {}); toast('已重新打分'); renderHead(); renderTabs(); renderBody(); }
       if (a === 'rerun') { const j = await api(`${path}/rerun`, {}); location.hash = `#/jobs/${encodeURIComponent(j.id)}`; }
+      if (a === 'resume') { const j = await api(`${path}/resume`, {}); toast(`已新建采集，只抓没抓完的 ${j.spec.keywords.length} 个关键词`); location.hash = `#/jobs/${encodeURIComponent(j.id)}`; }
       if (a === 'delete') {
         if (!(await ask('删除这次采集的全部数据？（会移到数据目录下的 .trash 文件夹，还能找回）', { ok: '删除', danger: true }))) return;
         await api(`${path}/delete`, {});
@@ -444,7 +464,8 @@ async function viewJob(id) {
       if (job.totals?.items != null) tab = 'signals';
       renderTabs();
       renderBody();
-      toast(job.status === 'done' ? '采集完成，已经打好分' : `任务${STATUS[job.status] || job.status}`);
+      toast(job.status === 'done' ? '采集完成，已经打好分'
+        : job.status === 'partial' ? '中途被拦住了，已经抓到的都打好分了。看上面的说明' : `任务${STATUS[job.status] || job.status}`, job.status === 'failed');
     }
   }, 1200);
 }

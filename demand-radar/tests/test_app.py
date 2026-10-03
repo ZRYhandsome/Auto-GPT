@@ -216,6 +216,18 @@ FAKE_MC = textwrap.dedent('''
         print("Error: 登录失败，滑块验证没通过", flush=True)
         sys.exit(1)
     d = os.path.join(out, "xhs", "jsonl")
+    if os.environ.get("FAKE_MC_BLOCK"):
+        # 像真的小红书那样：第一个关键词抓了一半被拦住，run_mc.py 停手并报告没抓完的关键词
+        kws = get("--keywords").split(",")
+        os.makedirs(d, exist_ok=True)
+        with open(os.path.join(d, "search_contents_2026-10-03.jsonl"), "a", encoding="utf-8") as f:
+            f.write(json.dumps({"note_id": "b1", "title": "有没有app可以记录体检报告", "liked_count": "300",
+                                "source_keyword": kws[0]}, ensure_ascii=False) + "\\n")
+        with open(os.path.join(d, "search_comments_2026-10-03.jsonl"), "a", encoding="utf-8") as f:
+            f.write(json.dumps({"comment_id": "bc1", "note_id": "b1", "content": "求一个这种app", "parent_comment_id": 0}, ensure_ascii=False) + "\\n")
+        print("tenacity.RetryError: RetryError[<Future at 0x11e97e890 state=finished raised KeyError>]", flush=True)
+        print("[需求雷达·结果] " + json.dumps({"blocked": "KeyError: 'Verifytype'", "cut_keywords": kws[1:], "skipped": 1}, ensure_ascii=False), flush=True)
+        sys.exit(3)
     os.makedirs(d, exist_ok=True)
     with open(os.path.join(d, "search_contents_2026-10-02.jsonl"), "a", encoding="utf-8") as f:
         f.write(json.dumps({"note_id": "n1", "title": "有没有app可以帮我记住衣柜里的衣服", "desc": "", "liked_count": "1200",
@@ -268,10 +280,12 @@ class JobsTest(unittest.TestCase):
         job = self.jm.create({"platforms": ["xhs", "dy", "appstore"], "mode": "search", "keywords": ["记账"], "notes": 5, "comments": 10})
         done = wait_for(lambda: (j := self.jm.get(job["id"])) and j["status"] not in ("queued", "running") and j)
         steps = {s["platform"]: s for s in done["steps"]}
-        self.assertEqual(done["status"], "done")
+        self.assertEqual(done["status"], "partial", "抖音没登录上：这次算没抓完，抓到的照样打分")
         self.assertEqual((steps["xhs"]["state"], steps["xhs"]["posts"], steps["xhs"]["comments"]), ("done", 1, 3))
         self.assertEqual(steps["dy"]["state"], "failed")
         self.assertIn("登录失败", steps["dy"]["error"])
+        self.assertIn("扫码", steps["dy"]["error"], "报错翻成了能照着做的话")
+        self.assertEqual(done["remaining"], {"dy": ["记账"]}, "抖音一条都没抓到，关键词算没抓完")
         self.assertEqual((steps["appstore"]["state"], steps["appstore"]["posts"], steps["appstore"]["comments"]), ("done", 1, 2))
         run = os.path.join(self.home, "runs", job["id"])
         for name in ("summary.md", "需求信号.csv", "全部数据.csv", "keywords_used.txt", "crawl.log"):
@@ -285,6 +299,69 @@ class JobsTest(unittest.TestCase):
         self.assertIn("开始：小红书", self.jm.log_tail(job["id"])["text"])
         found = self.jm.search("衣柜")
         self.assertEqual(found["rows"][0][-1], job["id"])
+
+    def test_blocked_midway_is_partial_and_can_resume(self):
+        os.environ["FAKE_MC_BLOCK"] = "1"
+        try:
+            job = self.jm.create({"platforms": ["xhs"], "mode": "search", "keywords": ["体检", "记账", "养花"], "notes": 20, "comments": 300})
+            done = wait_for(lambda: (j := self.jm.get(job["id"])) and j["status"] not in ("queued", "running") and j)
+        finally:
+            os.environ.pop("FAKE_MC_BLOCK", None)
+        st = done["steps"][0]
+        self.assertEqual((done["status"], st["state"]), ("partial", "partial"), "抓到了数据就不算失败")
+        self.assertEqual((st["posts"], st["comments"]), (1, 1))
+        self.assertIn("小红书暂时拦住了请求", st["error"])
+        self.assertIn("接着抓剩下的", st["error"])
+        self.assertIn("KeyError", st["detail"])
+        self.assertEqual((st["cut_keywords"], st["skipped"]), (["记账", "养花"], 1))
+        self.assertEqual(done["remaining"], {"xhs": ["记账", "养花"]})
+        self.assertGreater(done["totals"]["signals"], 0, "抓到的照样合并打分")
+        self.assertNotIn("remaining", self.jm.list()[0], "任务列表不读数据文件")
+        again = self.jm.resume(job["id"])
+        self.assertEqual((again["spec"]["platforms"], again["spec"]["keywords"]), (["xhs"], ["记账", "养花"]))
+        self.assertTrue(again["spec"]["label"].startswith("接着抓"))
+        self.assertEqual((again["spec"]["notes"], again["spec"]["comments"]), (20, 300))
+        wait_for(lambda: self.jm.get(again["id"])["status"] not in ("queued", "running"))
+        self.assertEqual(self.jm.get(again["id"])["status"], "done")
+        with self.assertRaises(ValueError):
+            self.jm.resume(again["id"])  # 这次抓完了，没有剩下的
+
+    def test_old_failed_job_with_data_shows_as_unfinished(self):
+        # 0.4.0 记下的任务：小红书抓了 40 帖后 RetryError，整个任务记成"失败"
+        from jobs import JobManager
+        jid = "20261003-151103"
+        run = os.path.join(self.home, "runs", jid)
+        os.makedirs(os.path.join(run, "xhs", "jsonl"))
+        with open(os.path.join(run, "xhs", "jsonl", "search_contents_2026-10-03.jsonl"), "w", encoding="utf-8") as f:
+            f.write(json.dumps({"note_id": "n1", "title": "x", "source_keyword": "大家有什么想要的app吗"}, ensure_ascii=False) + "\n")
+        raw = "tenacity.RetryError: RetryError[<Future at 0x11e97e890 state=finished raised KeyError>]"
+        with open(os.path.join(run, "job.json"), "w", encoding="utf-8") as f:
+            json.dump({"id": jid, "created": "2026-10-03 15:11:03", "status": "failed",
+                       "spec": {"platforms": ["xhs"], "mode": "search", "keywords": ["大家有什么想要的app吗", "你希望有什么软件"],
+                                "targets": [], "notes": 20, "comments": 300, "sub": False, "label": ""},
+                       "steps": [{"platform": "xhs", "state": "failed", "posts": 40, "comments": 4279, "error": raw, "partial": True}],
+                       "totals": {"posts": 40, "comments": 4279, "items": 3810, "signals": 430}}, f, ensure_ascii=False)
+        self.jm.stop_all()
+        jm = JobManager(self.home, mc_dir=self.mc, mc_python=sys.executable)
+        try:
+            job = jm.get(jid)
+            st = job["steps"][0]
+            self.assertEqual((job["status"], st["state"]), ("partial", "partial"))
+            self.assertIn("小红书暂时拦住了请求", st["error"])
+            self.assertEqual(st["detail"], raw)
+            self.assertEqual(job["remaining"], {"xhs": ["你希望有什么软件"]})
+            with open(os.path.join(run, "job.json"), encoding="utf-8") as f:
+                self.assertEqual(json.load(f)["status"], "failed", "只改显示，不改记录")
+        finally:
+            jm.stop_all()
+
+    def test_explain(self):
+        from jobs import explain
+        self.assertIn("暂时拦住了请求", explain("小红书", "tenacity.RetryError: RetryError[<Future at 0x1 state=finished raised KeyError>]"))
+        self.assertIn("账号被限制", explain("小红书", "XHS account security restriction, code: 300011"))
+        self.assertIn("网络", explain("小红书", "IPBlockError: 300012"))
+        self.assertIn("登录失败", explain("抖音", "Error: 登录失败，滑块验证没通过"))
+        self.assertEqual(explain("小红书", "ModuleNotFoundError: No module named 'x'"), "")
 
     def test_stop_keeps_partial_data_and_skips_rest(self):
         os.environ["FAKE_MC_SLEEP"] = "20"

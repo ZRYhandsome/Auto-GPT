@@ -25,6 +25,25 @@ HINTS = [
     (re.compile(r"captcha|滑块|验证码|slider|verify", re.I), "遇到验证：在 Chrome 窗口里手动拖一下滑块或完成验证"),
 ]
 ERROR = re.compile(r"(Error|Exception|Traceback|错误|失败|连不上)", re.I)
+RESULT_MARK = "[需求雷达·结果] "  # run_mc.py 最后一行：被拦住的原因、没抓完的关键词、跳过几条
+# 把 MediaCrawler 的报错翻成一句人话（先匹配的优先）
+EXPLAIN = [
+    (re.compile(r"登录失败|login fail|扫码超时", re.I), "{name}登录失败：在弹出的 Chrome 窗口里用手机扫码登录，遇到滑块验证就手动拖一下，然后点「再跑一次」。"),
+    (re.compile(r"300011|security restriction", re.I), "{name}账号被限制了：先在手机 App 上看看账号有没有异常，过一两天再采集。"),
+    (re.compile(r"300012|IPBlockError", re.I), "{name}限制了你现在的网络：换个网络（比如手机热点），或者过几个小时再试。"),
+    (re.compile(r"拦住|captcha|verif|滑块|验证|\b461\b|\b471\b|RetryError|KeyError|频繁|频次|限流|300013", re.I),
+     "{name}暂时拦住了请求：多半是一次抓得太多、太快，触发了验证或限流。"),
+    (re.compile(r"\b(401|403|429)\b|PlatformAccessError", re.I), "{name}拒绝了请求（被限流了）。"),
+    (re.compile(r"Timeout|超时", re.I), "打开{name}的页面超时：网络慢，或者页面一直没加载完。"),
+]
+ADVICE = "已经抓到的都保存并打分了。过半小时到一小时再点「接着抓剩下的」；每帖评论数调小（比如 50）、请求间隔调到 5 秒左右，就不容易被拦。"
+
+
+def explain(name, raw):
+    for rx, text in EXPLAIN:
+        if rx.search(raw or ""):
+            return text.format(name=name)
+    return ""
 RESULT_FILES = {"signals": "需求信号.csv", "posts": "按帖子汇总.csv", "all": "全部数据.csv"}
 
 
@@ -137,17 +156,30 @@ class JobManager:
     def list(self):
         with self.lock:
             jobs = sorted(self.jobs.values(), key=lambda j: j.get("created", ""), reverse=True)
-            return [self._public(j) for j in jobs]
+            return [self._public(j, detail=False) for j in jobs]
 
     def get(self, jid):
         with self.lock:
             j = self.jobs.get(jid)
             return self._public(j) if j else None
 
-    def _public(self, j):
+    def _public(self, j, detail=True):
         out = json.loads(json.dumps(j))
         if j["id"] in self.queue:
             out["queue_pos"] = self.queue.index(j["id"]) + 1
+        # 旧版记下的任务：中途出错但抓到了数据的也显示成"没抓完"，报错翻成人话
+        for st in out.get("steps", []):
+            got = st.get("posts") or st.get("comments")
+            if st.get("state") == "failed" and got:
+                st["state"] = "partial"
+            if st.get("state") in ("failed", "partial") and st.get("error") and not st.get("detail"):
+                friendly = explain(catalog.name_of(st["platform"]), st["error"])
+                if friendly and friendly not in st["error"]:
+                    st["detail"], st["error"] = st["error"][-300:], friendly + (ADVICE if got else "")
+        if out.get("status") == "failed" and any(st.get("state") == "partial" for st in out.get("steps", [])):
+            out["status"] = "partial"
+        if detail and out.get("status") in ("partial", "failed", "stopped", "interrupted"):
+            out["remaining"] = self.remaining_keywords(out)
         return out
 
     def validate(self, spec):
@@ -206,6 +238,52 @@ class JobManager:
             self._save(job)
         self.wake.set()
         return self._public(job)
+
+    def remaining_keywords(self, job):
+        """搜索任务里没抓完的关键词：被平台拦住时还没抓（完）的，加上一条帖子都没抓到的。"""
+        spec = job.get("spec", {})
+        if spec.get("mode") != "search":
+            return {}
+        out = os.path.join(self.runs, job["id"])
+        left = {}
+        for st in job.get("steps", []):
+            if st.get("state") not in ("partial", "failed", "stopped", "interrupted"):
+                continue
+            done = set()
+            for path in glob.glob(os.path.join(out, catalog.MC_DIRS.get(st["platform"], st["platform"]), "jsonl", "*_contents_*.jsonl")):
+                try:
+                    with open(path, encoding="utf-8") as f:
+                        for line in f:
+                            try:
+                                kw = json.loads(line).get("source_keyword")
+                            except ValueError:
+                                continue
+                            if kw:
+                                done.add(kw)
+                except OSError:
+                    pass
+            cut = set(st.get("cut_keywords") or [])
+            rest = [k for k in spec.get("keywords", []) if k not in done or k in cut]
+            if rest:
+                left[st["platform"]] = rest
+        return left
+
+    def resume(self, jid):
+        """新建一个任务，只抓上次没抓完的平台和关键词。"""
+        with self.lock:
+            job = self.jobs.get(jid)
+        if not job:
+            raise ValueError("找不到这个任务")
+        left = self.remaining_keywords(job)
+        if not left:
+            raise ValueError("没有没抓完的关键词")
+        keywords = []
+        for rest in left.values():
+            keywords += [k for k in rest if k not in keywords]
+        spec = dict(job["spec"], platforms=list(left), keywords=keywords)
+        title = job["spec"].get("label") or "、".join(job["spec"].get("keywords", [])[:3])
+        spec["label"] = f"接着抓：{title}"[:60]
+        return self.create(spec)
 
     def stop(self, jid):
         with self.lock:
@@ -388,7 +466,12 @@ class JobManager:
         self._append_log(out, "\n================ 合并与打分 ================\n")
         self._merge(job)
         states = [s["state"] for s in job["steps"]]
-        job["status"] = "stopped" if job.get("stop") else ("failed" if states and all(s == "failed" for s in states) else "done")
+        if job.get("stop"):
+            job["status"] = "stopped"
+        elif states and all(s == "failed" for s in states):
+            job["status"] = "failed"
+        else:
+            job["status"] = "partial" if any(s in ("partial", "failed") for s in states) else "done"
         job["ended"] = now()
         job.pop("stop", None)
         self._save(job)
@@ -415,6 +498,7 @@ class JobManager:
             self._save(job)
             return
         last_error = ""
+        result = {}
 
         def reader():
             nonlocal last_error
@@ -423,6 +507,12 @@ class JobManager:
                     log.write(raw)
                     log.flush()
                     line = raw.decode("utf-8", errors="replace").strip()
+                    if line.startswith(RESULT_MARK):
+                        try:
+                            result.update(json.loads(line[len(RESULT_MARK):]))
+                        except ValueError:
+                            pass
+                        continue
                     for rx, hint in HINTS:
                         if rx.search(line):
                             step["hint"] = hint
@@ -451,16 +541,26 @@ class JobManager:
         step["posts"], step["comments"] = posts - base_posts, comments - base_comments
         step["ended"] = now()
         step["exit_code"] = code
+        got = step["posts"] or step["comments"]
+        raw = result.get("blocked") or last_error or f"退出码 {code}"
         if job.get("stop"):
             step["state"] = "stopped"
         elif code == 0:
             step["state"] = "done"
             step["hint"] = ""
         else:
-            step["state"] = "failed"
-            step["error"] = last_error or f"退出码 {code}"
-        if step["state"] != "done" and (step["posts"] or step["comments"]):
-            step["partial"] = True  # 中途失败，但已经抓到的数据照样合并
+            # 中途出错但已经抓到数据：算"没抓完"，抓到的照样合并打分
+            step["state"] = "partial" if got else "failed"
+            friendly = explain(name, raw)
+            step["error"] = f"{friendly}{ADVICE if got else ''}" if friendly else raw
+            if friendly:
+                step["detail"] = raw[-300:]
+        if result.get("cut_keywords"):
+            step["cut_keywords"] = result["cut_keywords"]
+        if result.get("skipped"):
+            step["skipped"] = result["skipped"]
+        if step["state"] != "done" and got:
+            step["partial"] = True
         self._save(job)
 
     def _merge(self, job):
