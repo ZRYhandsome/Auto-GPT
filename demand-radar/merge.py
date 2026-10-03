@@ -8,6 +8,8 @@
   全部数据.csv   所有帖子和评论拍平成一张表
   需求信号.xlsx  上面前两张表各占一页（装了 openpyxl 时才生成）
   summary.md     各平台、各搜索词的命中情况，得分最高的 50 条，值得深挖的帖子，全部命中的原文
+  signals.jsonl  需求信号.csv 的同一批行（同样的顺序），每行一个 JSON，多了作者和作者 ID，
+                 给软件里的「线索与回复」用
 只用 Python 标准库；openpyxl 可选。
 """
 import csv
@@ -178,6 +180,15 @@ def post_id(d):
     return str(first(d, "note_id", "aweme_id", "video_id", "content_id"))
 
 
+def author(d):
+    """发帖人或评论人的昵称。MediaCrawler 和软件自带的数据源大多写 nickname，知乎、贴吧写 user_nickname。"""
+    return str(first(d, "nickname", "author", "user_name", "screen_name", "user_nickname"))
+
+
+def author_id(d):
+    return str(first(d, "user_id", "author_id", "sec_uid"))
+
+
 def post_url(platform, d):
     url = first(d, "note_url", "aweme_url", "video_url", "content_url")
     if url:
@@ -278,7 +289,7 @@ def load(run_dir):
                 "collects": to_int(first(d, "collected_count", "collect_count", "favorite_count")),
                 "post_title": title, "post_type": ptype, "url": url, "keyword": keyword,
                 "time": to_time(first(d, "time", "create_time", "created_time", "publish_time", "create_date_time")),
-                "id": pid, "post_id": pid,
+                "id": pid, "post_id": pid, "author": author(d), "author_id": author_id(d),
             })
     for path in files:
         platform = os.path.basename(os.path.dirname(os.path.dirname(path)))
@@ -296,7 +307,7 @@ def load(run_dir):
                 "url": post.get("url", "") or first(d, "note_url") or post_url(platform, d),
                 "keyword": "、".join(sorted(post.get("keywords", ()))),
                 "time": to_time(first(d, "create_time", "publish_time", "create_date_time")), "id": str(first(d, "comment_id")),
-                "post_id": pid,
+                "post_id": pid, "author": author(d), "author_id": author_id(d),
             })
     for it in items:
         if it["kind"] == "帖子":
@@ -402,6 +413,20 @@ def write_csv(path, rows, fields=FIELDS):
         w.writerow([label for _, label in fields])
         for r in rows:
             w.writerow([r.get(k, "") for k, _ in fields])
+
+
+# signals.jsonl 每行的字段，顺序固定
+SIGNAL_KEYS = ["platform", "platform_name", "kind", "id", "post_id", "author", "author_id", "text", "post_title", "post_type",
+               "url", "signals", "score", "likes", "replies", "time", "keyword"]
+
+
+def write_signals_jsonl(path, signal_rows):
+    """命中需求信号的行写成 jsonl。platform 记软件里的平台 ID（dy、wb……），不是 MediaCrawler 的目录名。"""
+    with open(path, "w", encoding="utf-8") as f:
+        for r in signal_rows:
+            row = {k: r.get(k, "") for k in SIGNAL_KEYS}
+            row["platform"] = PLATFORM_ARGS.get(r["platform"], r["platform"])
+            f.write(json.dumps(row, ensure_ascii=False) + "\n")
 
 
 def write_xlsx(path, signal_rows, post_rows):
@@ -563,6 +588,7 @@ def main(run_dir):
     write_csv(os.path.join(run_dir, "需求信号.csv"), signal_rows)
     write_csv(os.path.join(run_dir, "按帖子汇总.csv"), post_rows, POST_FIELDS)
     write_csv(os.path.join(run_dir, "全部数据.csv"), all_rows)
+    write_signals_jsonl(os.path.join(run_dir, "signals.jsonl"), signal_rows)
     has_xlsx = write_xlsx(os.path.join(run_dir, "需求信号.xlsx"), signal_rows, post_rows)
     write_summary(os.path.join(run_dir, "summary.md"), run_dir, uniq, signal_rows, post_rows, deep)
     print(f"共 {len(uniq)} 条帖子和评论，其中 {len(signal_rows)} 条命中需求信号。")

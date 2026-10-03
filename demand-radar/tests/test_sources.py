@@ -1,8 +1,12 @@
-"""YouTube 和 X 两个数据源的测试：接口返回用录好的样例数据，不联网。
+"""YouTube 和 X 两个数据源的测试，各数据源都记下作者，merge.py 写出 signals.jsonl。
+接口返回用录好的样例数据，不联网。
 
 运行：python -m unittest discover tests
 """
+import contextlib
+import csv
 import glob
+import io
 import json
 import os
 import shutil
@@ -17,7 +21,7 @@ sys.path.insert(0, os.path.join(ROOT, "app"))
 
 import merge  # noqa: E402
 import run_source  # noqa: E402
-from sources import x, youtube  # noqa: E402
+from sources import appstore, github, hn, reddit, x, youtube  # noqa: E402
 from sources.common import ERRORS, FetchError, Writer  # noqa: E402
 
 # ---------- 样例数据（按 YouTube Data API v3 和 X API v2 文档里的格式） ----------
@@ -264,6 +268,184 @@ class XNoTokenTest(Base):
             x.run(opts(), Writer(self.tmp, "x", "search"))
         self.assertIn("Bearer Token", str(cm.exception))
         self.assertEqual(f.calls, [])
+
+
+# ---------- 作者（Reddit / HN / GitHub / App Store 的样例，按各自接口的格式） ----------
+REDDIT_POSTS = {"data": [
+    {"id": "abc123", "title": "Is there an app that reminds me to water plants?", "selftext": "I keep forgetting", "score": 420,
+     "num_comments": 2, "created_utc": 1758000000, "permalink": "/r/SomebodyMakeThis/comments/abc123/x/",
+     "subreddit": "SomebodyMakeThis", "author": "plant_lady", "author_fullname": "t2_aaa"},
+    {"id": "def456", "title": "Is there a tool that tracks my receipts?", "selftext": "", "score": 3, "num_comments": 0,
+     "created_utc": 1758000000, "permalink": "/r/SomebodyMakeThis/comments/def456/y/", "subreddit": "SomebodyMakeThis",
+     "author": "[deleted]"}]}
+REDDIT_TREE = {"data": [
+    {"kind": "t1", "data": {"id": "c1", "body": "I'd happily pay for this", "score": 88, "created_utc": 1758000100,
+                            "author": "Buyer_Bob", "author_fullname": "t2_bbb", "parent_id": "t3_abc123",
+                            "replies": {"data": {"children": [
+                                {"kind": "t1", "data": {"id": "c2", "body": "same, take my money", "score": 5, "parent_id": "t1_c1",
+                                                        "created_utc": 1758000200, "author": "[deleted]", "author_fullname": "t2_ccc",
+                                                        "replies": ""}}]}}}}]}
+HN_STORIES = {"hits": [{"objectID": "111", "title": "Ask HN: Is there a tool for tracking freelance invoices?", "author": "ann"}]}
+HN_COMMENT_HITS = {"hits": [{"objectID": "222", "story_id": 333, "story_title": "What do you wish existed?", "parent_id": 333,
+                             "comment_text": "<p>I wish there was an app for splitting rent</p>", "created_at_i": 1758000000,
+                             "author": "renter"}]}
+HN_ITEM = {"id": 111, "type": "story", "author": "ann", "title": "Ask HN: Is there a tool for tracking freelance invoices?",
+           "text": "", "points": 150, "created_at_i": 1758000000, "children": [
+               {"id": 112, "type": "comment", "author": "fred", "text": "Would pay for this", "created_at_i": 1758000100,
+                "parent_id": 111, "children": [
+                    {"id": 113, "type": "comment", "author": None, "text": "me too", "created_at_i": 1758000200, "parent_id": 112,
+                     "children": []}]}]}
+GH_SEARCH = {"items": [{"id": 9, "number": 5, "title": "Feature request: dark mode", "body": "please add dark mode",
+                        "html_url": "https://github.com/o/r/issues/5", "comments": 2,
+                        "comments_url": "https://api.github.com/repos/o/r/issues/5/comments", "reactions": {"+1": 321},
+                        "created_at": "2026-01-01T00:00:00Z", "repository_url": "https://api.github.com/repos/o/r", "state": "open",
+                        "user": {"login": "octocat", "id": 583231}}]}
+GH_COMMENTS = [{"id": 77, "body": "+1, would pay for this", "created_at": "2026-01-02T00:00:00Z", "reactions": {"+1": 12},
+                "user": {"login": "dev-dan", "id": 42}},
+               {"id": 78, "body": "me too", "created_at": "2026-01-03T00:00:00Z", "user": {"login": "ghost", "id": 10137}}]
+APP_SEARCH = {"results": [{"trackId": 1050106939, "trackName": "随手记账", "sellerName": "某某科技", "artistId": 31415926,
+                           "primaryGenreName": "财务", "averageUserRating": 3.2, "userRatingCount": 12000, "formattedPrice": "免费",
+                           "description": "记账软件", "trackViewUrl": "https://apps.apple.com/cn/app/id1050106939",
+                           "currentVersionReleaseDate": "2026-09-01T00:00:00Z"}]}
+# 苹果真实的 RSS 里作者带着一个空的 label，昵称在 name 里
+APP_RSS = {"feed": {"entry": [
+    {"author": {"uri": {"label": "https://itunes.apple.com/cn/reviews/id987654321"}, "name": {"label": "小王"}, "label": ""},
+     "im:version": {"label": "5.1"}, "im:rating": {"label": "1"}, "id": {"label": "r1"}, "title": {"label": "广告太多了"},
+     "content": {"label": "开屏广告忍无可忍，希望能加一个关闭广告的会员"}, "im:voteSum": {"label": "37"},
+     "im:voteCount": {"label": "40"}, "updated": {"label": "2026-09-20T08:00:00-07:00"}}]}}
+SIGNAL_KEYS = ["platform", "platform_name", "kind", "id", "post_id", "author", "author_id", "text", "post_title", "post_type",
+               "url", "signals", "score", "likes", "replies", "time", "keyword"]
+
+
+def write_jsonl(root, platform, kind, rows):
+    d = os.path.join(root, platform, "jsonl")
+    os.makedirs(d, exist_ok=True)
+    with open(os.path.join(d, f"search_{kind}_2026-10-01.jsonl"), "a", encoding="utf-8") as f:
+        for r in rows:
+            f.write(json.dumps(r, ensure_ascii=False) + "\n")
+
+
+class AuthorTest(Base):
+    def setUp(self):
+        super().setUp()
+        self.subs = os.environ.get("RADAR_REDDIT_SUBS")
+        os.environ["RADAR_REDDIT_SUBS"] = "SomebodyMakeThis"
+        # Reddit 至少停 2 秒、GitHub 搜索至少停 6 秒，测试里不停
+        self.saved_pause = {mod: mod.pause for mod in (reddit, github)}
+        for mod in self.saved_pause:
+            mod.pause = lambda base: None
+
+    def tearDown(self):
+        for mod, fn in self.saved_pause.items():
+            mod.pause = fn
+        if self.subs is None:
+            os.environ.pop("RADAR_REDDIT_SUBS", None)
+        else:
+            os.environ["RADAR_REDDIT_SUBS"] = self.subs
+        super().tearDown()
+
+    def run_reddit(self, out=None):
+        self.fake(reddit, [("posts/search", REDDIT_POSTS), ("comments/tree", REDDIT_TREE)])
+        reddit.run(opts(keywords=["plants"], sub=True), Writer(out or self.tmp, "reddit", "search"))
+
+    def test_reddit_records_authors(self):
+        self.run_reddit()
+        posts = {p["note_id"]: p for p in read(os.path.join(self.tmp, "reddit/jsonl/*contents*"))}
+        comments = {c["comment_id"]: c for c in read(os.path.join(self.tmp, "reddit/jsonl/*comments*"))}
+        self.assertEqual((posts["abc123"]["nickname"], posts["abc123"]["user_id"]), ("plant_lady", "t2_aaa"))
+        self.assertEqual((posts["def456"]["nickname"], posts["def456"]["user_id"]), ("", ""))  # 删号的记成空
+        self.assertEqual((comments["c1"]["nickname"], comments["c1"]["user_id"]), ("Buyer_Bob", "t2_bbb"))
+        self.assertEqual((comments["c2"]["nickname"], comments["c2"]["user_id"]), ("", ""))
+        # 详情页兜底（帖子没取到）也带着这两个字段
+        self.assertEqual(reddit.author_of({"id": "x"}), ("", ""))
+
+    def test_hn_records_authors(self):
+        self.fake(hn, [("tags=story", HN_STORIES), ("tags=comment", HN_COMMENT_HITS), ("/items/111", HN_ITEM)])
+        hn.run(opts(keywords=["invoice"], sub=True), Writer(self.tmp, "hn", "search"))
+        posts = {p["note_id"]: p for p in read(os.path.join(self.tmp, "hn/jsonl/*contents*"))}
+        comments = {c["comment_id"]: c for c in read(os.path.join(self.tmp, "hn/jsonl/*comments*"))}
+        self.assertEqual((posts["111"]["nickname"], posts["111"]["user_id"]), ("ann", "ann"))
+        self.assertEqual(posts["333"]["nickname"], "")  # 只从评论里知道这个帖子，不知道发帖人
+        self.assertEqual((comments["112"]["nickname"], comments["112"]["user_id"]), ("fred", "fred"))
+        self.assertEqual(comments["113"]["nickname"], "")  # 删掉的评论没有作者
+        self.assertEqual((comments["222"]["nickname"], comments["222"]["user_id"]), ("renter", "renter"))
+
+    def test_github_records_authors(self):
+        self.fake(github, [("search/issues", GH_SEARCH), ("issues/5/comments", GH_COMMENTS)])
+        github.run(opts(keywords=["dark mode"]), Writer(self.tmp, "github", "search"))
+        post = read(os.path.join(self.tmp, "github/jsonl/*contents*"))[0]
+        comments = read(os.path.join(self.tmp, "github/jsonl/*comments*"))
+        self.assertEqual((post["nickname"], post["user_id"]), ("octocat", "583231"))
+        self.assertEqual([(c["nickname"], c["user_id"]) for c in comments], [("dev-dan", "42"), ("", "")])  # ghost = 注销的账号
+
+    def test_appstore_records_review_authors(self):
+        self.fake(appstore, [("itunes.apple.com/search", APP_SEARCH), ("sortby=mosthelpful", APP_RSS)])
+        appstore.run(opts(keywords=["记账"]), Writer(self.tmp, "appstore", "search"))
+        post = read(os.path.join(self.tmp, "appstore/jsonl/*contents*"))[0]
+        review = read(os.path.join(self.tmp, "appstore/jsonl/*comments*"))[0]
+        self.assertEqual((post["nickname"], post["user_id"]), ("某某科技", "31415926"))
+        self.assertEqual((review["nickname"], review["user_id"]), ("小王", "987654321"))
+        self.assertTrue(review["content"].startswith("【1星】广告太多了"))
+        web = appstore.parse_catalog_reviews({"data": [{"id": "w1", "attributes": {"rating": 2, "review": "x", "userName": "u"}}]})
+        self.assertEqual((web[0]["author"], web[0]["author_id"]), ("u", ""))
+
+    def test_merge_load_reads_author_keys(self):
+        write_jsonl(self.tmp, "xhs", "contents", [{"note_id": "n1", "title": "有没有app可以记衣服", "nickname": "小红", "user_id": "u1"}])
+        write_jsonl(self.tmp, "xhs", "comments", [{"comment_id": "c1", "note_id": "n1", "content": "同求", "nickname": "阿青",
+                                                    "user_id": "u2", "parent_comment_id": 0}])
+        write_jsonl(self.tmp, "douyin", "comments", [{"comment_id": "d1", "aweme_id": "a1", "content": "蹲安卓", "nickname": "抖友",
+                                                       "sec_uid": "MS4w"}])
+        write_jsonl(self.tmp, "zhihu", "contents", [{"content_id": "z1", "title": "问题", "content_text": "求推荐", "user_nickname": "知友",
+                                                      "user_id": "zid"}])
+        write_jsonl(self.tmp, "web", "contents", [{"note_id": "p1", "title": "a", "author": "someone", "author_id": "9"},
+                                                   {"note_id": "p2", "title": "b", "screen_name": "tw"},
+                                                   {"note_id": "p3", "title": "c"}])
+        items, _ = merge.load(self.tmp)
+        got = {i["id"]: (i["author"], i["author_id"]) for i in items}
+        self.assertEqual(got, {"n1": ("小红", "u1"), "c1": ("阿青", "u2"), "d1": ("抖友", "MS4w"), "z1": ("知友", "zid"),
+                               "p1": ("someone", "9"), "p2": ("tw", ""), "p3": ("", "")})
+
+    def test_merge_writes_signals_jsonl(self):
+        self.run_reddit()
+        # MediaCrawler 的抖音目录叫 douyin，signals.jsonl 里要记软件里的平台 ID dy
+        write_jsonl(self.tmp, "douyin", "contents", [{"aweme_id": "a1", "title": "", "desc": "为什么没有人做一个老人专用的防诈骗app",
+                                                       "liked_count": "5000", "comment_count": "800", "nickname": "老王",
+                                                       "user_id": "dy-1", "aweme_url": "https://www.douyin.com/video/a1",
+                                                       "source_keyword": "为什么没有人做", "create_time": 1758000000}])
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            self.assertEqual(merge.main(self.tmp), 0)
+        with open(os.path.join(self.tmp, "signals.jsonl"), encoding="utf-8") as f:
+            raw = f.read()
+        rows = [json.loads(line) for line in raw.splitlines() if line.strip()]
+        with open(os.path.join(self.tmp, "需求信号.csv"), encoding="utf-8-sig") as f:
+            table = list(csv.reader(f))
+        # CSV 的列不变；signals.jsonl 和 需求信号.csv 行数、顺序一致
+        self.assertEqual(table[0], ["平台", "类型", "需求信号", "得分", "内容", "点赞", "回复数", "所属帖子", "帖子类型", "链接", "搜索词", "时间"])
+        self.assertEqual(len(rows), len(table) - 1)
+        self.assertEqual([(r["text"], str(r["score"])) for r in rows], [(t[4], t[3]) for t in table[1:]])
+        self.assertIn(f"其中 {len(rows)} 条命中需求信号。", out.getvalue())  # jobs.py 读这一行
+        self.assertTrue(all(list(r) == SIGNAL_KEYS for r in rows))
+        self.assertIn("老人专用", raw)  # 中文原样写，不转成 \\u
+        by_id = {r["id"]: r for r in rows}
+        post, buyer = by_id["abc123"], by_id["c1"]
+        self.assertEqual((post["platform"], post["platform_name"], post["kind"]), ("reddit", "Reddit", "帖子"))
+        self.assertEqual((post["author"], post["author_id"], post["post_id"]), ("plant_lady", "t2_aaa", "abc123"))
+        self.assertEqual((buyer["kind"], buyer["author"], buyer["author_id"], buyer["post_id"]), ("评论", "Buyer_Bob", "t2_bbb", "abc123"))
+        self.assertEqual(buyer["url"], "https://www.reddit.com/r/SomebodyMakeThis/comments/abc123/x/")
+        self.assertEqual(buyer["post_title"], "Is there an app that reminds me to water plants?")
+        self.assertEqual((buyer["likes"], buyer["keyword"]), (88, "plants"))
+        self.assertIsInstance(buyer["score"], float)
+        self.assertTrue(buyer["signals"])
+        dy = by_id["a1"]
+        self.assertEqual((dy["platform"], dy["platform_name"], dy["author"], dy["author_id"]), ("dy", "抖音", "老王", "dy-1"))
+
+    def test_signals_jsonl_empty_when_nothing_hits(self):
+        write_jsonl(self.tmp, "xhs", "contents", [{"note_id": "n1", "title": "今天的晚饭", "desc": "好吃", "nickname": "小红"}])
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(merge.main(self.tmp), 0)
+        with open(os.path.join(self.tmp, "signals.jsonl"), encoding="utf-8") as f:
+            self.assertEqual(f.read(), "")
 
 
 if __name__ == "__main__":

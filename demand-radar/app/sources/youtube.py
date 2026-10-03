@@ -5,7 +5,7 @@
 - 视频点赞、评论数：/videos?part=snippet,statistics&id=ID1,ID2（1 点）；
 - 评论：/commentThreads?part=snippet,replies&videoId=ID（1 点，一次最多 100 条）。
 API key 在 Google Cloud 控制台免费申请（启用 YouTube Data API v3 → 凭据 → 创建 API 密钥），
-填在软件的 设置 → 网络和接口 里。国内要开代理。
+填在软件的 设置 → 抓取用的 Key 里。国内要开代理。
 """
 import os
 import re
@@ -19,7 +19,7 @@ API = "https://www.googleapis.com/youtube/v3"
 def key():
     k = os.environ.get("RADAR_YOUTUBE_KEY", "").strip()
     if not k:
-        raise FetchError("还没填 YouTube API key：在 设置 → 网络和接口 里填（Google Cloud 控制台免费申请）")
+        raise FetchError("还没填 YouTube API key：在 设置 → 抓取用的 Key 里填（Google Cloud 控制台免费申请）")
     return k
 
 

@@ -25,8 +25,9 @@ sys.path.insert(0, APP_DIR)
 
 import catalog  # noqa: E402
 from jobs import JobManager  # noqa: E402
+from outreach import Outreach  # noqa: E402
 
-VERSION = "0.3.1"
+VERSION = "0.4.0"
 HOME = os.environ.get("RADAR_HOME") or os.path.dirname(APP_DIR)
 WEB_DIR = os.path.join(APP_DIR, "web")
 IS_MAC = sys.platform == "darwin"
@@ -45,8 +46,39 @@ DEFAULT_SETTINGS = {
     "default_notes": 20,
     "default_comments": 20,
     "keyword_sets": [],
+    # 线索与回复：AI 判断和写回复
+    "anthropic_api_key": "",
+    "ai_model": "claude-opus-5-5",
+    "product_name": "",
+    "product_pitch": "",       # 一句话说明：做什么、解决什么问题、给谁用
+    "product_link": "",
+    "sender_identity": "",     # 你的身份，会写进每条回复（不冒充路人）
+    "reply_style": "",         # 对回复的额外要求
+    # 每天最多发多少条，用户自己定；0 = 不往这个平台发。没有"每天至少发多少"
+    "cap_reddit": 20,
+    "cap_x": 20,
+    "cap_youtube": 20,
+    "cap_other": 30,
+    "send_gap_sec": 90,        # 批量发送时每条之间等几秒
+    "reply_check_min": 30,     # 每隔几分钟自动查一次回复，0 = 不自动查
+    "send_mode_reddit": "api", # 用户自己选：api = 批准后用官方接口发；manual = 复制后自己去发
+    "send_mode_x": "api",
+    # 发送账号：每个平台一个，就是你自己的
+    "reddit_client_id": "",
+    "reddit_client_secret": "",
+    "reddit_username": "",
+    "reddit_password": "",
+    "x_api_key": "",
+    "x_api_secret": "",
+    "x_access_token": "",
+    "x_access_secret": "",
 }
-SECRET_KEYS = {"github_token", "youtube_api_key", "x_bearer_token"}  # 界面上只显示"已填写"
+SECRET_KEYS = {"github_token", "youtube_api_key", "x_bearer_token", "anthropic_api_key", "reddit_client_secret",
+               "reddit_password", "x_api_key", "x_api_secret", "x_access_token", "x_access_secret"}  # 界面上只显示"已填写"
+TEXT_LIMITS = {"product_pitch": 1000, "reply_style": 1000, "reddit_subs": 2000, "browser_path": 1000}  # 其余文字最多 300 字
+INT_RANGES = {"cap_reddit": (0, 1000), "cap_x": (0, 1000), "cap_youtube": (0, 1000), "cap_other": (0, 1000),
+              "send_gap_sec": (0, 3600), "reply_check_min": (0, 1440)}  # 其余数字 0–5000
+CHOICES = {"send_mode_reddit": ("api", "manual"), "send_mode_x": ("api", "manual")}
 
 
 # ---------- 设置 ----------
@@ -99,12 +131,17 @@ class Settings:
                 elif isinstance(DEFAULT_SETTINGS[k], bool):
                     v = bool(v)
                 elif isinstance(DEFAULT_SETTINGS[k], int):
+                    lo, hi = INT_RANGES.get(k, (0, 5000))
                     try:
-                        v = max(0, min(int(v), 5000))
+                        v = max(lo, min(int(v), hi))
                     except (TypeError, ValueError):
                         continue
+                elif k in CHOICES:
+                    if v not in CHOICES[k]:
+                        continue
                 else:
-                    v = str(v).strip()
+                    v = str(v) if k == "reddit_password" else str(v).strip()  # 密码前后的空格也算密码
+                    v = v[:TEXT_LIMITS.get(k, 300)]
                 self.data[k] = v
             tmp = self.path + ".tmp"
             with open(tmp, "w", encoding="utf-8") as f:
@@ -152,11 +189,24 @@ def login_state(mc_dir, pid):
 
 
 class App:
-    def __init__(self, home=HOME, mc_dir=None, mc_python=None):
+    def __init__(self, home=HOME, mc_dir=None, mc_python=None, **outreach_kwargs):
+        """outreach_kwargs 原样交给 Outreach（测试里换成假的 AI 客户端、假 http，关掉自动查回复）。"""
         self.home = home
         self.settings = Settings(home)
         self.jobs = JobManager(home, mc_dir=mc_dir, mc_python=mc_python, env_fn=self.settings.env)
         self.mc_dir = self.jobs.mc_dir
+        self.outreach = Outreach(home, self.settings.get, self.jobs.runs, **outreach_kwargs)
+
+    def job_list(self):
+        """任务列表；signals_file 表示这次采集能不能拿去找线索（旧任务要先重新打分）。"""
+        jobs = self.jobs.list()
+        for j in jobs:
+            j["signals_file"] = os.path.isfile(os.path.join(self.jobs.runs, j["id"], "signals.jsonl"))
+        return jobs
+
+    def close(self):
+        self.jobs.stop_all()
+        self.outreach.close()
 
     def state(self):
         last_ok = {}
@@ -238,10 +288,92 @@ class App:
             return {"ok": False, "message": "这个任务还没有 summary.md"}
         with open(path, encoding="utf-8") as f:
             text = f.read()
-        if IS_MAC and shutil.which("pbcopy"):
-            subprocess.run(["pbcopy"], input=text.encode("utf-8"))
+        if self.copy_text(text):
             return {"ok": True, "copied": True, "chars": len(text)}
         return {"ok": True, "copied": False, "text": text}
+
+    # ---------- 线索与回复 ----------
+    def copy_text(self, text):
+        """Mac 上用 pbcopy 放进剪贴板；别的系统返回 False，让页面自己复制。"""
+        if not (IS_MAC and text and shutil.which("pbcopy")):
+            return False
+        try:
+            subprocess.run(["pbcopy"], input=text.encode("utf-8"), timeout=5, check=True)
+            return True
+        except (OSError, subprocess.SubprocessError):
+            return False
+
+    def open_url(self, url):
+        """用系统浏览器打开网址。只开 http(s)：网址来自别人的帖子，不能让它打开本机的文件或程序。"""
+        if not re.fullmatch(r"https?://\S+", url or "", re.I):
+            return False
+        try:
+            if IS_MAC:
+                subprocess.Popen(["open", url])
+                return True
+            return bool(webbrowser.open(url))
+        except Exception:
+            return False
+
+    def open_lead(self, lid):
+        """「复制并打开」：回复放进剪贴板，原帖在浏览器里打开。"""
+        info = self.outreach.open_info(lid)
+        return {**info, "opened": self.open_url(info["url"]), "copied": self.copy_text(info["draft"])}
+
+    def import_leads(self, body):
+        o = self.outreach
+        res = {"import": o.import_job(body.get("job"), body.get("limit", 30), body.get("min_score", 0)), "judging": False}
+        if body.get("judge"):
+            ready = o.ready()
+            if not (ready["ai"] and ready["profile"]):
+                res["judge_error"] = "填好 Anthropic API key 和产品资料（设置 → 线索与回复）以后，AI 才能判断"
+            else:
+                try:
+                    o.judge()
+                    res["judging"] = True
+                except ValueError as e:
+                    res["judge_error"] = str(e)
+        return res
+
+    def outreach_post(self, path, body):
+        """/api/outreach/... 的写操作。出错抛 ValueError，界面上显示原话。"""
+        o = self.outreach
+        act = path[len("/api/outreach/"):]
+        if not isinstance(body, dict):
+            raise ValueError("请求内容不对")
+        if act == "import":
+            return self.import_leads(body)
+        if act == "judge":
+            ids = body.get("ids")
+            if ids is not None and not isinstance(ids, list):
+                raise ValueError("ids 要是列表")
+            return o.judge(ids)
+        if act == "send":
+            ids = body.get("ids")
+            if not isinstance(ids, list):
+                raise ValueError("先选要发的线索")
+            return o.send(ids)
+        if act == "check":
+            return o.check_replies()
+        if act == "stop":
+            return {"ok": o.stop()}
+        if act == "test-ai":
+            return o.test_ai()
+        m = re.fullmatch(r"test/(reddit|x)", act)
+        if m:
+            return o.test_sender(m.group(1))
+        m = re.fullmatch(r"leads/([\w-]+)(/sent|/reply|/open)?", act)
+        if m:
+            lid, sub = m.groups()
+            if not sub:
+                draft = body.get("draft")
+                return o.update(lid, draft=None if draft is None else str(draft), action=body.get("action"))
+            if sub == "/sent":
+                return o.mark_sent(lid)
+            if sub == "/reply":
+                return o.add_reply(lid, body.get("text"))
+            return self.open_lead(lid)
+        return None
 
 
 # ---------- HTTP ----------
@@ -293,7 +425,10 @@ def make_handler(app, port_ref):
                 if path == "/api/state":
                     return self._json(app.state())
                 if path == "/api/jobs":
-                    return self._json({"jobs": app.jobs.list()})
+                    # hot：侧栏「线索与回复」上的热线索数字，跟着任务列表一起刷新
+                    return self._json({"jobs": app.job_list(), "hot": app.outreach.store.counts().get("hot", 0)})
+                if path == "/api/outreach":
+                    return self._json(app.outreach.state())
                 if path == "/api/search":
                     return self._json(app.jobs.search(q.get("q", [""])[0]))
                 m = re.fullmatch(r"/api/jobs/([\w-]+)(/log|/results|/file)?", path)
@@ -338,10 +473,13 @@ def make_handler(app, port_ref):
                     self._json({"ok": True})
 
                     def quit_all():
-                        app.jobs.stop_all()
+                        app.close()
                         self.server.shutdown()
                     threading.Thread(target=quit_all, daemon=True).start()
                     return None
+                if path.startswith("/api/outreach/"):
+                    res = app.outreach_post(path, body)
+                    return self._error("没有这个接口", 404) if res is None else self._json(res)
                 m = re.fullmatch(r"/api/(login|probe)/(\w+)(/clear)?", path)
                 if m:
                     if m.group(1) == "probe":
@@ -445,10 +583,11 @@ def open_window(url, app=None):
     win = webview.create_window("需求雷达", url, width=1360, height=880, min_size=(1000, 640), text_select=True)
 
     def closing():
-        # 正在采集时关窗口先问一句：关了任务就停了
-        if app and app.jobs.busy():
+        # 正在采集或正在发回复时关窗口先问一句：关了就停了
+        if app and (app.jobs.busy() or app.outreach.task.get("kind")):
             try:
-                return bool(win.create_confirmation_dialog("还有任务在采集", "关掉需求雷达，正在采集的任务会停止（已抓到的数据会保留）。确定关掉吗？"))
+                return bool(win.create_confirmation_dialog(
+                    "还有任务在跑", "关掉需求雷达，正在采集的任务、正在发的回复都会停下（已抓到的数据、已经发出的回复都会保留）。确定关掉吗？"))
             except Exception:
                 return True
         return True
@@ -482,11 +621,11 @@ def main(argv=None):
         if a.no_open:
             t.join()
         elif open_window(url, app):
-            app.jobs.stop_all()
+            app.close()
         else:
             t.join()
     except KeyboardInterrupt:
-        app.jobs.stop_all()
+        app.close()
     httpd.shutdown()
     httpd.server_close()
     return 0

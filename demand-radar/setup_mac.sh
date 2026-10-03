@@ -109,6 +109,13 @@ if uv pip install --python "$MC_DIR/.venv/bin/python" pywebview trafilatura >/de
 else
   warn "pywebview 没装上，软件会在浏览器里打开，功能不受影响"
 fi
+# anthropic：「线索与回复」里 AI 判断、写回复要用（装不上不影响采集）
+if uv pip install --python "$MC_DIR/.venv/bin/python" anthropic >/dev/null 2>&1 \
+   || uv pip install --python "$MC_DIR/.venv/bin/python" --index-url https://pypi.org/simple anthropic >/dev/null 2>&1; then
+  ok "AI 组件（anthropic）已装好"
+else
+  warn "anthropic 没装上：「线索与回复」里的 AI 判断用不了，采集不受影响。可以稍后重跑本脚本"
+fi
 
 # 在"应用程序"里放一个能双击打开的 需求雷达.app（启动台、聚焦搜索都能找到）
 if [[ "$(uname)" == "Darwin" ]]; then
@@ -125,7 +132,7 @@ if [[ "$(uname)" == "Darwin" ]]; then
   <key>CFBundleExecutable</key><string>radar</string>
   <key>CFBundleIconFile</key><string>icon</string>
   <key>CFBundlePackageType</key><string>APPL</string>
-  <key>CFBundleShortVersionString</key><string>0.3.0</string>
+  <key>CFBundleShortVersionString</key><string>0.4.0</string>
   <key>LSMinimumSystemVersion</key><string>11.0</string>
   <key>NSHighResolutionCapable</key><true/>
 </dict></plist>
@@ -162,6 +169,7 @@ cat <<EOF
 
   打开软件：在启动台里点"需求雷达"，或者在终端运行  open ~/Applications/需求雷达.app
            选平台、填关键词、点"开始采集"就行。国内平台第一次会弹出 Chrome 窗口，用手机 App 扫码登录。
+           想找需要你产品的人：在"设置 → 线索与回复"里填好 Anthropic API key 和产品资料，再打开"线索与回复"。
 
   也还可以用命令行：
     "$RADAR_HOME/radar.sh" -p xhs -n 20 -c 10

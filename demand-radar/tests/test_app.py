@@ -1,7 +1,7 @@
 """需求雷达软件的测试：数据源解析、任务执行（用假的 MediaCrawler 和录好的接口数据）、本机服务接口。
 
 运行：python -m unittest discover tests
-不联网：数据源的网络请求都换成了 RADAR_FAKE_HTTP 指定的样例数据。
+不联网：数据源的网络请求都换成了 RADAR_FAKE_HTTP 指定的样例数据；「线索与回复」用假的 Claude 和假的 Reddit。
 """
 import glob
 import json
@@ -15,6 +15,7 @@ import time
 import unittest
 import urllib.error
 import urllib.request
+from types import SimpleNamespace
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
@@ -333,7 +334,7 @@ class ServerTest(unittest.TestCase):
         import server
         cls.home, cls.mc, fake_http = make_home()
         os.environ["RADAR_FAKE_HTTP"] = fake_http
-        cls.app = server.App(home=cls.home, mc_dir=cls.mc, mc_python=sys.executable)
+        cls.app = server.App(home=cls.home, mc_dir=cls.mc, mc_python=sys.executable, auto_check=False)
         cls.port = server.free_port(0)
         cls.httpd = server.serve(cls.app, cls.port)
         threading.Thread(target=cls.httpd.serve_forever, daemon=True).start()
@@ -342,7 +343,7 @@ class ServerTest(unittest.TestCase):
     def tearDownClass(cls):
         cls.httpd.shutdown()
         cls.httpd.server_close()
-        cls.app.jobs.stop_all()
+        cls.app.close()
         os.environ.pop("RADAR_FAKE_HTTP", None)
         shutil.rmtree(cls.home, ignore_errors=True)
 
@@ -438,6 +439,215 @@ class ServerTest(unittest.TestCase):
         self.assertIn("随手记账", r["message"])
         code, r = self.call("/api/probe/xhs", {})
         self.assertFalse(r["ok"])
+
+
+# ---------- 线索与回复 ----------
+SECRETS = {"github_token": "ghp_1", "youtube_api_key": "yt_1", "x_bearer_token": "xb_1", "anthropic_api_key": "sk-ant-1",
+           "reddit_client_secret": "rs_1", "reddit_password": " pw with spaces ", "x_api_key": "xk_1", "x_api_secret": "xs_1",
+           "x_access_token": "xt_1", "x_access_secret": "xts_1"}
+PROFILE = {"product_name": "PlantPal", "product_pitch": "A phone app that reminds you when each plant needs water",
+           "product_link": "https://plantpal.app", "sender_identity": "I'm Li, the developer of PlantPal"}
+LEAD_ROWS = [  # merge.py 写的 signals.jsonl 的格式
+    {"platform": "reddit", "platform_name": "Reddit", "kind": "帖子", "id": "p1", "post_id": "p1", "author": "Alice",
+     "text": "Is there an app that reminds me to water my plants?", "post_title": "Plant reminder app?",
+     "url": "https://www.reddit.com/r/plants/comments/p1/t/", "signals": "求工具", "score": 9},
+    {"platform": "reddit", "platform_name": "Reddit", "kind": "评论", "id": "c1", "post_id": "p1", "author": "bob",
+     "text": "lol same", "url": "https://www.reddit.com/r/plants/comments/p1/t/", "signals": "想要", "score": 8},
+    {"platform": "xhs", "platform_name": "小红书", "kind": "评论", "id": "x1", "post_id": "n1", "author": "小李",
+     "text": "有没有提醒浇水的app", "url": "https://www.xiaohongshu.com/explore/n1", "signals": "求工具", "score": 7},
+    {"platform": "appstore", "platform_name": "App Store", "kind": "评论", "id": "a1", "author": "小王", "text": "广告太多", "score": 6},
+    {"platform": "hn", "platform_name": "Hacker News", "kind": "评论", "id": "h1", "author": "", "text": "I wish there was a water reminder", "score": 5},
+]
+
+
+class FakeClaude:
+    """和 anthropic.Anthropic 一样有 .beta.messages.parse：提到浇水的判合适并写回复；对方回复里有 try 的算想试用。"""
+
+    def __init__(self):
+        self.calls = []
+        self.beta = SimpleNamespace(messages=SimpleNamespace(parse=self.parse))
+
+    def parse(self, **kw):
+        self.calls.append(kw)
+        text = kw["messages"][0]["content"]
+        if "<reply>" in text:
+            hot = "try" in text.split("<reply>")[1]
+            out = SimpleNamespace(intent="trial" if hot else "stop", hot=hot, summary="想试用" if hot else "让我们别再联系",
+                                  suggested_reply="Here is the link: https://plantpal.app" if hot else "")
+        else:
+            post = text.split("<post>")[1]
+            fit = "water" in post or "浇水" in post
+            out = SimpleNamespace(fit=fit, fit_score=90 if fit else 10, need="想要浇水提醒" if fit else "闲聊",
+                                  reason="正是产品解决的问题" if fit else "没有需求", reply_language="en",
+                                  draft="Checking the soil beats a fixed schedule. I'm the developer of PlantPal, it reminds you per plant." if fit else "")
+        return SimpleNamespace(stop_reason="end_turn", parsed_output=out)
+
+
+class FakeReddit:
+    """查表回 (状态码, 内容)，记下每个请求。"""
+
+    def __init__(self):
+        self.calls = []
+        self.inbox = []
+
+    def __call__(self, method, url, headers=None, form=None, json_body=None, timeout=30, proxy=""):
+        self.calls.append((method, url, form))
+        if "access_token" in url:
+            return 200, {"access_token": "tok", "expires_in": 3600}
+        if url.endswith("/api/comment"):
+            return 200, {"json": {"errors": [], "data": {"things": [{"kind": "t1", "data": {"name": "t1_mine", "id": "mine"}}]}}}
+        if "/api/v1/me" in url:
+            return 200, {"name": "maker"}
+        if "/message/inbox" in url:
+            return 200, {"data": {"children": self.inbox}}
+        return 404, {"error": "no route"}
+
+
+class OutreachServerTest(unittest.TestCase):
+    """「线索与回复」走真的本机服务：导入 → AI 判断 → 批准 → 用（假的）Reddit 发出 → 手动发 → 记回复 → 查回复。"""
+
+    @classmethod
+    def setUpClass(cls):
+        import server
+        cls.home, cls.mc, _ = make_home()
+        cls.claude, cls.reddit = FakeClaude(), FakeReddit()
+        cls.app = server.App(home=cls.home, mc_dir=cls.mc, mc_python=sys.executable, auto_check=False,
+                             client_factory=lambda key, proxy: cls.claude, http=cls.reddit, sleep=lambda s: None)
+        cls.opened = []
+        cls.app.open_url = lambda url: cls.opened.append(url) or True  # 测试里不真开浏览器
+        cls.port = server.free_port(0)
+        cls.httpd = server.serve(cls.app, cls.port)
+        threading.Thread(target=cls.httpd.serve_forever, daemon=True).start()
+        run = os.path.join(cls.home, "runs", "job-a")
+        os.makedirs(run)
+        with open(os.path.join(run, "signals.jsonl"), "w", encoding="utf-8") as f:
+            for r in LEAD_ROWS:
+                f.write(json.dumps(r, ensure_ascii=False) + "\n")
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.httpd.shutdown()
+        cls.httpd.server_close()
+        cls.app.close()
+        shutil.rmtree(cls.home, ignore_errors=True)
+
+    call = ServerTest.call
+
+    def wait_idle(self):
+        return wait_for(lambda: (st := self.call("/api/outreach")[1]) and st["task"]["kind"] is None and st["task"]["finished"] and st, timeout=10)
+
+    def lead(self, author, st=None):
+        st = st or self.call("/api/outreach")[1]
+        return next(l for l in st["leads"] if l["author"] == author)
+
+    def test_settings_mask_every_secret_and_clamp(self):
+        import server
+        self.assertTrue(set(SECRETS) <= server.SECRET_KEYS)
+        code, st = self.call("/api/settings", {**SECRETS, "cap_reddit": 5000, "cap_x": -3, "cap_other": "abc", "send_gap_sec": 7,
+                                               "send_mode_reddit": "manual", "send_mode_x": "bogus", "product_pitch": "长" * 1500,
+                                               "product_name": "名" * 400})
+        self.assertEqual(code, 200)
+        pub = st["settings"]
+        self.assertEqual({k: pub[k] for k in SECRETS}, {k: "已填写" for k in SECRETS}, "页面上看不到任何 Key 和密码")
+        self.assertEqual((pub["cap_reddit"], pub["cap_x"], pub["cap_other"], pub["send_gap_sec"]), (1000, 0, 30, 7))
+        self.assertEqual((pub["send_mode_reddit"], pub["send_mode_x"]), ("manual", "api"), "发送方式只认 api / manual")
+        self.assertEqual((len(pub["product_pitch"]), len(pub["product_name"])), (1000, 300))
+        # 页面把"已填写"原样存回来，不能把真的值盖掉
+        self.call("/api/settings", {k: "已填写" for k in SECRETS})
+        real = self.app.settings.get()
+        self.assertEqual({k: real[k] for k in SECRETS}, SECRETS, "密码前后的空格也保留")
+        if os.name == "posix":
+            self.assertEqual(os.stat(self.app.settings.path).st_mode & 0o777, 0o600)
+        self.call("/api/settings", {**{k: "" for k in SECRETS}, "cap_reddit": 20, "cap_x": 20, "send_mode_reddit": "api",
+                                    "product_pitch": "", "product_name": ""})
+        self.assertFalse(any(self.app.settings.get()[k] for k in SECRETS))
+
+    def test_import_judge_approve_send_reply_check(self):
+        # AI 和产品资料没填：只导入，不判断
+        self.call("/api/settings", {**{k: "" for k in SECRETS}, "reddit_client_id": "", "reddit_username": "", "product_name": ""})
+        code, r = self.call("/api/outreach/import", {"job": "job-a", "judge": True})
+        self.assertEqual(code, 200, r)
+        self.assertEqual(r["import"], {"added": 3, "dup": 0, "blocked": 0, "no_contact": 1, "no_author": 1})
+        self.assertFalse(r["judging"])
+        self.assertIn("Anthropic API key", r["judge_error"])
+        st = self.call("/api/outreach")[1]
+        self.assertEqual(st["ready"], {"ai": False, "profile": False, "reddit": False, "x": False})
+        self.assertEqual(st["modes"]["reddit"], "manual", "Reddit 账号没填就只能手动发")
+
+        self.call("/api/settings", {"anthropic_api_key": "sk-test", **PROFILE, "reddit_client_id": "cid", "reddit_client_secret": "cs",
+                                    "reddit_username": "maker", "reddit_password": "pw", "send_gap_sec": 0})
+        code, r = self.call("/api/outreach/import", {"job": "job-a", "judge": True})
+        self.assertEqual(r["import"]["dup"], 3, "同一条、同一个人不重复导入")
+        self.assertTrue(r["judging"], r)
+        st = self.wait_idle()
+        self.assertEqual({l["author"]: l["status"] for l in st["leads"]}, {"Alice": "draft", "bob": "unfit", "小李": "draft"})
+        self.assertEqual((st["modes"]["reddit"], st["modes"]["xhs"]), ("api", "manual"))
+        self.assertIn("I'm Li, the developer of PlantPal", self.claude.calls[0]["system"][0]["text"])
+        alice, xhs = self.lead("Alice", st), self.lead("小李", st)
+
+        code, err = self.call(f"/api/outreach/leads/{alice['id']}", {"action": "bogus"})
+        self.assertEqual(code, 400)
+        self.assertIn("bogus", err["error"])
+        self.assertEqual(self.call("/api/outreach/leads/no-such-lead", {"action": "approve"})[0], 400)
+        code, _ = self.call("/api/outreach/send", {"ids": [alice["id"]]}, headers={"X-Radar": "0"})
+        self.assertEqual(code, 403, "没有自定义请求头的提交不能发")
+
+        mine = "Soil check beats a schedule. I'm the developer of PlantPal, it pings you per plant."
+        code, lead = self.call(f"/api/outreach/leads/{alice['id']}", {"draft": mine, "action": "approve"})
+        self.assertEqual((lead["status"], lead["edited"]), ("approved", True))
+        code, r = self.call("/api/outreach/send", {"ids": [alice["id"]]})
+        self.assertEqual(r, {"queued": 1, "manual": []})
+        st = self.wait_idle()
+        alice = self.lead("Alice", st)
+        self.assertEqual((alice["status"], alice["sent_via"], alice["sent_ref"]), ("sent", "api", "t1_mine"))
+        self.assertEqual(st["today"]["reddit"]["sent"], 1)
+        posted = [form for m, url, form in self.reddit.calls if url.endswith("/api/comment")]
+        self.assertEqual(posted, [{"api_type": "json", "thing_id": "t3_p1", "text": mine}], "发出去的是你改过的那版")
+
+        # 手动发的平台：复制并打开 → 我已发出 → 把对方回复贴进来
+        code, info = self.call(f"/api/outreach/leads/{xhs['id']}/open", {})
+        self.assertEqual((info["url"], info["opened"]), ("https://www.xiaohongshu.com/explore/n1", True))
+        self.assertIn("PlantPal", info["draft"])
+        self.assertEqual(self.opened[-1], info["url"])
+        self.assertEqual(self.lead("小李")["status"], "approved")
+        code, lead = self.call(f"/api/outreach/leads/{xhs['id']}/sent", {})
+        self.assertEqual((lead["status"], lead["sent_via"]), ("sent", "manual"))
+        self.assertEqual(self.call(f"/api/outreach/leads/{xhs['id']}/reply", {"text": " "})[0], 400)
+        code, lead = self.call(f"/api/outreach/leads/{xhs['id']}/reply", {"text": "can I try it?"})
+        self.assertEqual((lead["status"], lead["hot"], lead["replies"][0]["intent"]), ("replied", True, "trial"))
+        self.assertEqual(self.call("/api/jobs")[1]["hot"], 1, "侧栏热线索数字")
+
+        # 查回复：Reddit 收件箱里回的是我们那条评论 → 记到 Alice 名下；说别再联系 → 拉黑
+        self.reddit.inbox = [{"kind": "t1", "data": {"name": "t1_r9", "parent_id": "t1_mine", "author": "Alice",
+                                                     "body": "please stop messaging me", "created_utc": time.time()}}]
+        code, r = self.call("/api/outreach/check", {})
+        self.assertEqual(r["platforms"], ["reddit"])
+        st = self.wait_idle()
+        alice = self.lead("Alice", st)
+        self.assertEqual((alice["status"], alice["hot"], alice["replies"][0]["intent"]), ("replied", False, "stop"))
+        self.assertIn("1 条新回复", st["task"]["message"])
+        self.assertTrue(self.app.outreach.store.is_blocked("reddit", "alice"))
+
+        # 不合适的可以恢复；已经发出去的不能删
+        bob = self.lead("bob", st)
+        self.assertEqual(self.call(f"/api/outreach/leads/{bob['id']}", {"action": "restore"})[1]["status"], "new")
+        self.assertEqual(self.call(f"/api/outreach/leads/{alice['id']}", {"action": "delete"})[0], 400)
+        self.assertEqual(self.call("/api/outreach/stop", {})[1], {"ok": False})
+        self.assertEqual(self.call("/api/outreach/nope", {})[0], 404)
+
+    def test_open_url_only_http(self):
+        import server
+        app = server.App.__new__(server.App)
+        for bad in ("javascript:alert(1)", "file:///etc/passwd", "/Applications/Calculator.app", "", "https://x.com/a b", "https://x.com/a\n"):
+            self.assertFalse(app.open_url(bad), bad)
+
+    def test_job_list_marks_signals_file(self):
+        os.makedirs(os.path.join(self.home, "runs", "job-b"), exist_ok=True)
+        with open(os.path.join(self.home, "runs", "job-b", "job.json"), "w", encoding="utf-8") as f:
+            json.dump({"id": "job-b", "created": "2026-10-03 10:00:00", "status": "done", "spec": {"platforms": ["hn"]}, "steps": []}, f)
+        self.app.jobs._load()
+        jobs = {j["id"]: j for j in self.app.job_list()}
+        self.assertIs(jobs["job-b"]["signals_file"], False, "没有 signals.jsonl 的任务界面上提示先重新打分")
 
 
 if __name__ == "__main__":

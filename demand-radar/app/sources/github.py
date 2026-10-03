@@ -40,16 +40,26 @@ def search(q, limit):
     return (data or {}).get("items", [])
 
 
+def user_of(d):
+    """(登录名, 数字 ID)。注销的账号 GitHub 显示成 ghost，记成空。"""
+    u = d.get("user") or {}
+    if not u.get("login") or u["login"] == "ghost":
+        return "", ""
+    return u["login"], str(u.get("id") or "")
+
+
 def repo_name(d):
     url = d.get("repository_url") or ""
     return "/".join(url.rstrip("/").split("/")[-2:])
 
 
 def write_issue(w, d, keyword):
+    login, uid = user_of(d)
     w.post(
         note_id=str(d["id"]), title=f"[{repo_name(d)}] {d.get('title', '')}", desc=(d.get("body") or "")[:4000],
         liked_count=thumbs(d), comment_count=d.get("comments", 0), note_url=d.get("html_url", ""),
         source_keyword=keyword, time=d.get("created_at", "")[:16].replace("T", " "), state=d.get("state", ""),
+        nickname=login, user_id=uid,
     )
 
 
@@ -57,10 +67,15 @@ def fetch_comments(d, limit):
     if not d.get("comments"):
         return []
     rows = get_json(d["comments_url"], {"per_page": min(max(limit, 1), 100)}, headers()) or []
-    return [{
-        "comment_id": str(c["id"]), "note_id": str(d["id"]), "content": c.get("body") or "", "like_count": thumbs(c),
-        "sub_comment_count": 0, "parent_comment_id": 0, "create_time": (c.get("created_at") or "")[:16].replace("T", " "),
-    } for c in rows[:limit]]
+    out = []
+    for c in rows[:limit]:
+        login, uid = user_of(c)
+        out.append({
+            "comment_id": str(c["id"]), "note_id": str(d["id"]), "content": c.get("body") or "", "like_count": thumbs(c),
+            "sub_comment_count": 0, "parent_comment_id": 0, "create_time": (c.get("created_at") or "")[:16].replace("T", " "),
+            "nickname": login, "user_id": uid,
+        })
+    return out
 
 
 def run(opts, w):

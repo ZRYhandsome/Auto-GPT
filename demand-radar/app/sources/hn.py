@@ -5,7 +5,8 @@
   所以搜索时帖子和评论都搜，命中的评论挂到它所属的帖子下。
 - 帖子全文和评论树：https://hn.algolia.com/api/v1/items/<ID>
 
-HN 不公开评论的点赞数，评论的"点赞"记 0，回复数照实记。国内要开代理。
+HN 不公开评论的点赞数，评论的"点赞"记 0，回复数照实记。
+HN 的用户名就是账号 ID，nickname 和 user_id 都记用户名。国内要开代理。
 """
 import re
 
@@ -29,10 +30,11 @@ def search(q, tags, limit):
     return (data or {}).get("hits", [])
 
 
-def write_story(w, sid, title, text, points, num_comments, created, keyword):
+def write_story(w, sid, title, text, points, num_comments, created, keyword, author=""):
     return w.post(
         note_id=str(sid), title=title or "", desc=strip_html(text)[:4000], liked_count=points or 0,
         comment_count=num_comments or 0, note_url=item_url(sid), source_keyword=keyword, time=created or "",
+        nickname=author or "", user_id=author or "",
     )
 
 
@@ -49,7 +51,7 @@ def flatten(children, story_id, limit, with_replies, out, top=True):
         out.append({
             "comment_id": str(c["id"]), "note_id": str(story_id), "content": strip_html(c["text"]), "like_count": 0,
             "sub_comment_count": count_tree(c), "parent_comment_id": 0 if top else str(c.get("parent_id", "")),
-            "create_time": c.get("created_at_i", ""),
+            "create_time": c.get("created_at_i", ""), "nickname": c.get("author") or "", "user_id": c.get("author") or "",
         })
         if with_replies:
             flatten(c.get("children"), story_id, limit, with_replies, out, top=False)
@@ -67,7 +69,8 @@ def run(opts, w):
         item = attempt(f"帖子 {sid}", fetch_item, sid)
         if not item:
             return 0
-        write_story(w, sid, item.get("title"), item.get("text"), item.get("points"), count_tree(item), item.get("created_at_i"), keyword)
+        write_story(w, sid, item.get("title"), item.get("text"), item.get("points"), count_tree(item), item.get("created_at_i"), keyword,
+                    item.get("author"))
         if not want_comments:
             return 0
         out = []
@@ -95,7 +98,7 @@ def run(opts, w):
                 w.comment(comment_id=str(h["objectID"]), note_id=str(sid), content=strip_html(h.get("comment_text")),
                           like_count=0, sub_comment_count=0,
                           parent_comment_id=0 if str(h.get("parent_id")) == str(sid) else str(h.get("parent_id", "")),
-                          create_time=h.get("created_at_i", ""))
+                          create_time=h.get("created_at_i", ""), nickname=h.get("author") or "", user_id=h.get("author") or "")
             pause(sleep)
     else:
         for target in opts["targets"]:

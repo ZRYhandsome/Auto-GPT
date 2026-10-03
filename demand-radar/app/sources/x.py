@@ -4,7 +4,7 @@
   只能搜最近 7 天；关键词可以直接写 X 的搜索语法，比如 "is there an app" lang:en；
 - 回复：同一个接口搜 conversation_id:<推文ID>。
 X API 按用量收费（每读一条推文都算钱），所以默认只在推文有回复时才去取回复。
-Bearer Token 在 developer.x.com 的开发者后台创建应用后拿到，填在软件的 设置 → 网络和接口 里。国内要开代理。
+Bearer Token 在 developer.x.com 的开发者后台创建应用后拿到，填在软件的 设置 → 抓取用的 Key 里。国内要开代理。
 """
 import os
 import re
@@ -23,7 +23,7 @@ FIELDS = {
 def headers():
     token = os.environ.get("RADAR_X_BEARER", "").strip()
     if not token:
-        raise FetchError("还没填 X 的 Bearer Token：在 设置 → 网络和接口 里填。X API 要付费（按用量）")
+        raise FetchError("还没填 X 的 Bearer Token：在 设置 → 抓取用的 Key 里填。X API 要付费（按用量）")
     return {"Authorization": f"Bearer {token}"}
 
 

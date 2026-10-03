@@ -9,7 +9,8 @@
   https://apps.apple.com/api/apps/v1/catalog/cn/apps/<App ID>/reviews?platform=web&limit=20&offset=0
   再不行就从 App 网页里取出临时令牌，调 amp-api.apps.apple.com。三个都没数据时会在日志里写清楚。
 
-一个 App 记成一条"帖子"（点赞数 = 评分人数），它的评论记成"评论"（点赞数 = 觉得有用的票数）。
+一个 App 记成一条"帖子"（点赞数 = 评分人数，作者 = 开发商），它的评论记成"评论"（点赞数 = 觉得有用的票数，
+作者 = 评论人的昵称；App Store 没法回复别人的评论，记下来只是让数据完整）。
 评论开头加上【几星】，差评一眼能看出来。
 """
 import os
@@ -43,15 +44,23 @@ def lookup(app_id, country=COUNTRY):
 def _label(entry, key):
     v = entry.get(key)
     if isinstance(v, dict):
-        if "label" in v:
-            return v["label"]
-        if "name" in v and isinstance(v["name"], dict):
+        # 作者是 {"uri": {...}, "name": {"label": 昵称}, "label": ""}，昵称在 name 里
+        if isinstance(v.get("name"), dict):
             return v["name"].get("label", "")
+        return v.get("label", "")
     return v if isinstance(v, str) else ""
 
 
+def _author_id(entry):
+    """RSS 里评论人的链接形如 https://itunes.apple.com/cn/reviews/id123456，取出数字。"""
+    author = entry.get("author")
+    uri = _label(author, "uri") if isinstance(author, dict) else ""
+    m = re.search(r"/id(\d+)", uri)
+    return m.group(1) if m else ""
+
+
 def parse_reviews(feed_json):
-    """把评论 RSS 的 JSON 转成 [{id, rating, title, content, votes, vote_count, version, updated, author}]。"""
+    """把评论 RSS 的 JSON 转成 [{id, rating, title, content, votes, vote_count, version, updated, author, author_id}]。"""
     entries = ((feed_json or {}).get("feed") or {}).get("entry") or []
     if isinstance(entries, dict):  # 只有一条时不是列表
         entries = [entries]
@@ -70,6 +79,7 @@ def parse_reviews(feed_json):
             "version": _label(e, "im:version"),
             "updated": _label(e, "updated"),
             "author": _label(e, "author"),
+            "author_id": _author_id(e),
         })
     return out
 
@@ -83,7 +93,7 @@ def parse_catalog_reviews(data):
             continue
         out.append({"id": str(d.get("id", "")), "rating": int(a.get("rating") or 0), "title": a.get("title", ""),
                     "content": a.get("review", ""), "votes": 0, "vote_count": 0, "version": "",
-                    "updated": a.get("date", ""), "author": a.get("userName", "")})
+                    "updated": a.get("date", ""), "author": a.get("userName", ""), "author_id": ""})
     return out
 
 
@@ -181,6 +191,8 @@ def write_app(w, app, keyword, country):
         source_keyword=keyword,
         time=app.get("currentVersionReleaseDate", ""),
         rating=app.get("averageUserRating", 0),
+        nickname=app.get("sellerName", ""),
+        user_id=str(app.get("artistId") or ""),
     )
     return app_id
 
@@ -191,6 +203,7 @@ def write_reviews(w, app_id, reviews):
         w.comment(
             comment_id=r["id"], note_id=app_id, content=text, like_count=r["votes"], sub_comment_count=0,
             parent_comment_id=0, create_time=r["updated"][:16].replace("T", " "), rating=r["rating"], version=r["version"],
+            nickname=r.get("author") or "", user_id=r.get("author_id") or "",
         )
 
 

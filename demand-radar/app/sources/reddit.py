@@ -54,13 +54,22 @@ def search(sub, q, limit):
         return [c["data"] for c in ((data or {}).get("data") or {}).get("children", []) if c.get("kind") == "t3"]
 
 
+def author_of(d):
+    """(用户名, 账号 ID "t2_…")。账号删了的显示 [deleted]，记成空。"""
+    name = d.get("author") or ""
+    if name in ("[deleted]", "[removed]"):
+        return "", ""
+    return name, d.get("author_fullname") or ""
+
+
 def write_post(w, d, keyword):
     pid = str(d.get("id", "")).removeprefix("t3_")
+    nickname, user_id = author_of(d)
     w.post(
         note_id=pid, title=d.get("title", ""), desc=(d.get("selftext") or "")[:4000],
         liked_count=d.get("score", 0), comment_count=d.get("num_comments", 0),
         note_url=REDDIT + (d.get("permalink") or f"/comments/{pid}"), source_keyword=keyword,
-        time=d.get("created_utc", ""), subreddit=d.get("subreddit", ""),
+        time=d.get("created_utc", ""), subreddit=d.get("subreddit", ""), nickname=nickname, user_id=user_id,
     )
     return pid
 
@@ -86,11 +95,12 @@ def flatten(children, post_id, limit, with_replies, out, depth=0):
         if not body or body in ("[deleted]", "[removed]"):
             continue
         kids = _children(d)
+        nickname, user_id = author_of(d)
         out.append({
             "comment_id": str(d.get("id", "")), "note_id": post_id, "content": body, "like_count": d.get("score", 0),
             "sub_comment_count": len(kids),
             "parent_comment_id": 0 if depth == 0 else str(d.get("parent_id", "")).replace("t1_", ""),
-            "create_time": d.get("created_utc", ""),
+            "create_time": d.get("created_utc", ""), "nickname": nickname, "user_id": user_id,
         })
         if with_replies and kids:
             flatten(kids, post_id, limit, with_replies, out, depth + 1)
