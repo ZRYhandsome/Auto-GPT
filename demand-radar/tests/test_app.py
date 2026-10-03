@@ -7,6 +7,7 @@ import glob
 import json
 import os
 import shutil
+import subprocess
 import sys
 import tempfile
 import textwrap
@@ -648,6 +649,135 @@ class OutreachServerTest(unittest.TestCase):
         self.app.jobs._load()
         jobs = {j["id"]: j for j in self.app.job_list()}
         self.assertIs(jobs["job-b"]["signals_file"], False, "没有 signals.jsonl 的任务界面上提示先重新打分")
+
+
+
+# ---------- 真浏览器里点「线索与回复」 ----------
+UI_SCRIPT = r"""
+import { createRequire } from 'module';
+const require = createRequire(process.argv[2] + '/');
+const { chromium } = require('playwright');
+const out = { errors: [] };
+let browser;
+try { browser = await chromium.launch(); } catch (e) { console.log(JSON.stringify({ nobrowser: String(e) })); process.exit(0); }
+const page = await browser.newPage();
+page.on('pageerror', (e) => out.errors.push(e.message));
+await page.goto(`http://127.0.0.1:${process.argv[3]}/#/leads`);
+await page.waitForSelector('#ltabs button[data-lt="all"]');
+await page.click('#ltabs button[data-lt="all"]');
+await page.waitForSelector('article[data-id="xhs-b"] textarea[data-draft]');
+out.acts = await page.evaluate(() => Object.fromEntries([...document.querySelectorAll('article.lead')].map((a) => [a.dataset.id, [...a.querySelectorAll('[data-act]')].map((b) => b.dataset.act)])));
+// A 记录对方回复（AI 要读 2 秒）；这期间在 B 的草稿框里改字
+await page.fill('article[data-id="xhs-a"] textarea[data-reply]', '谢谢');
+await page.click('article[data-id="xhs-a"] button[data-act="reply"]');
+const b = 'article[data-id="xhs-b"] textarea[data-draft]';
+await page.click(b);
+await page.keyboard.press('Control+A');
+await page.keyboard.type('EDITED BY ME 我是 PlantPal 的开发者');
+await page.waitForTimeout(3500);
+out.after = await page.evaluate((sel) => ({ value: document.querySelector(sel)?.value, focused: document.activeElement === document.querySelector(sel) }), b);
+await page.click('article[data-id="xhs-b"] button[data-act="open"]');
+await page.waitForTimeout(1000);
+// 待发送：「发送全部待发送」不算不确定的那条
+await page.click('#ltabs button[data-lt="queue"]');
+await page.waitForTimeout(300);
+out.queue = await page.evaluate(() => document.querySelector('[data-b="queue"]')?.textContent || '');
+// 不确定的那条：点「没发出去」要先确认
+await page.click('article[data-id="rd-u"] button[data-act="unsent"]');
+await page.click('dialog.modal button[value="yes"]');
+await page.waitForTimeout(1000);
+console.log(JSON.stringify(out));
+await browser.close();
+"""
+
+
+class LeadsUiTest(unittest.TestCase):
+    """在真浏览器里点「线索与回复」页面（本机有 node 和 playwright 才跑）。"""
+
+    @classmethod
+    def setUpClass(cls):
+        import server
+        node, npm = shutil.which("node"), shutil.which("npm")
+        root = ""
+        if node and npm:
+            try:
+                root = subprocess.run([npm, "root", "-g"], capture_output=True, text=True, timeout=60).stdout.strip()
+            except (OSError, subprocess.SubprocessError):
+                root = ""
+        if not (root and os.path.isdir(os.path.join(root, "playwright"))):
+            raise unittest.SkipTest("没装 node + playwright，跳过真浏览器里的界面测试")
+        cls.node, cls.root = node, root
+        cls.home, cls.mc, _ = make_home()
+        with open(os.path.join(cls.home, "app_settings.json"), "w", encoding="utf-8") as f:
+            json.dump({"anthropic_api_key": "k", "product_name": "PlantPal", "product_pitch": "water reminders", "sender_identity": "I'm the dev",
+                       "reddit_client_id": "c", "reddit_client_secret": "s", "reddit_username": "maker", "reddit_password": "p"}, f)
+        now = time.strftime("%Y-%m-%d %H:%M:%S")
+
+        def lead(lid, platform, author, status, draft, **kw):
+            return {"id": lid, "platform": platform, "kind": "comment", "item_id": lid, "post_id": "n1", "author": author, "author_id": "",
+                    "text": "有没有提醒浇水的app", "post_title": "t", "url": "https://www.xiaohongshu.com/explore/n1", "signals": "求工具",
+                    "score": 3, "likes": 0, "time": "", "job": "j", "found_at": "2026-10-03 10:00:00", "status": status, "fit_score": 90,
+                    "need": "", "reason": "", "lang": "zh", "draft": draft, "edited": False, "error": "", "sent_at": "", "sent_via": "",
+                    "sent_ref": "", "replies": [], "hot": False, "tried_at": "", "unsure": False, "manual": False, **kw}
+        leads = [lead("xhs-a", "xhs", "小A", "sent", "我是 PlantPal 的开发者", sent_at=now, sent_via="manual"),
+                 lead("xhs-b", "xhs", "小B", "draft", "ORIGINAL AI DRAFT 我是 PlantPal 的开发者"),
+                 lead("xhs-k", "xhs", "小K", "draft", "我是 PlantPal 的开发者"),
+                 lead("rd-u", "reddit", "uu", "failed", "I'm the dev of PlantPal", unsure=True, tried_at=now,
+                      error="Reddit 出错了（502）。不确定发出去没有：先去平台上看一眼"),
+                 lead("rd-f", "reddit", "ff", "failed", "I'm the dev of PlantPal", error="Reddit 拒绝了：locked"),
+                 lead("rd-m", "reddit", "mm", "approved", "I'm the dev of PlantPal", manual=True)]
+        os.makedirs(os.path.join(cls.home, "outreach"))
+        with open(os.path.join(cls.home, "outreach", "leads.json"), "w", encoding="utf-8") as f:
+            json.dump({"version": 1, "leads": {l["id"]: l for l in leads}, "blocked": [["xhs", "小k"]]}, f, ensure_ascii=False)
+
+        def slow_read(**kw):
+            time.sleep(2)
+            return SimpleNamespace(stop_reason="end_turn", parsed_output=SimpleNamespace(intent="positive", hot=False, summary="客气", suggested_reply=""))
+        client = SimpleNamespace(beta=SimpleNamespace(messages=SimpleNamespace(parse=slow_read)))
+        cls.app = server.App(home=cls.home, mc_dir=cls.mc, mc_python=sys.executable, auto_check=False,
+                             client_factory=lambda key, proxy: client, http=lambda *a, **k: (404, {}))
+        cls.app.open_url = lambda url: True
+        cls.app.copy_text = lambda text: True
+        cls.posts = []
+        real = cls.app.outreach_post
+        cls.app.outreach_post = lambda path, body: (cls.posts.append((path, body)), real(path, body))[1]
+        cls.port = server.free_port(0)
+        cls.httpd = server.serve(cls.app, cls.port)
+        threading.Thread(target=cls.httpd.serve_forever, daemon=True).start()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.httpd.shutdown()
+        cls.httpd.server_close()
+        cls.app.close()
+        shutil.rmtree(cls.home, ignore_errors=True)
+
+    def test_leads_page(self):
+        script = os.path.join(self.home, "ui.mjs")
+        with open(script, "w", encoding="utf-8") as f:
+            f.write(UI_SCRIPT)
+        r = subprocess.run([self.node, script, self.root, str(self.port)], capture_output=True, text=True, timeout=120)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        out = json.loads(r.stdout.strip().splitlines()[-1])
+        if "nobrowser" in out:
+            self.skipTest("playwright 没装浏览器：" + out["nobrowser"][:200])
+        self.assertEqual(out["errors"], [])
+        acts = out["acts"]
+        # 不确定发出去没有的：只能「已经发出去了」或「没发出去」，没有「重试发送」
+        self.assertEqual(acts["rd-u"], ["sent", "unsent", "block"])
+        self.assertIn("retry", acts["rd-f"])
+        # 点过「改为手动发」的（服务端记着）：即使 Reddit 是自动发，也只给复制并打开 / 我已发出
+        self.assertIn("open", acts["rd-m"])
+        self.assertNotIn("send", acts["rd-m"])
+        self.assertEqual(acts["xhs-k"], [], "不再联系名单里的人没有任何发送按钮")
+        # 别的操作做完后页面重画：正在改的草稿不能被旧内容盖掉，「复制并打开」也不能把旧内容存回去
+        self.assertEqual(out["after"], {"value": "EDITED BY ME 我是 PlantPal 的开发者", "focused": True})
+        drafts = [b["draft"] for path, b in self.posts if path == "/api/outreach/leads/xhs-b" and "draft" in b]
+        self.assertNotIn("ORIGINAL AI DRAFT 我是 PlantPal 的开发者", drafts)
+        self.assertEqual(self.app.outreach.store.get("xhs-b")["draft"], "EDITED BY ME 我是 PlantPal 的开发者")
+        self.assertIn("（1 条）", out["queue"], "「发送全部待发送」不算不确定发出去没有的那条")
+        self.assertIn(("/api/outreach/leads/rd-u", {"action": "unsent"}), self.posts)
+        self.assertFalse(self.app.outreach.store.get("rd-u")["unsure"])
 
 
 if __name__ == "__main__":

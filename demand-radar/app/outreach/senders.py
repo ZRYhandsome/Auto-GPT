@@ -7,6 +7,7 @@
 import base64
 import hashlib
 import hmac
+import http.client
 import json
 import secrets
 import time
@@ -19,15 +20,19 @@ NO_CONTACT = {"appstore"}  # 不能回复别人 App 的评论
 
 
 class SendError(Exception):
-    """fatal=True：账号不对、被限流这类，后面的也发不出去，整批停下。"""
+    """fatal=True：账号不对、被限流这类，后面的也发不出去，整批停下。
+    unknown=True：请求已经发出去了，但没等到正常的回应（超时、断线、对方服务器出错），不知道回复发出去没有。"""
 
-    def __init__(self, message, fatal=False):
+    def __init__(self, message, fatal=False, unknown=False):
         super().__init__(message)
         self.fatal = fatal
+        self.unknown = unknown
 
 
 def http_request(method, url, headers=None, form=None, json_body=None, timeout=30, proxy=""):
-    """发一个请求，返回 (状态码, 内容)。内容能解析成 JSON 就解析。HTTP 错误码照样返回，连不上才抛 SendError。"""
+    """发一个请求，返回 (状态码, 内容)。内容能解析成 JSON 就解析。HTTP 错误码照样返回，连不上才抛 SendError。
+    连接、发请求时出的错（urllib 包成 URLError）：对方肯定没收到。请求发出去以后等回应时出的错（超时、断线、内容不全）：
+    对方可能已经收到并照做了，非 GET 请求抛 unknown=True，免得把可能已经发出去的回复当成没发、再发一遍。"""
     data = None
     headers = dict(headers or {})
     if form is not None:
@@ -47,12 +52,15 @@ def http_request(method, url, headers=None, form=None, json_body=None, timeout=3
     except urllib.error.HTTPError as e:
         try:
             body = e.read()
-        except OSError:
+        except (OSError, http.client.HTTPException):
             body = b""
         return e.code, _parse(body)
-    except (urllib.error.URLError, TimeoutError, ConnectionError, OSError) as e:
+    except urllib.error.URLError as e:  # 还没连上或请求没发完：对方没收到
         host = urllib.parse.urlparse(url).netloc
         raise SendError(f"连不上 {host}（{getattr(e, 'reason', e)}）。国外网站要开代理") from e
+    except (OSError, http.client.HTTPException) as e:  # 请求发出去了，等回应时超时、断线、内容不全
+        host = urllib.parse.urlparse(url).netloc
+        raise SendError(f"{host} 没有正常回应（{type(e).__name__}: {e}）", unknown=method.upper() != "GET") from e
 
 
 def _parse(raw):
@@ -115,9 +123,12 @@ class Reddit:
         if not self.ready():
             raise SendError("Reddit 账号还没填全（设置 → 发送账号）", fatal=True)
         basic = base64.b64encode(f"{self.client_id}:{self.client_secret}".encode("utf-8")).decode("ascii")
-        status, body = self.http("POST", self.TOKEN_URL, headers={"Authorization": "Basic " + basic, "User-Agent": self.ua},
-                                 form={"grant_type": "password", "username": self.username, "password": self.password},
-                                 proxy=self.proxy)
+        try:
+            status, body = self.http("POST", self.TOKEN_URL, headers={"Authorization": "Basic " + basic, "User-Agent": self.ua},
+                                     form={"grant_type": "password", "username": self.username, "password": self.password},
+                                     proxy=self.proxy)
+        except SendError as e:  # 只是登录没成，回复还没发：不算「不确定发出去没有」
+            raise SendError(str(e), fatal=e.fatal) from e
         # 密码不对时 Reddit 也返回 200，只是内容里带 error
         if status == 401 or (isinstance(body, dict) and body.get("error") in ("invalid_grant", "unauthorized_client", 401)):
             raise SendError("Reddit 账号或密码不对，或应用的 client id/secret 不对", fatal=True)
@@ -140,7 +151,9 @@ class Reddit:
                 raise SendError("Reddit 账号或密码不对，或应用的 client id/secret 不对", fatal=True)
             if status == 429:
                 raise SendError("Reddit 限流了，稍后再发", fatal=True)
-            if status >= 500:
+            if status >= 500:  # 发回复时服务器出错：评论可能已经建好了
+                if method == "POST":
+                    raise SendError(f"Reddit 出错了（{status}）", unknown=True)
                 raise SendError(f"Reddit 出错了（{status}），稍后再试")
             return status, body
         return status, body
@@ -158,7 +171,7 @@ class Reddit:
         if status == 404:
             raise SendError("Reddit 上找不到这条帖子或评论了（可能被删了）")
         if status != 200 or not isinstance(body, dict):
-            raise SendError(f"Reddit 出错了（{status}）：{_detail(body)}")
+            raise SendError(f"Reddit 出错了（{status}）：{_detail(body)}", unknown=status == 200)
         j = body.get("json") or {}
         errors = j.get("errors") or []
         if errors:
@@ -170,12 +183,13 @@ class Reddit:
             raise SendError("Reddit 拒绝了：" + "；".join(msgs), fatal=rate)
         things = (j.get("data") or {}).get("things") or []
         if not things:
-            raise SendError("Reddit 没返回新评论，可能没发出去，去帖子里看一眼")
+            raise SendError("Reddit 没返回新评论", unknown=True)
         d = things[0].get("data") or {}
         return d.get("name") or ("t1_" + str(d.get("id", "")))
 
     def inbox(self):
-        status, body = self._call("GET", "/message/inbox?limit=100")
+        # raw_json=1：不然 Reddit 会把正文里的 & < > 转成 &amp; &lt; &gt;
+        status, body = self._call("GET", "/message/inbox?limit=100&raw_json=1")
         if status != 200 or not isinstance(body, dict):
             raise SendError(f"Reddit 收件箱没取到（{status}）：{_detail(body)}")
         out = []
@@ -242,7 +256,9 @@ class X:
             raise SendError("X 的密钥不对", fatal=True)
         if status == 429:
             raise SendError("X 限流了，稍后再发", fatal=True)
-        if status >= 500:
+        if status >= 500:  # 发推时服务器出错：推文可能已经发出去了
+            if method == "POST":
+                raise SendError(f"X 出错了（{status}）", unknown=True)
             raise SendError(f"X 出错了（{status}），稍后再试")
         return status, body
 
@@ -265,29 +281,37 @@ class X:
             raise SendError("X 不允许这条回复：" + _detail(body))
         data = body.get("data") if isinstance(body, dict) else None
         if status not in (200, 201) or not data or not data.get("id"):
-            raise SendError(f"X 出错了（{status}）：{_detail(body)}")
+            raise SendError(f"X 出错了（{status}）：{_detail(body)}", unknown=status in (200, 201))
         return str(data["id"])
 
+    MENTION_PAGES = 8  # X 的提及时间线最多给最近 800 条，一页 100 条
+
     def mentions(self, since_id=""):
-        """返回 (提到我的推文列表, 最新的推文 ID)。下次从这个 ID 往后查，不重复计费。"""
+        """返回 (提到我的推文列表, 最新的推文 ID)。下次从这个 ID 往后查，不重复计费。
+        一页 100 条，有下一页（next_token）就接着翻，翻完才算查过了，免得一次来了 100 条以上时漏掉后面的。"""
         me = self.whoami()[0]
         query = {"max_results": "100", "tweet.fields": "created_at,conversation_id,referenced_tweets,author_id",
                  "expansions": "author_id", "user.fields": "username"}
         if since_id:
             query["since_id"] = str(since_id)
-        status, body = self._call("GET", f"/users/{me}/mentions", query)
-        if status == 403:
-            raise SendError("X 不允许读提及：" + _detail(body))
-        if status != 200 or not isinstance(body, dict):
-            raise SendError(f"X 提及没取到（{status}）：{_detail(body)}")
-        users = {u.get("id"): u.get("username", "") for u in (body.get("includes") or {}).get("users") or []}
-        items = []
-        for t in body.get("data") or []:
-            replied = next((r.get("id") for r in t.get("referenced_tweets") or [] if r.get("type") == "replied_to"), "")
-            items.append({"id": str(t.get("id", "")), "text": t.get("text", ""), "author": users.get(t.get("author_id")) or str(t.get("author_id", "")),
-                          "at": t.get("created_at", ""), "replied_to": str(replied or ""), "conversation_id": str(t.get("conversation_id") or "")})
-        newest = (body.get("meta") or {}).get("newest_id") or since_id
-        return items, str(newest or "")
+        items, newest = [], ""
+        for _ in range(self.MENTION_PAGES):
+            status, body = self._call("GET", f"/users/{me}/mentions", query)
+            if status == 403:
+                raise SendError("X 不允许读提及：" + _detail(body))
+            if status != 200 or not isinstance(body, dict):
+                raise SendError(f"X 提及没取到（{status}）：{_detail(body)}")
+            users = {u.get("id"): u.get("username", "") for u in (body.get("includes") or {}).get("users") or []}
+            for t in body.get("data") or []:
+                replied = next((r.get("id") for r in t.get("referenced_tweets") or [] if r.get("type") == "replied_to"), "")
+                items.append({"id": str(t.get("id", "")), "text": t.get("text", ""), "author": users.get(t.get("author_id")) or str(t.get("author_id", "")),
+                              "at": t.get("created_at", ""), "replied_to": str(replied or ""), "conversation_id": str(t.get("conversation_id") or "")})
+            meta = body.get("meta") or {}
+            newest = newest or str(meta.get("newest_id") or "")  # 第一页是最新的
+            if not meta.get("next_token"):
+                break
+            query = {**query, "pagination_token": str(meta["next_token"])}
+        return items, str(newest or since_id or "")
 
 
 SENDERS = {"reddit": Reddit, "x": X}

@@ -4,7 +4,10 @@
 - 每个平台只用你自己的一个账号；同一个人在同一个平台最多联系一次；说了别再联系、不感兴趣的人自动拉黑；
 - 没有你批准，什么都不会发出去；
 - 每天最多发多少（上限）、每个平台怎么发（官方接口自动发 / 复制后自己去发），都由你在设置里定。
-  没有「每天至少发多少」这种东西。
+  没有「每天至少发多少」这种东西；
+- 不确定发出去没有的（超时、断线、对方服务器出错、发送途中软件被关掉）标成 unsure，绝不自动重发：
+  你去平台上看过，点「没发出去」才能再发，点「已经发出去了」就记为已发；
+- 点过「复制并打开」的标成 manual：你可能已经自己发了，官方接口不会再替你发一遍。
 后台任务（判断、发送、查回复）同一时间只跑一个，随时能停；出什么错都只记下来，不让软件崩掉。
 """
 import copy
@@ -38,6 +41,8 @@ APPROVABLE = ("new", "draft", "unfit", "failed", "skipped", "error", "approved")
 JOB_ID = re.compile(r"[\w-]+")
 AUTO_TICK = 60  # 自动查回复：每分钟看一眼到没到时间
 MAX_ERRORS = 50
+UNSURE_HINT = "不确定发出去没有：先去平台上看一眼"
+X_UNMATCHED = 200  # 没对上线索的 X 提及留多少条，等你后来点了「我已发出」再对一遍
 
 
 def platform_name(p):
@@ -75,6 +80,7 @@ def make_lead(row, job, found_at):
         "likes": int(_num(row.get("likes"))), "time": str(row.get("time") or ""), "job": job, "found_at": found_at,
         "status": "new", "fit_score": None, "need": "", "reason": "", "lang": "", "draft": "", "edited": False,
         "error": "", "sent_at": "", "sent_via": "", "sent_ref": "", "replies": [], "hot": False,
+        "tried_at": "", "unsure": False, "manual": False,  # 第一次尝试发的时间；不确定发出去没有；点过「复制并打开」
     }
 
 
@@ -154,7 +160,7 @@ class Outreach:
         # 上次软件在发送途中被关掉：不知道发出去没有，标成失败让你自己去看，绝不自动重发
         for l in self.store.all():
             if l.get("status") == "sending":
-                self.store.update(l["id"], status="failed", error="发送时软件被关掉了，不确定发出去没有：先去平台上看一眼，没发出再点重试")
+                self.store.update(l["id"], status="failed", unsure=True, error=f"发送时软件被关掉了，{UNSURE_HINT}")
 
     def profile(self):
         s = self.settings()
@@ -190,7 +196,8 @@ class Outreach:
             return 0
 
     def today_sent(self, platform):
-        return self.store.sent_on(platform, self.today())
+        """算上限用的数：今天发出的，加上正在发的、今天试着发了但不确定发出去没有的（都可能已经发出去了）。"""
+        return self.store.used_on(platform, self.today())
 
     def cap_message(self, platform):
         name = platform_name(platform)
@@ -200,6 +207,13 @@ class Outreach:
 
     def _capped(self, platform):
         return self.today_sent(platform) >= self.cap_for(platform)
+
+    # ---------- 不再联系 ----------
+    def _blocked(self, lead):
+        return self.store.is_blocked(lead["platform"], lead.get("author"), lead.get("author_id"))
+
+    def _block(self, lead):
+        self.store.block(lead["platform"], lead.get("author"), lead.get("author_id"))
 
     # ---------- 后台任务 ----------
     def _check_idle(self):
@@ -273,6 +287,8 @@ class Outreach:
         job_id = str(job_id or "").strip()
         if not JOB_ID.fullmatch(job_id):
             raise ValueError("任务 ID 不对")
+        if self.store.error:  # 线索文件坏了：不能当成没联系过任何人接着导入
+            raise ValueError(self.store.error)
         path = os.path.join(self.runs, job_id, "signals.jsonl")
         if not os.path.isfile(path):
             raise ValueError("这个任务没有可用的结果，先等它采集完并打分；旧任务可以点「重新打分」")
@@ -315,8 +331,9 @@ class Outreach:
         if not r["profile"]:
             raise ValueError("先在 设置 → 线索与回复 里填好产品名称、一句话说明和你的身份（会写进每条回复）")
         if ids is None:
+            # 没指定哪几条：只判断还没判断的；你自己写了回复的不动（要重判就在那条上点「让 AI 判断」）
             leads = sorted(self.store.all(), key=lambda l: -_num(l.get("score")))
-            targets = [l["id"] for l in leads if l.get("status") in ("new", "error")]
+            targets = [l["id"] for l in leads if l.get("status") in ("new", "error") and not l.get("edited")]
         else:
             targets = [str(i) for i in ids if (self.store.get(str(i)) or {}).get("status") in REJUDGE]
         if not targets:
@@ -357,17 +374,23 @@ class Outreach:
             msg += f"，{stats['error']} 条出错"
         return ("已停止。" + msg) if self._stop.is_set() else msg
 
+    @staticmethod
+    def _snap(lead):
+        """判断开始时这条的样子：AI 回来时要是变了（你跳过、拉黑、改了回复），AI 的结果就作废。"""
+        return (lead or {}).get("status"), (lead or {}).get("draft") or "", bool((lead or {}).get("edited"))
+
     def _judge_one(self, lid, client, profile, model, stats, fatal):
         lead = self.store.get(lid)
         try:
             if not lead or lead.get("status") not in REJUDGE:
                 return
+            before = self._snap(lead)
             try:
                 res = agent.judge(client, lead, profile, model)
             except Exception as e:
                 err = e if isinstance(e, agent.AgentError) else agent.AgentError(f"{type(e).__name__}: {e}")
                 with self.lock:
-                    if (self.store.get(lid) or {}).get("status") in REJUDGE:
+                    if self._snap(self.store.get(lid)) == before:
                         self.store.update(lid, status="error", error=str(err))
                     stats["error"] += 1
                 self._err(f"{lead.get('author')}：{err}")
@@ -375,7 +398,7 @@ class Outreach:
                     fatal.append(str(err))
                 return
             with self.lock:
-                if (self.store.get(lid) or {}).get("status") not in REJUDGE:  # 判断期间你已经处理了这条
+                if self._snap(self.store.get(lid)) != before:  # 判断期间你已经处理了这条（跳过、拉黑、改了回复）
                     return
                 common = {"fit_score": res["fit_score"], "need": res["need"], "reason": res["reason"], "lang": res["lang"],
                           "edited": False, "error": ""}
@@ -407,9 +430,11 @@ class Outreach:
                     raise ValueError("这条已经发出去了")
                 if not text.strip():
                     raise ValueError("回复是空的，先写好再批准")
-                if self.store.is_blocked(lead["platform"], lead["author"]):
+                if self._blocked(lead):
                     raise ValueError("这个人在不再联系名单里")
-                fields.update(status="approved", error="")
+                fields["status"] = "approved"
+                if not lead.get("unsure"):  # 「不确定发出去没有」的提示要留着
+                    fields["error"] = ""
             elif action == "skip":
                 if st in LOCKED:
                     raise ValueError("这条已经发出去了，不用跳过")
@@ -419,12 +444,17 @@ class Outreach:
                     raise ValueError("只有跳过、不合适、出错的线索能恢复")
                 fields["status"] = "draft" if text.strip() else "new"
             elif action == "block":
-                self.store.block(lead["platform"], lead["author"])
+                self._block(lead)
                 if st not in LOCKED:
                     fields["status"] = "skipped"
+            elif action == "unsent":
+                # 不确定发出去没有的：你去平台上看过了，确实没发出去，这才能再发
+                if not lead.get("unsure"):
+                    raise ValueError("这条没有「不确定发出去没有」的问题")
+                fields.update(unsure=False, error="你去平台上看过了，确实没发出去，可以重发")
             elif action == "delete":
-                if st in LOCKED:
-                    raise ValueError("已经联系过的人不能删（删了以后可能被再次联系）；不想看到可以点「不再联系此人」")
+                if st in LOCKED or lead.get("unsure") or lead.get("manual"):
+                    raise ValueError("已经联系过（或可能已经发出去）的人不能删（删了以后可能被再次联系）；不想看到可以点「不再联系此人」")
                 self.store.delete(lid)
                 return {"id": lid, "deleted": True}
             else:
@@ -435,8 +465,14 @@ class Outreach:
     def mode(self, platform):
         return senders.mode_for(platform, self.settings())
 
+    def _api_ok(self, lead, settings=None):
+        """这条能交给官方接口发：平台选了自动发；没点过「复制并打开」（你可能已经自己发了）；不是「不确定发出去没有」。"""
+        mode = senders.mode_for(lead["platform"], settings) if settings is not None else self.mode(lead["platform"])
+        return mode == "api" and not lead.get("manual") and not lead.get("unsure")
+
     def send(self, ids):
-        """批准并发送：草稿先批准；官方接口能发的排队在后台慢慢发，要手动发的把 ID 还给界面。"""
+        """批准并发送：草稿先批准；官方接口能发的排队在后台慢慢发，要手动发的把 ID 还给界面。
+        不确定上次发出去没有的不发：你去平台上看过、点了「没发出去」才行。"""
         ids = [str(i) for i in (ids or [])]
         if not ids:
             raise ValueError("先选要发的线索")
@@ -446,13 +482,13 @@ class Outreach:
             queued, manual = [], []
             for lid in ids:
                 lead = self.store.get(lid)
-                if not lead or self.store.is_blocked(lead["platform"], lead["author"]):
+                if not lead or lead.get("unsure") or self._blocked(lead):
                     continue
                 if lead["status"] in ("draft", "failed") and (lead.get("draft") or "").strip():
                     lead = self.store.update(lid, status="approved", error="")
                 if lead["status"] != "approved":
                     continue
-                (queued if senders.mode_for(lead["platform"], s) == "api" else manual).append(lid)
+                (queued if self._api_ok(lead, s) else manual).append(lid)
             if queued:
                 self._begin("send", len(queued), self._send_run, queued)
         return {"queued": len(queued), "manual": manual}
@@ -469,11 +505,11 @@ class Outreach:
                 halt = "已停止"
                 break
             lead = self.store.get(lid)
-            if not lead or lead["status"] != "approved" or self.mode(lead["platform"]) != "api":
+            if not lead or lead["status"] != "approved" or not self._api_ok(lead):
                 self._progress()
                 continue
             p = lead["platform"]
-            if self.store.is_blocked(p, lead["author"]):
+            if self._blocked(lead):
                 self.store.update(lid, status="skipped", error="对方在不再联系名单里，没发")
                 self._progress()
                 continue
@@ -485,13 +521,13 @@ class Outreach:
             if tried and gap > 0 and self._pause(gap * self.uniform(1.0, 1.5)):
                 halt = "已停止"
                 break
-            with self.lock:  # 等的这段时间里你可能改了、跳过、拉黑了这条
+            with self.lock:  # 等的这段时间里你可能改了、跳过、拉黑了这条，或者把这个平台改成了自己发
                 lead = self.store.get(lid)
-                if (not lead or lead["status"] != "approved" or self._capped(p)
-                        or self.store.is_blocked(p, lead["author"])):
+                if (not lead or lead["status"] != "approved" or not self._api_ok(lead) or self._capped(p)
+                        or self._blocked(lead)):
                     self._progress()
                     continue
-                self.store.update(lid, status="sending")
+                self.store.update(lid, status="sending", tried_at=self.now())
             tried = True
             try:
                 ref = self._sender(p).reply(lead, lead["draft"])
@@ -501,12 +537,15 @@ class Outreach:
                     self._err(f"{platform_name(p)}：{e}")
                     halt = str(e)
                     break
-                self.store.update(lid, status="failed", error=str(e))
-                self._err(f"{lead['author']}：{e}")
+                # 超时、断线、对方服务器出错：可能已经发出去了，标成不确定，不能自动重发
+                err = f"{e}。{UNSURE_HINT}" if e.unknown else str(e)
+                self.store.update(lid, status="failed", error=err, unsure=bool(e.unknown))
+                self._err(f"{lead['author']}：{err}")
                 failed += 1
-            except Exception as e:
-                self.store.update(lid, status="failed", error=f"{type(e).__name__}: {e}")
-                self._err(f"{lead['author']}：{type(e).__name__}: {e}")
+            except Exception as e:  # 请求发出去以后出的意外：同样不知道发出去没有
+                err = f"{type(e).__name__}: {e}。{UNSURE_HINT}"
+                self.store.update(lid, status="failed", error=err, unsure=True)
+                self._err(f"{lead['author']}：{err}")
                 failed += 1
             else:
                 self.store.update(lid, status="sent", sent_at=self.now(), sent_via="api", sent_ref=str(ref or ""), error="")
@@ -537,41 +576,73 @@ class Outreach:
                 raise ValueError("先批准这条再标记发出")
             if not (lead.get("draft") or "").strip():
                 raise ValueError("回复是空的，先写好再发")
-            if self.store.is_blocked(lead["platform"], lead["author"]):
+            if self._blocked(lead):
                 raise ValueError("这个人在不再联系名单里")
-            if self._capped(lead["platform"]):
+            # 不确定发出去没有的那条，试着发的时候已经算过上限；这里只是把发生过的事记下来
+            if not lead.get("unsure") and self._capped(lead["platform"]):
                 raise ValueError(self.cap_message(lead["platform"]))
-            return self.store.update(lid, status="sent", sent_at=self.now(), sent_via="manual", sent_ref="", error="")
+            return self.store.update(lid, status="sent", sent_at=self.now(), sent_via="manual", sent_ref="", error="", unsure=False)
 
     def open_info(self, lid):
-        """「复制并打开」：给出要打开的网址和回复内容；草稿顺手批准（马上就要手动发了）。"""
+        """「复制并打开」：给出要打开的网址和回复内容；草稿顺手批准（马上就要手动发了）。
+        和「我已发出」一样先看不再联系名单和今天的上限：到了就不给打开，免得你手动发出去以后才发现超了。
+        记下 manual：你可能已经自己发了，官方接口不会再替你发一遍。"""
         with self.lock:
             lead = self.store.get(lid)
             if not lead:
                 raise ValueError("找不到这条线索")
-            if (lead["status"] in ("draft", "failed") and (lead.get("draft") or "").strip()
-                    and not self.store.is_blocked(lead["platform"], lead["author"])):
-                lead = self.store.update(lid, status="approved", error="")
+            st, p = lead["status"], lead["platform"]
+            if self._blocked(lead):
+                raise ValueError("这个人在不再联系名单里")
+            if st == "sending":
+                raise ValueError("这条正在用官方接口发，等一下")
+            if st not in ("sent", "replied"):
+                if not lead.get("unsure") and self._capped(p):
+                    raise ValueError(self.cap_message(p))
+                fields = {"manual": True, "tried_at": lead.get("tried_at") or self.now()}
+                if st in ("draft", "failed") and (lead.get("draft") or "").strip():
+                    fields["status"] = "approved"
+                    if not lead.get("unsure"):  # 「不确定发出去没有」的提示要留着
+                        fields["error"] = ""
+                lead = self.store.update(lid, **fields)
             return {"url": reply_url(lead), "draft": lead.get("draft") or ""}
 
     # ---------- 回复 ----------
-    def _classify(self, lead, text, client):
+    def _ai_on(self):
+        r = self.ready()
+        return r["ai"] and r["profile"]
+
+    def _classify(self, lead, text, client, ai_on=True):
+        """AI 读对方的回复，返回 (结果, AI 是不是彻底用不了)。
+        AI 设好了却没读成（出错、点了停止、客户端建不起来）的标上 unread，下次查回复或记录回复时再读，
+        免得「别再联系」的回复没被认出来、人没被拉黑。没设 AI 的照规矩记成「其他」。"""
+        blank = {"intent": "other", "hot": False, "summary": "", "suggested_reply": ""}
         if client is None:
-            return {"intent": "other", "hot": False, "summary": "", "suggested_reply": ""}
+            return ({**blank, "unread": True} if ai_on else blank), False
         try:
-            return agent.classify_reply(client, lead, text, self.profile(), self.model())
+            return agent.classify_reply(client, lead, text, self.profile(), self.model()), False
         except Exception as e:
-            return {"intent": "other", "hot": False, "summary": f"（AI 没读成：{e}）", "suggested_reply": ""}
+            return {**blank, "summary": f"（AI 没读成：{e}）", "unread": True}, bool(getattr(e, "fatal", False))
 
     def _reply_client(self):
-        r = self.ready()
-        if not (r["ai"] and r["profile"]):
+        if not self._ai_on():
             return None
         try:
             return self._client()
         except Exception as e:
             self._err(f"AI 用不了：{e}")
             return None
+
+    @staticmethod
+    def _hot_of(replies):
+        """按顺序看全部回复：想试用、问价格的是热线索；说了别再联系的就不是了。"""
+        hot = False
+        for r in replies:
+            if r.get("intent") == "stop":
+                hot = False
+            elif r.get("intent") != "negative":
+                hot = hot or bool(r.get("hot"))
+        return hot
 
     def _apply_replies(self, lid, replies):
         """记下新回复：状态改成已回复；想试用、问价格的标成热线索；说别再联系、不感兴趣的拉黑。"""
@@ -583,18 +654,41 @@ class Outreach:
             new = [r for r in replies if r.get("id") not in have]
             if not new:
                 return lead
-            hot, block = bool(lead.get("hot")), False
-            for r in new:
-                if r.get("intent") == "stop":
-                    hot, block = False, True
-                elif r.get("intent") == "negative":
-                    block = True
-                else:
-                    hot = hot or bool(r.get("hot"))
-            lead = self.store.update(lid, replies=(lead.get("replies") or []) + new, status="replied", hot=hot)
-            if block:
-                self.store.block(lead["platform"], lead["author"])
+            every = (lead.get("replies") or []) + new
+            lead = self.store.update(lid, replies=every, status="replied", hot=self._hot_of(every))
+            if any(r.get("intent") in ("stop", "negative") for r in new):
+                self._block(lead)
             return lead
+
+    def _reread(self, client, only=None):
+        """上次 AI 没读成的回复再读一次。返回读成了几条。"""
+        if client is None:
+            return 0
+        n = 0
+        for lead in self.store.all():
+            if only and lead["id"] != only:
+                continue
+            for r in lead.get("replies") or []:
+                if not r.get("unread"):
+                    continue
+                if self._stop.is_set():
+                    return n
+                res, fatal = self._classify(lead, r.get("text", ""), client)
+                if res.get("unread"):
+                    if fatal:
+                        return n
+                    continue
+                with self.lock:
+                    cur = self.store.get(lead["id"])
+                    if not cur:
+                        break
+                    every = [({k: v for k, v in {**x, **res}.items() if k != "unread"} if x.get("id") == r.get("id") else x)
+                             for x in cur.get("replies") or []]
+                    cur = self.store.update(cur["id"], replies=every, hot=self._hot_of(every))
+                    if res.get("intent") in ("stop", "negative"):
+                        self._block(cur)
+                n += 1
+        return n
 
     def add_reply(self, lid, text):
         """手动发的平台：把对方的回复贴进来，AI 读一下是什么意思。"""
@@ -606,7 +700,10 @@ class Outreach:
             raise ValueError("找不到这条线索")
         if lead["status"] not in ("sent", "replied"):
             raise ValueError("这条还没发出去，先点「我已发出」再记录回复")
-        res = self._classify(lead, text, self._reply_client())
+        ai_on = self._ai_on()
+        client = self._reply_client() if ai_on else None
+        self._reread(client, only=lid)  # 这个人以前没读成的回复顺手再读一次
+        res, _ = self._classify(lead, text, client, ai_on)
         reply = {"id": f"manual-{len(lead.get('replies') or []) + 1}", "author": lead["author"], "text": text,
                  "at": self.now(), **res}
         return self._apply_replies(lid, [reply])
@@ -631,13 +728,18 @@ class Outreach:
 
     @staticmethod
     def _after_sent(lead, at):
-        """只认发出之后的回复（留 10 分钟余量）。"""
+        """只认发出之后的回复（留 10 分钟余量）。手动发的以点「复制并打开」的时间算：
+        你可能发完过了好一阵才点「我已发出」，这中间对方的回复也要认。"""
         t = _ts(at)
-        try:
-            sent = time.mktime(time.strptime(lead.get("sent_at") or "", "%Y-%m-%d %H:%M:%S"))
-        except ValueError:
+        starts = []
+        for k in ("tried_at", "sent_at"):
+            try:
+                starts.append(time.mktime(time.strptime(lead.get(k) or "", "%Y-%m-%d %H:%M:%S")))
+            except ValueError:
+                pass
+        if not starts:
             return True
-        return t is None or t >= sent - 600
+        return t is None or t >= min(starts) - 600
 
     def _match_reddit(self, lead, it):
         if not self._after_sent(lead, it["at"]):
@@ -659,6 +761,7 @@ class Outreach:
         try:
             leads = [l for l in self.store.all() if l.get("status") in ("sent", "replied")]
             found = []  # (线索 ID, 回复)
+            x_since, x_left = "", None
             for p in platforms:
                 mine = [l for l in leads if l["platform"] == p]
                 since = str(self.store.get_meta("x_since_id", "") or "")
@@ -670,29 +773,49 @@ class Outreach:
                 except senders.SendError as e:
                     self._err(f"{platform_name(p)}：{e}")
                     continue
+                if p == "x":
+                    # 以前没对上任何线索的提及再对一遍：可能是你后来才点的「我已发出」。X 每读一条都收钱，不重新去读
+                    seen = {it["id"] for it in items}
+                    old = self.store.get_meta("x_unmatched", []) or []
+                    items = items + [it for it in old if isinstance(it, dict) and it.get("id") not in seen]
                 match = self._match_reddit if p == "reddit" else self._match_x
+                left = []
                 for it in items:
                     for l in mine:
                         if match(l, it):
                             if it["id"] not in {r.get("id") for r in l.get("replies") or []}:
                                 found.append((l["id"], {"id": it["id"], "author": it["author"], "text": it["text"], "at": it["at"]}))
                             break
-                if p == "x" and newest and newest != since:
-                    self.store.set_meta("x_since_id", newest)
+                    else:
+                        left.append(it)
+                if p == "x":
+                    x_left = left[:X_UNMATCHED]  # 新读到的在前面
+                    x_since = newest if newest and newest != since else ""
             with self.lock:
                 self.task["total"] = len(found)
-            client = self._reply_client() if found else None
+            ai_on = self._ai_on()
+            unread = any(r.get("unread") for l in self.store.all() for r in l.get("replies") or [])
+            client = self._reply_client() if ai_on and (found or unread) else None
             hot = 0
             for lid, raw in found:
                 lead = self.store.get(lid)
                 if not lead:
                     continue
-                # 停止后剩下的也记下来（不让 AI 读），免得漏掉回复
-                res = self._classify(lead, raw["text"], None if self._stop.is_set() else client)
+                # 停止后、AI 彻底用不了以后，剩下的也记下来（标成没读，下次再读），免得漏掉回复
+                res, fatal = self._classify(lead, raw["text"], None if self._stop.is_set() else client, ai_on)
+                if fatal:
+                    client = None
                 after = self._apply_replies(lid, [{**raw, **res}])
                 if after and after.get("hot") and not lead.get("hot"):
                     hot += 1
                 self._progress()
+            # 回复都记下了，再往后挪查询起点（中途出错或被关掉，下次还能查到这些）
+            if x_left is not None:
+                self.store.set_meta("x_unmatched", x_left)
+            if x_since:
+                self.store.set_meta("x_since_id", x_since)
+            if not self._stop.is_set():
+                self._reread(client)
             return f"查到 {len(found)} 条新回复（{hot} 个热线索）"
         finally:
             self.last_check = self.clock()
@@ -757,8 +880,10 @@ class Outreach:
         platforms = ["reddit", "x"] + sorted({l["platform"] for l in leads} - {"reddit", "x"})
         with self.lock:
             task = copy.deepcopy(self.task)
+        for l in leads:  # 界面上不再给不再联系的人显示发送按钮
+            l["blocked"] = self._blocked(l)
         return {
-            "leads": leads, "counts": self.store.counts(),
+            "leads": leads, "counts": self.store.counts(), "store_error": self.store.error,
             "today": {p: {"name": platform_name(p), "sent": self.today_sent(p), "cap": self.cap_for(p)} for p in platforms},
             "task": task, "ready": self.ready(), "modes": {p: senders.mode_for(p, s) for p in platforms},
             "last_check": self.last_check_str(),

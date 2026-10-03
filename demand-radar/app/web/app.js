@@ -562,14 +562,16 @@ const LEAD_EMPTY = {
 const LOCKED = ['sending', 'sent', 'replied'];
 const PER_PAGE = 30;
 // 页面上的临时状态：换页面再回来还在
-const lv = { tab: 'review', page: 0, job: '', limit: 30, minScore: 0, sel: new Set(), open: new Set(), opened: new Set(), stay: new Set(), manual: new Set(), reply: {}, errsOpen: false, loaded: 0 };
+const lv = { tab: 'review', page: 0, job: '', limit: 30, minScore: 0, sel: new Set(), open: new Set(), opened: new Set(), stay: new Set(), reply: {}, errsOpen: false, loaded: 0 };
 let LEADS = null; // /api/outreach
 let leadsSig = '';
 
 const leadById = (id) => LEADS?.leads.find((l) => l.id === id);
 const leadPath = (id, sub = '') => `/api/outreach/leads/${encodeURIComponent(id)}${sub}`;
-// 「改为手动发」只对这一条生效；其余按设置里每个平台选的发送方式
-const leadMode = (l) => (lv.manual.has(l.id) ? 'manual' : LEADS?.modes[l.platform] || 'manual');
+// 点过「复制并打开」/「改为手动发」的（服务端记下的 manual）只能手动发；其余按设置里每个平台选的发送方式
+const leadMode = (l) => (l.manual ? 'manual' : LEADS?.modes[l.platform] || 'manual');
+// 能交给「批准并发送」的：不在不再联系名单里，也不是「不确定上次发出去没有」（那种要你先去平台上看）
+const sendable = (l) => !l.blocked && !l.unsure;
 const whoOf = (l) => (l.platform === 'reddit' ? `u/${l.author}` : l.platform === 'x' ? `@${l.author}` : l.author);
 const pad2 = (n) => String(n).padStart(2, '0');
 
@@ -694,11 +696,21 @@ function renderLeads(force) {
   renderLeadStatus();
   renderLeadTabs();
   // 正在改回复草稿或贴回复时不重画列表，免得打断输入
-  const editing = document.activeElement?.tagName === 'TEXTAREA' && document.activeElement.closest('#llist');
-  const sig = JSON.stringify([lv.tab, lv.page, LEADS.modes, LEADS.task.kind, [...lv.manual], [...lv.opened], [...lv.stay], pageLeads().map((l) => [l.id, l.status, l.draft, l.error, l.hot, l.fit_score, (l.replies || []).length])]);
+  const ae = document.activeElement;
+  const editing = ae?.tagName === 'TEXTAREA' && ae.closest('#llist') ? ae : null;
+  const sig = JSON.stringify([lv.tab, lv.page, LEADS.modes, LEADS.task.kind, [...lv.opened], [...lv.stay], pageLeads().map((l) => [l.id, l.status, l.draft, l.error, l.hot, l.fit_score, l.manual, l.unsure, l.blocked, (l.replies || []).length])]);
   if (force || (sig !== leadsSig && !editing)) {
     leadsSig = sig;
+    // 非重画不可时（别的操作做完了），正在打字的框照原样还回去：内容、光标都不变。
+    // 不然框里会换成旧内容，下一次点按钮时又把旧内容存回去、发出去
+    const keep = editing && { key: editing.dataset.draft ? 'draft' : 'reply', id: editing.dataset.draft || editing.dataset.reply, value: editing.value, a: editing.selectionStart, b: editing.selectionEnd };
     renderLeadList();
+    const ta = keep?.id && $$(`textarea[data-${keep.key}]`, $('#llist')).find((t) => t.dataset[keep.key] === keep.id);
+    if (ta && !ta.readOnly) {
+      ta.value = keep.value;
+      ta.focus();
+      try { ta.setSelectionRange(keep.a, keep.b); } catch { /* 有的框不支持 */ }
+    }
   }
 }
 
@@ -754,6 +766,7 @@ function setImportLabel() {
 function renderLeadSetup() {
   const r = LEADS.ready;
   const box = $('#lsetup');
+  if (LEADS.store_error) { box.innerHTML = `<section class="card setup"><div class="note bad">${esc(LEADS.store_error)}</div></section>`; return; }
   if (r.ai && r.profile) { box.innerHTML = ''; return; }
   const item = (ok, text, optional) => `<li class="${ok ? 'ok' : optional ? 'opt' : 'todo'}"><span class="mark">${ok ? '✓' : optional ? '–' : '!'}</span>${text}</li>`;
   box.innerHTML = `<section class="card setup"><h2>先在设置里填好这几样，AI 才能帮你判断和写回复</h2><ul class="checklist">
@@ -830,8 +843,8 @@ function renderBatch(pickable) {
   const box = $('#lbatch');
   const n = lv.sel.size;
   const apiNames = Object.entries(LEADS.modes).filter(([, m]) => m === 'api').map(([p]) => pname(p));
-  const drafts = LEADS.leads.filter((l) => l.status === 'draft' && leadMode(l) === 'api');
-  const queued = LEADS.leads.filter((l) => ['approved', 'failed'].includes(l.status) && leadMode(l) === 'api');
+  const drafts = LEADS.leads.filter((l) => l.status === 'draft' && leadMode(l) === 'api' && sendable(l));
+  const queued = LEADS.leads.filter((l) => ['approved', 'failed'].includes(l.status) && leadMode(l) === 'api' && sendable(l));
   const left = pickable.length ? `<label class="check"><input type="checkbox" id="lall" ${n && n === pickable.length ? 'checked' : ''}> 全选本页</label>
     <span class="muted small">已选 ${n} 条</span>
     ${lv.tab === 'other' ? `<button data-b="restore" ${n ? '' : 'disabled'}>批量恢复到待审核</button>`
@@ -850,8 +863,8 @@ async function onBatch(e) {
   b.disabled = true;
   try {
     if (act === 'send') await sendIds(ids, true);
-    if (act === 'all') await sendIds(LEADS.leads.filter((l) => l.status === 'draft' && leadMode(l) === 'api').map((l) => l.id), true);
-    if (act === 'queue') await sendIds(LEADS.leads.filter((l) => ['approved', 'failed'].includes(l.status) && leadMode(l) === 'api').map((l) => l.id), true);
+    if (act === 'all') await sendIds(LEADS.leads.filter((l) => l.status === 'draft' && leadMode(l) === 'api' && sendable(l)).map((l) => l.id), true);
+    if (act === 'queue') await sendIds(LEADS.leads.filter((l) => ['approved', 'failed'].includes(l.status) && leadMode(l) === 'api' && sendable(l)).map((l) => l.id), true);
     if (act === 'skip' || act === 'restore') {
       let ok = 0;
       for (const id of ids) {
@@ -867,7 +880,7 @@ async function onBatch(e) {
 
 // 批准并发送：自动发的在后台一条条发；手动发的批准后放进「待发送」
 async function sendIds(ids, confirmFirst) {
-  const leads = ids.map(leadById).filter((l) => l && ['new', 'draft', 'error', 'failed', 'approved'].includes(l.status) && (l.draft || '').trim());
+  const leads = ids.map(leadById).filter((l) => l && sendable(l) && ['new', 'draft', 'error', 'failed', 'approved'].includes(l.status) && (l.draft || '').trim());
   if (!leads.length) return toast('选中的线索还没有回复草稿，没法发', true);
   const auto = leads.filter((l) => leadMode(l) === 'api');
   const manual = leads.filter((l) => leadMode(l) !== 'api');
@@ -882,9 +895,9 @@ async function sendIds(ids, confirmFirst) {
     return;
   }
   if (confirmFirst && !(await ask(sendPlanText(auto, manual), { ok: auto.length ? '批准并发送' : '批准' }))) return;
-  // 还没判断过的（自己写了回复）和这台电脑上改成手动发的，先批准；改成手动发的不交给官方接口
-  await approve(leads.filter((l) => ['new', 'error'].includes(l.status) || lv.manual.has(l.id)));
-  const toServer = leads.filter((l) => !lv.manual.has(l.id)).map((l) => l.id);
+  // 还没判断过的（自己写了回复）和改成手动发的，先批准；改成手动发的不交给官方接口
+  await approve(leads.filter((l) => ['new', 'error'].includes(l.status) || l.manual));
+  const toServer = leads.filter((l) => !l.manual).map((l) => l.id);
   const r = toServer.length ? await api('/api/outreach/send', { ids: toServer }) : { queued: 0, manual: [] };
   const msg = [];
   if (r.queued) msg.push(r.queued > 1 ? `开始发送 ${r.queued} 条：在后台一条一条发，随时可以停止` : '正在发送…');
@@ -949,6 +962,17 @@ function replyBox(l) {
   const hasDraft = !!(l.draft || '').trim();
   const acts = [];
   let note = '';
+  if (l.blocked) {
+    // 不再联系名单里的人：不给任何发送按钮
+    return `${hasDraft ? `<div class="mine">${esc(l.draft)}</div>` : ''}<div class="note">这个人在不再联系名单里，不会再联系。</div>`;
+  }
+  if (l.unsure) {
+    // 不确定上次发出去没有：先去平台上看，绝不直接重发
+    const url = safeUrl(l.url);
+    return `<div class="mine">${esc(l.draft)}</div><div class="note bad">${esc(l.error || '不确定发出去没有：先去平台上看一眼')}</div>
+      <div class="muted small hint">${url ? `<a href="${esc(url)}" target="_blank" rel="noopener">去原帖看看 ↗</a> · ` : ''}看到你的回复了就点「已经发出去了」；确实没有，点「没发出去」以后才能再发。</div>
+      <div class="lead-actions">${actBtn('sent', '已经发出去了', 'primary')}${actBtn('unsent', '没发出去')}${actBtn('block', '不再联系此人', 'danger')}</div>`;
+  }
   if (st === 'new' && !hasDraft && LEADS.task.kind === 'judge') {
     return `<div class="note">AI 正在判断，写好的回复会出现在这里。</div><div class="lead-actions">${actBtn('skip', '跳过')}${actBtn('block', '不再联系此人', 'danger')}</div>`;
   }
@@ -965,7 +989,12 @@ function replyBox(l) {
     note += `<div class="note warn">${esc(pname(l.platform))} 的每天上限设成了 0（不往这个平台发）。要发的话先去 <a href="#/settings/outreach">设置 → 线索与回复</a> 里改上限。</div>`;
     canSend = false;
   } else if (canSend && day && day.sent >= day.cap) {
-    note += `<div class="note warn">今天 ${esc(pname(l.platform))} 已发 ${day.sent} 条，到你设的上限了。批准的会留在「待发送」，明天再发；上限在设置里能改。</div>`;
+    if (mode === 'api') note += `<div class="note warn">今天 ${esc(pname(l.platform))} 已发 ${day.sent} 条，到你设的上限了。批准的会留在「待发送」，明天再发；上限在设置里能改。</div>`;
+    else {
+      // 手动发的到了上限就不给「复制并打开」：发了也超了你自己定的数
+      note += `<div class="note warn">今天 ${esc(pname(l.platform))} 已发 ${day.sent} 条，到你设的上限了，明天再发；上限在设置里能改。</div>`;
+      canSend = false;
+    }
   }
   if (canSend) {
     if (mode === 'api' && st === 'failed') acts.push(actBtn('retry', '重试发送', 'primary'), actBtn('to-manual', '改为手动发'));
@@ -1052,8 +1081,7 @@ async function leadAct(act, id, card) {
     const ta = $('textarea[data-draft]', card);
     const copying = copyText(ta ? ta.value.trim() : l.draft);
     await saveDraft(id, card);
-    if (act === 'to-manual') lv.manual.add(id);
-    const r = await api(`${path}/open`, {});
+    const r = await api(`${path}/open`, {}); // 服务端记下这条改成手动发了，官方接口不会再替你发
     const copied = r.copied || (await copying);
     const url = safeUrl(r.url);
     if (!r.opened && url) window.open(url, '_blank', 'noopener');
@@ -1074,6 +1102,10 @@ async function leadAct(act, id, card) {
     lv.opened.delete(id);
     lv.stay.delete(id);
     toast('已记为发出。对方回了的话，把回复贴到这条线索里（在「已发」里）');
+  } else if (act === 'unsent') {
+    if (!(await ask(`你去平台上看过了，确定 ${whoOf(l)} 那里没有你的这条回复？\n确定没有才能再发，不然对方会收到两条一样的。`, { ok: '确定没发出去' }))) return;
+    await api(path, { action: 'unsent' });
+    toast('好的，这条可以重发了');
   } else if (act === 'skip') {
     await api(path, { action: 'skip' });
     toast('已跳过');
