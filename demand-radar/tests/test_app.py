@@ -408,6 +408,24 @@ class ServerTest(unittest.TestCase):
         self.assertTrue(r["ok"])
         self.assertEqual(self.call(f"/api/jobs/{again['id']}")[0], 404)
 
+    def test_youtube_and_x_keys(self):
+        plats = {p["id"]: p for p in self.call("/api/state")[1]["platforms"]}
+        self.assertIs(plats["youtube"]["configured"], False)
+        self.assertIs(plats["x"]["configured"], False)
+        self.assertNotIn("configured", plats["reddit"], "不需要 Key 的平台不带这个标记")
+        code, st = self.call("/api/settings", {"youtube_api_key": "yt-secret", "x_bearer_token": "x-secret"})
+        self.assertEqual((st["settings"]["youtube_api_key"], st["settings"]["x_bearer_token"]), ("已填写", "已填写"))
+        plats = {p["id"]: p for p in st["platforms"]}
+        self.assertTrue(plats["youtube"]["configured"] and plats["x"]["configured"])
+        # 页面把"已填写"原样存回来时不能覆盖真正的 Key
+        self.call("/api/settings", {"youtube_api_key": "已填写", "x_bearer_token": "已填写"})
+        env = self.app.settings.env()
+        self.assertEqual((env["RADAR_YOUTUBE_KEY"], env["RADAR_X_BEARER"]), ("yt-secret", "x-secret"))
+        if os.name == "posix":
+            self.assertEqual(os.stat(self.app.settings.path).st_mode & 0o777, 0o600, "设置文件里有 Key，只给自己读")
+        self.call("/api/settings", {"youtube_api_key": "", "x_bearer_token": ""})
+        self.assertNotIn("RADAR_YOUTUBE_KEY", self.app.settings.env())
+
     def test_static_page_and_traversal(self):
         req = urllib.request.Request(f"http://127.0.0.1:{self.port}/")
         with urllib.request.build_opener(urllib.request.ProxyHandler({})).open(req) as r:

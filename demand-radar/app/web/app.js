@@ -98,6 +98,7 @@ const DOMAINS = [
   [/xiaohongshu\.com|xhslink\.com|rednote/i, 'xhs'], [/douyin\.com|iesdouyin/i, 'dy'], [/bilibili\.com|b23\.tv/i, 'bili'],
   [/zhihu\.com/i, 'zhihu'], [/weibo\.(com|cn)/i, 'wb'], [/tieba\.baidu\.com/i, 'tieba'], [/kuaishou\.com|chenzhongtech|gifshow/i, 'ks'],
   [/apps\.apple\.com|itunes\.apple\.com/i, 'appstore'], [/reddit\.com|redd\.it/i, 'reddit'], [/news\.ycombinator\.com/i, 'hn'], [/github\.com/i, 'github'],
+  [/youtube\.com|youtu\.be/i, 'youtube'], [/(^|[/.])(x|twitter)\.com\//i, 'x'],
 ];
 function detectPlatform(text) {
   for (const [rx, id] of DOMAINS) if (rx.test(text)) return id;
@@ -152,6 +153,7 @@ function viewNew() {
       const on = draft.platforms.includes(p.id);
       let st = '';
       if (p.kind === 'browser') st = p.login === 'saved' ? '<span class="st ok">登录过</span>' : '<span class="st">第一次要扫码</span>';
+      else if (p.configured === false) st = '<span class="st warn">要先在设置里填 Key</span>';
       else if (p.region === 'global') st = '<span class="st warn">要代理</span>';
       return `<button class="pcard ${on ? 'on' : ''}" data-p="${p.id}" ${can ? '' : 'disabled title="这个平台不支持这种抓法"'}>
         <span class="tick">${on ? '✓' : ''}</span><b>${esc(p.name)}</b><span class="hint">${esc(p.hint)}</span>${st}</button>`;
@@ -163,7 +165,8 @@ function viewNew() {
     const notes = [];
     if (sel.some((p) => p.kind === 'browser') && !STATE.mc_ready) notes.push(['bad', '还没装好 MediaCrawler：国内平台抓不了。在终端运行一次 setup_mac.sh 就好。']);
     if (sel.some((p) => p.kind === 'browser' && p.login !== 'saved')) notes.push(['warn', '会弹出一个 Chrome 窗口，用手机上对应的 App 扫码登录（只要第一次）。遇到滑块验证就在那个窗口里拖一下。']);
-    if (sel.some((p) => p.region === 'global')) notes.push(['', 'Reddit、Hacker News 在国内要开代理。软件会自动用系统代理，也可以在"设置"里填代理地址。']);
+    sel.filter((p) => p.configured === false).forEach((p) => notes.push(['bad', `${p.name} 要先在"设置 → 网络和接口"里填 Key，填好才能采集。`]));
+    if (sel.some((p) => p.region === 'global')) notes.push(['', '国外网站（Reddit、YouTube、X……）在国内要开代理。软件会自动用系统代理，也可以在"设置"里填代理地址。']);
     $('#plat-notes').innerHTML = notes.map(([c, t]) => `<div class="note ${c}">${esc(t)}</div>`).join('');
     estimate();
   };
@@ -256,6 +259,8 @@ function viewNew() {
   $('#sub').addEventListener('change', (e) => { draft.sub = e.target.checked; });
   $('#label').addEventListener('input', (e) => { draft.label = e.target.value; });
   $('#start').addEventListener('click', async () => {
+    const noKey = draft.platforms.map(plat).filter((p) => p?.configured === false);
+    if (noKey.length) return toast(`${noKey.map((p) => p.name).join('、')} 还没填 Key：先去"设置 → 网络和接口"里填`, true);
     const spec = {
       platforms: draft.platforms, mode: draft.mode, keywords: lines(draft.keywords), targets: lines(draft.targets),
       notes: +$('#notes').value, comments: +$('#comments').value, sub: draft.sub, label: draft.label.trim(),
@@ -535,6 +540,7 @@ function viewPlatforms() {
   const row = (p) => {
     const login = p.kind === 'browser'
       ? (p.login === 'saved' ? '<span class="status done">已保存登录</span>' : '<span class="status">还没登录</span>')
+      : p.configured === false ? '<span class="status failed">没填 Key</span>'
       : (p.region === 'global' ? '<span class="status stopped">要代理</span>' : '<span class="status done">不用登录</span>');
     const btn = p.kind === 'browser'
       ? `<button data-clear="${p.id}" ${p.login === 'saved' ? '' : 'disabled'} title="清除保存的登录，下次采集时重新扫码（换账号、账号被限制时用）">重新登录</button>`
@@ -588,6 +594,8 @@ function viewSettings() {
   <section class="card"><h2>网络和接口</h2><div class="form">
     <label>代理</label><div><input type="text" id="proxy" value="${esc(s.proxy)}" placeholder="例如 http://127.0.0.1:7890"><div class="help">只给不用登录的来源（Reddit、Hacker News、GitHub…）用。空着就用系统代理。</div></div>
     <label>GitHub Token</label><div><input type="password" id="github_token" value="${esc(s.github_token)}" placeholder="可选"><div class="help">不填每小时只能请求 60 次；填一个（不用勾任何权限）能到 5000 次。只保存在这台电脑上。</div></div>
+    <label>YouTube API key</label><div><input type="password" id="youtube_api_key" value="${esc(s.youtube_api_key)}" placeholder="抓 YouTube 要填"><div class="help">在 Google Cloud 控制台免费申请：新建项目 → 启用 YouTube Data API v3 → 凭据 → 创建 API 密钥。免费额度每天大约能搜 100 次。</div></div>
+    <label>X Bearer Token</label><div><input type="password" id="x_bearer_token" value="${esc(s.x_bearer_token)}" placeholder="抓 X（推特）要填"><div class="help">在 developer.x.com 建一个应用后拿到。X API 按用量收费，每读一条推文都算钱；只能搜最近 7 天。</div></div>
     <label>App Store 地区</label><div><input type="text" id="appstore_country" value="${esc(s.appstore_country)}" style="width:80px"><div class="help">cn 中国，us 美国，jp 日本……</div></div>
     <label>Reddit 默认版块</label><div><input type="text" id="reddit_subs" value="${esc(s.reddit_subs)}"><div class="help">关键词前没写 r/版块名 时，在这些版块里搜。英文逗号分隔。</div></div>
   </div></section>
@@ -608,7 +616,7 @@ function viewSettings() {
   $('#save').addEventListener('click', async () => {
     const patch = { keyword_sets: sets };
     ['sleep_sec', 'default_notes', 'default_comments'].forEach((k) => { patch[k] = +$('#' + k).value; });
-    ['xhs_sort', 'browser_path', 'proxy', 'github_token', 'appstore_country', 'reddit_subs'].forEach((k) => { patch[k] = $('#' + k).value; });
+    ['xhs_sort', 'browser_path', 'proxy', 'github_token', 'youtube_api_key', 'x_bearer_token', 'appstore_country', 'reddit_subs'].forEach((k) => { patch[k] = $('#' + k).value; });
     patch.connect_existing = $('#connect_existing').checked;
     try {
       STATE = await api('/api/settings', patch);

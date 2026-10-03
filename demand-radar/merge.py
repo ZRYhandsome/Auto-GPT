@@ -25,11 +25,13 @@ PLATFORM_NAMES = {
     "weibo": "微博", "wb": "微博", "tieba": "贴吧", "zhihu": "知乎", "kuaishou": "快手", "ks": "快手",
     # 需求雷达软件里的免登录数据源
     "appstore": "App Store", "reddit": "Reddit", "hn": "Hacker News", "github": "GitHub", "web": "网页",
+    "youtube": "YouTube", "x": "X",
 }
 # radar.sh -p 用的平台简称（MediaCrawler 的输出目录名 → 命令行参数）
 PLATFORM_ARGS = {"xhs": "xhs", "douyin": "dy", "dy": "dy", "bili": "bili", "bilibili": "bili", "weibo": "wb",
                  "wb": "wb", "tieba": "tieba", "zhihu": "zhihu", "kuaishou": "ks", "ks": "ks",
-                 "appstore": "appstore", "reddit": "reddit", "hn": "hn", "github": "github", "web": "web"}
+                 "appstore": "appstore", "reddit": "reddit", "hn": "hn", "github": "github", "web": "web",
+                 "youtube": "youtube", "x": "x"}
 
 PRODUCT = r"(app|软件|工具|小程序|网站|插件|平台|应用|神器|系统|功能|产品)"
 OTHER_OS = r"(安卓|android|鸿蒙|华为|荣耀|小米|vivo|oppo|三星|windows|win版|电脑版|电脑端|pc版|mac|ipad|平板|网页版|watch|手表|ios|苹果|iphone|全平台)"

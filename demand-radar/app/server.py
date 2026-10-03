@@ -26,7 +26,7 @@ sys.path.insert(0, APP_DIR)
 import catalog  # noqa: E402
 from jobs import JobManager  # noqa: E402
 
-VERSION = "0.3.0"
+VERSION = "0.3.1"
 HOME = os.environ.get("RADAR_HOME") or os.path.dirname(APP_DIR)
 WEB_DIR = os.path.join(APP_DIR, "web")
 IS_MAC = sys.platform == "darwin"
@@ -38,12 +38,15 @@ DEFAULT_SETTINGS = {
     "connect_existing": False, # 用日常 Chrome 的登录状态（要先开远程调试）
     "proxy": "",               # 国外网站用的代理，比如 http://127.0.0.1:7890；空着就用系统代理
     "github_token": "",
+    "youtube_api_key": "",     # YouTube Data API v3 的 key（Google Cloud 控制台免费申请）
+    "x_bearer_token": "",      # X API v2 的 Bearer Token（X 按用量收费）
     "appstore_country": "cn",
     "reddit_subs": "SomebodyMakeThis,AppIdeas,SaaS,Entrepreneur,startups,productivity",
     "default_notes": 20,
     "default_comments": 20,
     "keyword_sets": [],
 }
+SECRET_KEYS = {"github_token", "youtube_api_key", "x_bearer_token"}  # 界面上只显示"已填写"
 
 
 # ---------- 设置 ----------
@@ -79,7 +82,8 @@ class Settings:
 
     def public(self):
         d = self.get()
-        d["github_token"] = "已填写" if d.get("github_token") else ""
+        for k in SECRET_KEYS:
+            d[k] = "已填写" if d.get(k) else ""
         return d
 
     def update(self, patch):
@@ -87,7 +91,7 @@ class Settings:
             for k, v in patch.items():
                 if k not in DEFAULT_SETTINGS:
                     continue
-                if k == "github_token" and v == "已填写":
+                if k in SECRET_KEYS and v == "已填写":
                     continue
                 if k == "keyword_sets":
                     v = [{"name": str(s.get("name", ""))[:40] or "未命名", "keywords": [str(x).strip() for x in s.get("keywords", []) if str(x).strip()][:200]}
@@ -106,6 +110,10 @@ class Settings:
             with open(tmp, "w", encoding="utf-8") as f:
                 json.dump(self.data, f, ensure_ascii=False, indent=1)
             os.replace(tmp, self.path)
+            try:
+                os.chmod(self.path, 0o600)  # 里面有各家网站的 Key，只让自己能读
+            except OSError:
+                pass
 
     def env(self):
         """传给抓取进程的环境变量（run_mc.py 和 run_source.py 都认）。"""
@@ -123,6 +131,10 @@ class Settings:
             env["RADAR_PROXY"] = d["proxy"]
         if d["github_token"]:
             env["RADAR_GITHUB_TOKEN"] = d["github_token"]
+        if d["youtube_api_key"]:
+            env["RADAR_YOUTUBE_KEY"] = d["youtube_api_key"]
+        if d["x_bearer_token"]:
+            env["RADAR_X_BEARER"] = d["x_bearer_token"]
         return env
 
 
@@ -153,8 +165,11 @@ class App:
                 if s.get("state") == "done" and (s.get("posts") or s.get("comments") or j.get("legacy")):
                     last_ok.setdefault(s["platform"], j.get("created", ""))
         platforms = []
+        settings = self.settings.get()
         for p in catalog.PLATFORMS:
             item = dict(p)
+            if p.get("needs"):
+                item["configured"] = bool(settings.get(p["needs"]))
             if p["kind"] == "browser":
                 item["login"] = login_state(self.mc_dir, p["id"])
             item["last_ok"] = last_ok.get(p["id"], "")

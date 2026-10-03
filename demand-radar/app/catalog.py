@@ -3,6 +3,7 @@
 两类：
 - browser：用 MediaCrawler 打开真实 Chrome、用你自己的账号登录后抓，第一次要扫码。
 - api：走网站公开接口，不用登录。国外的网站在国内要开代理（软件会用系统代理）。
+  写了 needs 的平台要先在设置里填对应的 Key（YouTube API key、X 的 Bearer Token）。
 
 每个平台写明支持哪些抓法：
 - search：按关键词搜帖子，再抓每条帖子的评论；
@@ -34,6 +35,10 @@ PLATFORMS = [
      "hint": "程序员和创业者社区，Ask HN 里常有人求工具。需要代理"},
     {"id": "github", "name": "GitHub Issues", "kind": "api", "modes": ["search", "detail"], "region": "global",
      "hint": "开源软件的功能请求和 bug，按 👍 数排。国内多数能直连"},
+    {"id": "youtube", "name": "YouTube", "kind": "api", "modes": ["search", "detail"], "region": "global", "needs": "youtube_api_key",
+     "hint": "视频和评论。要在设置里填 YouTube API key（免费，每天大约能搜 100 次）。需要代理"},
+    {"id": "x", "name": "X（推特）", "kind": "api", "modes": ["search", "detail"], "region": "global", "needs": "x_bearer_token",
+     "hint": "最近 7 天的推文和回复。要在设置里填 X API 的 Bearer Token（X API 按用量收费）。需要代理"},
     {"id": "web", "name": "任意网页", "kind": "api", "modes": ["detail"], "region": "any",
      "hint": "贴链接抓正文：文章、论坛帖、博客。要登录的页面抓不到"},
 ]
@@ -42,7 +47,8 @@ BY_ID = {p["id"]: p for p in PLATFORMS}
 
 # 各平台的输出目录名（jsonl 写在 <运行目录>/<目录名>/jsonl/ 下）
 MC_DIRS = {"xhs": "xhs", "dy": "douyin", "ks": "kuaishou", "bili": "bili", "wb": "weibo", "tieba": "tieba", "zhihu": "zhihu",
-           "appstore": "appstore", "reddit": "reddit", "hn": "hn", "github": "github", "web": "web"}
+           "appstore": "appstore", "reddit": "reddit", "hn": "hn", "github": "github", "web": "web",
+           "youtube": "youtube", "x": "x"}
 
 MODES = {
     "search": "按关键词搜索",
