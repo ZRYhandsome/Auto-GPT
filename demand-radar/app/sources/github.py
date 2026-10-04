@@ -9,7 +9,7 @@
 import os
 import re
 
-from .common import attempt, get_json, log, pause
+from .common import attempt, get_json, log, pause, since_date
 
 PLATFORM_DIR = "github"
 API = "https://api.github.com"
@@ -36,6 +36,8 @@ def thumbs(d):
 
 def search(q, limit):
     query = q if re.search(r"\bis:(issue|pr)\b", q) else f"{q} is:issue"
+    if since_date() and "created:" not in query:
+        query += f" created:>={since_date()}"  # 只要这天以后开的 issue
     data = get_json(f"{API}/search/issues", {"q": query, "sort": "reactions-+1", "order": "desc", "per_page": min(max(limit, 1), 100)}, headers())
     return (data or {}).get("items", [])
 

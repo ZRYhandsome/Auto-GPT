@@ -11,8 +11,9 @@ Arctic Shift 连不上时再试 Reddit 自己的接口。国内要开代理。
 """
 import os
 import re
+import time
 
-from .common import FetchError, attempt, get_json, log, pause
+from .common import FetchError, attempt, get_json, log, pause, since_date, since_epoch
 
 PLATFORM_DIR = "reddit"
 ARCTIC = "https://arctic-shift.photon-reddit.com/api"
@@ -44,13 +45,24 @@ def _unwrap(x):
     return x.get("data", x) if isinstance(x, dict) and "kind" in x else x
 
 
+def reddit_window():
+    """Reddit 自己的搜索只认 day/week/month/year/all。"""
+    if not since_epoch():
+        return "all"
+    days = (time.time() - since_epoch()) / 86400
+    return next((w for w, d in (("day", 1), ("week", 7), ("month", 31), ("year", 366)) if days <= d), "all")
+
+
 def search(sub, q, limit):
+    params = {"subreddit": sub, "query": q, "limit": min(max(limit, 1), 100), "sort": "desc"}
+    if since_date():
+        params["after"] = since_date()  # 只要这天以后发的帖子
     try:
-        data = get_json(f"{ARCTIC}/posts/search", {"subreddit": sub, "query": q, "limit": min(max(limit, 1), 100), "sort": "desc"})
+        data = get_json(f"{ARCTIC}/posts/search", params)
         return [_unwrap(x) for x in (data or {}).get("data") or []]
     except FetchError as e:
         log(f"  Arctic Shift 没取到（{e}），改试 Reddit 自己的接口")
-        data = get_json(f"{REDDIT}/r/{sub}/search.json", {"q": q, "restrict_sr": 1, "sort": "relevance", "t": "all", "limit": min(max(limit, 1), 100), "raw_json": 1}, HEADERS)
+        data = get_json(f"{REDDIT}/r/{sub}/search.json", {"q": q, "restrict_sr": 1, "sort": "relevance", "t": reddit_window(), "limit": min(max(limit, 1), 100), "raw_json": 1}, HEADERS)
         return [c["data"] for c in ((data or {}).get("data") or {}).get("children", []) if c.get("kind") == "t3"]
 
 

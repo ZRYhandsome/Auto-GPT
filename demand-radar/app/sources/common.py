@@ -95,6 +95,17 @@ def get_json(url, params=None, headers=None, timeout=25, retries=3, opener=None)
     raise FetchError(str(last))
 
 
+def since_date():
+    """新建采集时选的"只要多久以内的"：'YYYY-MM-DD'，不限时为空。搜索时尽量让网站只返回这天以后的。"""
+    s = os.environ.get("RADAR_SINCE", "").strip()[:10]
+    return s if re.fullmatch(r"\d{4}-\d{2}-\d{2}", s) else ""
+
+
+def since_epoch():
+    s = since_date()
+    return int(datetime.strptime(s, "%Y-%m-%d").timestamp()) if s else 0
+
+
 def short(url, n=90):
     return url if len(url) <= n else url[: n - 1] + "…"
 

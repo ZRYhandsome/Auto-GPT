@@ -51,6 +51,32 @@ function toast(msg, bad = false) {
 
 const STATUS = { queued: '排队中', running: '采集中', done: '完成', partial: '没抓完', failed: '失败', stopped: '已停止', interrupted: '中断了' };
 const STEP = { waiting: '等待', running: '采集中', done: '完成', partial: '没抓完', failed: '失败', stopped: '已停止', skipped: '跳过', interrupted: '中断了' };
+// ---------- 时间 ----------
+// 很多老需求在 AI 出来以后已经被解决了：每条都写清楚是什么时候发的，太旧的不算需求
+const CHATGPT_DAY = '2022-11-30';
+const SINCE_OPTS = [['', '不限时间'], ['30', '近 1 个月'], ['90', '近 3 个月'], ['180', '近半年'], ['365', '近 1 年'], ['730', '近 2 年'],
+  ['chatgpt', 'ChatGPT 出来以后（2022 年 11 月底起）']];
+const ymd = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+function sinceDate(choice) {
+  if (!choice) return '';
+  if (choice === 'chatgpt') return CHATGPT_DAY;
+  return ymd(new Date(Date.now() - (+choice) * 86400000));
+}
+function parseTime(v) {
+  const m = String(v || '').match(/^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2}))?/);
+  return m ? new Date(+m[1], +m[2] - 1, +m[3], +(m[4] || 0), +(m[5] || 0)) : null;
+}
+function ago(d) {
+  const days = (Date.now() - d) / 86400000;
+  if (days < 1) return '今天';
+  if (days < 2) return '昨天';
+  if (days < 31) return `${Math.floor(days)} 天前`;
+  if (days < 365) return `${Math.floor(days / 30.4)} 个月前`;
+  return days < 730 ? '1 年多前' : `${Math.floor(days / 365)} 年前`;
+}
+// "2024-05-03（1 年多前）"；认不出就原样
+const whenText = (v) => { const d = parseTime(v); return d ? `${ymd(d)}（${ago(d)}）` : String(v || ''); };
+
 const pname = (id) => STATE?.platforms.find((p) => p.id === id)?.name || id;
 const plat = (id) => STATE?.platforms.find((p) => p.id === id);
 
@@ -122,7 +148,7 @@ const draft = { mode: 'search', platforms: ['xhs'], keywords: '', targets: '', n
 
 function viewNew() {
   const s = STATE.settings;
-  if (draft.notes === null) { draft.notes = s.default_notes; draft.comments = s.default_comments; }
+  if (draft.notes === null) { draft.notes = s.default_notes; draft.comments = s.default_comments; draft.since = s.since_choice ?? '365'; }
   main.innerHTML = `<div class="page">
   <div class="page-head"><div><h1>新建采集</h1><div class="muted">选平台、填关键词或链接，点开始。采集在后台跑，可以同时去看别的任务。</div></div></div>
   <section class="card">
@@ -148,7 +174,9 @@ function viewNew() {
       <label id="notes-l">每个关键词抓 <input type="number" id="notes" min="1" max="500" value="${draft.notes}"> 条帖子</label>
       <label>每条帖子抓 <input type="number" id="comments" min="0" max="5000" value="${draft.comments}"> 条评论</label>
       <label class="check"><input type="checkbox" id="sub" ${draft.sub ? 'checked' : ''}> 也抓楼中楼回复（更慢）</label>
+      <label>只要 <select id="since">${SINCE_OPTS.map(([v, t]) => `<option value="${v}" ${draft.since === v ? 'selected' : ''}>${t}</option>`).join('')}</select> 发的</label>
     </div>
+    <p class="muted small" id="since-help"></p>
     <p class="muted small" id="estimate"></p>
     <div class="row" style="margin-top:12px">
       <input type="text" id="label" placeholder="给这次采集起个名字（可选）" value="${esc(draft.label)}" style="width:320px">
@@ -182,6 +210,7 @@ function viewNew() {
     if (sel.some((p) => p.region === 'global')) notes.push(['', '国外网站（Reddit、YouTube、X……）在国内要开代理。软件会自动用系统代理，也可以在"设置"里填代理地址。']);
     $('#plat-notes').innerHTML = notes.map(([c, t]) => `<div class="note ${c}">${esc(t)}</div>`).join('');
     estimate();
+    sinceHelp();
   };
 
   const renderInput = () => {
@@ -277,6 +306,16 @@ function viewNew() {
     renderPlatforms();
   });
   ['notes', 'comments'].forEach((k) => $('#' + k).addEventListener('input', (e) => { draft[k] = +e.target.value; if (k === 'comments') draft.autoComments = false; estimate(); }));
+  function sinceHelp() {
+    const day = sinceDate(draft.since);
+    let t = day ? `${day} 以前发的帖子和评论照样抓下来、放在「全部数据」里，但不算需求。`
+      : '不管多久以前的都算需求。ChatGPT 是 2022 年 11 月底出来的，那之前的很多需求现在已经被 AI 解决了。';
+    if (day && +draft.since <= 180 && draft.platforms.includes('xhs') && STATE.settings.xhs_sort === 'general') {
+      t += ' 小红书按综合排序搜出来多是老帖子：只要近期的，到「设置」把小红书排序改成「最新」更划算。';
+    }
+    $('#since-help').textContent = t;
+  }
+  $('#since').addEventListener('change', (e) => { draft.since = e.target.value; sinceHelp(); });
   $('#sub').addEventListener('change', (e) => { draft.sub = e.target.checked; });
   $('#label').addEventListener('input', (e) => { draft.label = e.target.value; });
   $('#start').addEventListener('click', async () => {
@@ -284,7 +323,7 @@ function viewNew() {
     if (noKey.length) return toast(`${noKey.map((p) => p.name).join('、')} 还没填 Key：先去"设置 → 抓取用的 Key"里填`, true);
     const spec = {
       platforms: draft.platforms, mode: draft.mode, keywords: lines(draft.keywords), targets: lines(draft.targets),
-      notes: +$('#notes').value, comments: +$('#comments').value, sub: draft.sub, label: draft.label.trim(),
+      notes: +$('#notes').value, comments: +$('#comments').value, sub: draft.sub, label: draft.label.trim(), since: sinceDate(draft.since),
     };
     try {
       $('#start').disabled = true;
@@ -349,7 +388,7 @@ async function viewJob(id) {
   const renderHead = () => {
     $('#jt').textContent = jobTitle(job);
     const s = job.spec;
-    $('#jmeta').innerHTML = `<span class="status ${job.status}">${STATUS[job.status] || job.status}</span> ${esc(job.created || '')} · ${esc(STATE.modes[s.mode] || s.mode)}${s.mode === 'search' ? ` · 每词 ${s.notes || '?'} 帖、每帖 ${s.comments || '?'} 评` : ''}`;
+    $('#jmeta').innerHTML = `<span class="status ${job.status}">${STATUS[job.status] || job.status}</span> ${esc(job.created || '')} · ${esc(STATE.modes[s.mode] || s.mode)}${s.mode === 'search' ? ` · 每词 ${s.notes || '?'} 帖、每帖 ${s.comments || '?'} 评` : ''}${s.since ? ` · 只算 ${esc(s.since)} 以后发的` : ''}`;
     const busy = job.status === 'running' || job.status === 'queued';
     $('#jactions').innerHTML = busy
       ? '<button class="danger" data-a="stop">停止</button>'
@@ -399,7 +438,7 @@ async function viewJob(id) {
       body.innerHTML = `<div class="empty">${job.status === 'running' ? '采集完、打完分以后这里显示结果。' : '没有数据。'}</div>`;
       return;
     }
-    dataTable(body, data, { view: tab });
+    dataTable(body, data, { view: tab, since: job.spec?.since || '' });
   };
 
   const pullLog = async (first) => {
@@ -475,13 +514,23 @@ const NUM_COLS = new Set(['得分', '点赞', '回复数', '信号总分', '命�
 const TXT_COLS = new Set(['内容', '代表评论']);
 const POST_COLS = new Set(['所属帖子', '帖子']);
 const HIDE = { signals: ['帖子类型'], all: [], posts: [], search: ['帖子类型'] };
+const TIME_COLS = new Set(['时间', '发帖时间']);
 
-function dataTable(box, data, { view = 'signals', onJob } = {}) {
+function dataTable(box, data, { view = 'signals', onJob, since = '' } = {}) {
   const cols = data.columns;
   const idx = (n) => cols.indexOf(n);
-  const st = { q: '', platform: '', kind: '', sig: '', minLikes: 0, sort: -1, asc: false, page: 0 };
+  const st = { q: '', platform: '', kind: '', sig: '', minLikes: 0, since: '', sort: -1, asc: false, page: 0 };
   const per = 200;
-  const show = cols.map((c, i) => i).filter((i) => !HIDE[view]?.includes(cols[i]));
+  let show = cols.map((c, i) => i).filter((i) => !HIDE[view]?.includes(cols[i]));
+  // 时间挪到内容（或帖子标题）后面：一眼看出是什么时候说的
+  const timeCol = cols.findIndex((c) => TIME_COLS.has(c));
+  const after = idx('内容') >= 0 ? idx('内容') : idx('帖子');
+  if (timeCol >= 0 && after >= 0 && show.includes(timeCol)) {
+    show = show.filter((i) => i !== timeCol);
+    show.splice(show.indexOf(after) + 1, 0, timeCol);
+  }
+  const times = timeCol >= 0 ? data.rows.map((r) => parseTime(r[timeCol])) : [];
+  const rowTime = new Map(data.rows.map((r, i) => [r, times[i]]));
   const platforms = [...new Set(data.rows.map((r) => r[idx('平台')]).filter(Boolean))];
   const kinds = idx('类型') >= 0 ? [...new Set(data.rows.map((r) => r[idx('类型')]).filter(Boolean))] : [];
   const sigs = idx('需求信号') >= 0 ? [...new Set(data.rows.flatMap((r) => String(r[idx('需求信号')] || '').split('、')).filter(Boolean))] : [];
@@ -492,6 +541,7 @@ function dataTable(box, data, { view = 'signals', onJob } = {}) {
       ${kinds.length > 1 ? `<select id="f-k"><option value="">帖子和评论</option>${kinds.map((p) => `<option>${esc(p)}</option>`).join('')}</select>` : ''}
       ${sigs.length ? `<select id="f-s"><option value="">全部信号</option>${sigs.map((p) => `<option>${esc(p)}</option>`).join('')}</select>` : ''}
       ${likeCol >= 0 ? '<label class="muted small">点赞 ≥ <input type="number" id="f-l" min="0" value="0" style="width:70px"></label>' : ''}
+      ${timeCol >= 0 ? `<select id="f-t" title="只看这段时间里发的" style="width:auto;max-width:230px">${SINCE_OPTS.map(([v, t]) => `<option value="${v}">${v ? t : '全部时间'}</option>`).join('')}</select>` : ''}
       <span class="muted small" id="f-count"></span></div>
     <div class="tablewrap"><table class="data"><thead><tr>${show.map((i) => `<th data-c="${i}">${esc(cols[i])}</th>`).join('')}</tr></thead><tbody></tbody></table></div>
     <div class="pager" id="pager"></div>`;
@@ -502,7 +552,8 @@ function dataTable(box, data, { view = 'signals', onJob } = {}) {
     let rows = data.rows.filter((r) => (!q || r.some((v) => String(v).toLowerCase().includes(q)))
       && (!st.platform || r[idx('平台')] === st.platform) && (!st.kind || r[idx('类型')] === st.kind)
       && (!st.sig || String(r[idx('需求信号')] || '').split('、').includes(st.sig))
-      && (!st.minLikes || num(r[likeCol]) >= st.minLikes));
+      && (!st.minLikes || num(r[likeCol]) >= st.minLikes)
+      && (!st.since || (rowTime.get(r) && ymd(rowTime.get(r)) >= st.since)));
     if (st.sort >= 0) {
       const c = st.sort;
       const isNum = NUM_COLS.has(cols[c]);
@@ -521,6 +572,12 @@ function dataTable(box, data, { view = 'signals', onJob } = {}) {
     if (NUM_COLS.has(name)) return `<td class="num">${esc(v)}</td>`;
     if (TXT_COLS.has(name)) return `<td class="txt"><div class="clamp" title="点一下展开">${esc(v)}</div></td>`;
     if (POST_COLS.has(name)) return `<td class="post"><div class="clamp" title="${esc(v)}">${esc(v)}</div></td>`;
+    if (TIME_COLS.has(name)) {
+      const d = rowTime.get(row);
+      if (!d) return `<td class="time muted">${esc(v) || '不知道'}</td>`;
+      const old = since && ymd(d) < since;
+      return `<td class="time${old ? ' old' : ''}" title="${esc(v)}">${ymd(d)}<div class="ago">${ago(d)}${old ? ' · 太旧，不算需求' : ''}</div></td>`;
+    }
     return `<td class="nowrap">${esc(v)}</td>`;
   };
   const render = () => {
@@ -540,6 +597,7 @@ function dataTable(box, data, { view = 'signals', onJob } = {}) {
     else if (id === 'f-k') st.kind = e.target.value;
     else if (id === 'f-s') st.sig = e.target.value;
     else if (id === 'f-l') st.minLikes = +e.target.value || 0;
+    else if (id === 'f-t') st.since = sinceDate(e.target.value);
     else return;
     st.page = 0;
     render();
@@ -961,7 +1019,7 @@ function leadCard(l) {
     <div class="lead-head">
       ${locked ? '' : `<input type="checkbox" data-pick="${esc(id)}" ${lv.sel.has(id) ? 'checked' : ''} aria-label="选中这条">`}
       <span class="ptag">${esc(pname(l.platform))}</span><b class="who">${esc(whoOf(l))}</b>
-      <span class="muted small">${l.kind === 'comment' ? '评论' : '帖子'} · 信号得分 ${esc(l.score)}${l.likes ? ` · 赞 ${esc(l.likes)}` : ''}</span>${sigs}
+      <span class="muted small">${l.kind === 'comment' ? '评论' : '帖子'}${l.time ? ` · ${esc(whenText(l.time))}发` : ''} · 信号得分 ${esc(l.score)}${l.likes ? ` · 赞 ${esc(l.likes)}` : ''}</span>${sigs}
       <span class="sp"></span>${l.hot ? '<span class="hot-tag">🔥 热线索</span>' : ''}${fit}<span class="status ${LEAD_STATUS_CLS[l.status] || ''}">${LEAD_STATUS[l.status] || esc(l.status)}</span>
     </div>
     <div class="lead-grid">
@@ -1221,7 +1279,7 @@ const SECRET_HINTS = {
   reddit_client_secret: '', reddit_password: '', x_api_key: '', x_api_secret: '', x_access_token: '', x_access_secret: '',
 };
 const SET_NUMS = ['sleep_sec', 'default_notes', 'default_comments', 'cap_reddit', 'cap_x', 'cap_youtube', 'cap_other', 'send_gap_sec', 'reply_check_min'];
-const SET_TEXTS = ['xhs_sort', 'browser_path', 'proxy', 'appstore_country', 'reddit_subs', 'ai_model', 'product_name', 'product_pitch', 'product_link',
+const SET_TEXTS = ['since_choice', 'xhs_sort', 'browser_path', 'proxy', 'appstore_country', 'reddit_subs', 'ai_model', 'product_name', 'product_pitch', 'product_link',
   'sender_identity', 'reply_style', 'send_mode_reddit', 'send_mode_x', 'reddit_client_id', 'reddit_username'];
 const SEND_MODES = [['api', '批准后用官方接口自动发'], ['manual', '复制后我自己去发']];
 
@@ -1239,6 +1297,8 @@ function viewSettings(section) {
   <section class="card"><h2>采集</h2><div class="form">
     <label>请求间隔</label><div><input type="number" id="sleep_sec" min="0" max="60" value="${s.sleep_sec}"> 秒<div class="help">每次请求之间至少等这么久。太快容易被平台要求验证或限流；2–5 秒比较稳。</div></div>
     <label>默认抓多少</label><div>每个关键词 <input type="number" id="default_notes" value="${s.default_notes}"> 条帖子，每条帖子 <input type="number" id="default_comments" value="${s.default_comments}"> 条评论</div>
+    <label>默认只要多久以内的</label><div><select id="since_choice">${SINCE_OPTS.map(([v, t]) => `<option value="${v}" ${(s.since_choice ?? '365') === v ? 'selected' : ''}>${t}</option>`).join('')}</select>
+      <div class="help">新建采集时默认选这个。更早发的帖子和评论照样抓下来，但不算需求：很多老需求在 AI 出来以后已经被解决了。</div></div>
     <label>小红书搜索排序</label><div>${pick('xhs_sort', [['general', '综合（推荐）'], ['popularity_descending', '最热'], ['time_descending', '最新']])}
       <div class="help">按最热排，搜出来多是高赞的推广帖和段子。</div></div>
     <label>浏览器</label><div>${text('browser_path', '空着就用 Chrome；用 Edge 等填可执行文件路径', 1000)}

@@ -8,8 +8,9 @@ Bearer Token 在 developer.x.com 的开发者后台创建应用后拿到，填�
 """
 import os
 import re
+import time
 
-from .common import FetchError, attempt, get_json, iso_to_ts, log, pause
+from .common import FetchError, attempt, get_json, iso_to_ts, log, pause, since_date, since_epoch
 
 PLATFORM_DIR = "x"
 API = "https://api.x.com/2"
@@ -40,7 +41,11 @@ def search(q, limit):
     """返回 (推文列表, 作者ID→用户名)。"""
     if "is:retweet" not in q:
         q = f"{q} -is:retweet"
-    data = get_json(f"{API}/tweets/search/recent", {"query": q, "max_results": min(max(limit, 10), 100), **FIELDS}, headers()) or {}
+    params = {"query": q, "max_results": min(max(limit, 10), 100), **FIELDS}
+    # 最近搜索本来只有 7 天；选的时间更短时再让 X 只给这天以后的
+    if since_epoch() and since_epoch() > time.time() - 7 * 86400 + 60:
+        params["start_time"] = f"{since_date()}T00:00:00Z"
+    data = get_json(f"{API}/tweets/search/recent", params, headers()) or {}
     return data.get("data") or [], _users(data)
 
 

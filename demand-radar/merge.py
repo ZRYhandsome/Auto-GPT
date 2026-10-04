@@ -1,6 +1,8 @@
 """需求雷达：把 MediaCrawler 各平台抓到的帖子和评论合并成一张表，并挑出"需求信号"。
 
-用法：python merge.py <一次运行的输出目录>
+用法：python merge.py <一次运行的输出目录> [--since 2025-01-01]
+  --since（或环境变量 RADAR_SINCE）：只把这天以后发的帖子和评论算作需求。更早的照样留在全部数据.csv 里，
+  但不算进需求信号（很多老需求，AI 出来以后已经被解决了）。
 输入：<目录>/<平台>/jsonl/*_contents_*.jsonl 与 *_comments_*.jsonl（MediaCrawler 的 jsonl 输出）
 输出（写在同一目录下）：
   需求信号.csv   命中需求信号的帖子和评论，按得分排序
@@ -20,7 +22,8 @@ import os
 import re
 import sys
 from collections import Counter, defaultdict
-from datetime import datetime
+from datetime import datetime, timedelta
+from email.utils import parsedate_to_datetime
 
 PLATFORM_NAMES = {
     "xhs": "小红书", "douyin": "抖音", "dy": "抖音", "bili": "B站", "bilibili": "B站",
@@ -156,17 +159,67 @@ def to_int(v):
     return int(n)
 
 
-def to_time(v):
-    """时间戳（秒或毫秒）或字符串 → 'YYYY-MM-DD HH:MM'。"""
+REL_UNITS = {"秒": 1, "分钟": 60, "分": 60, "小时": 3600, "天": 86400, "周": 7 * 86400, "个月": 30 * 86400, "月": 30 * 86400, "年": 365 * 86400}
+
+
+def to_ts(v, now=None):
+    """各平台的时间 → 秒级时间戳；认不出返回 None。
+    认得：秒或毫秒时间戳、"2024-05-03 12:00"、"2024年5月3日"、"05-03"（今年）、ISO、RFC 2822、"3天前"、"刚刚"、"昨天 12:00"。"""
     if v in (None, "", 0, "0"):
-        return ""
+        return None
+    now = now or datetime.now()
     try:
         n = float(v)
         if n > 1e12:
             n /= 1000
-        return datetime.fromtimestamp(n).strftime("%Y-%m-%d %H:%M")
+        return int(n) if n > 1e9 else None  # 2001 年以前的"时间戳"多半不是时间
     except (TypeError, ValueError):
-        return str(v)[:16]
+        pass
+    s = str(v).strip()
+    try:
+        m = re.match(r"(\d{4})[-/.年](\d{1,2})[-/.月](\d{1,2})日?(?:[ T]+(\d{1,2}):(\d{2}))?", s)
+        if m:
+            y, mo, d, h, mi = (int(x or 0) for x in m.groups())
+            return int(datetime(y, mo, d, h, mi).timestamp())
+        m = re.fullmatch(r"(\d{1,2})[-/月](\d{1,2})日?(?:\s+(\d{1,2}):(\d{2}))?", s)
+        if m:
+            mo, d, h, mi = (int(x or 0) for x in m.groups())
+            t = datetime(now.year, mo, d, h, mi)
+            return int((t if t <= now else t.replace(year=now.year - 1)).timestamp())
+    except ValueError:
+        return None
+    m = re.match(r"(\d+)\s*(秒|分钟|分|小时|天|周|个月|月|年)前", s)
+    if m:
+        return int(now.timestamp()) - int(m.group(1)) * REL_UNITS[m.group(2)]
+    for word, days in (("刚刚", 0), ("今天", 0), ("昨天", 1), ("前天", 2)):
+        if s.startswith(word):
+            hm = re.search(r"(\d{1,2}):(\d{2})", s)
+            t = now - timedelta(days=days)
+            if hm:
+                t = t.replace(hour=int(hm.group(1)), minute=int(hm.group(2)))
+            return int(t.timestamp())
+    for parse in (lambda x: datetime.fromisoformat(x.replace("Z", "+00:00")), parsedate_to_datetime):
+        try:
+            return int(parse(s).timestamp())
+        except (TypeError, ValueError, IndexError):
+            continue
+    return None
+
+
+def to_time(v):
+    """各平台的时间 → 'YYYY-MM-DD HH:MM'；认不出就原样截一段。"""
+    ts = to_ts(v)
+    if ts:
+        return datetime.fromtimestamp(ts).strftime("%Y-%m-%d %H:%M")
+    return "" if v in (None, "", 0, "0") else str(v)[:16]
+
+
+def since_ts(since):
+    """'2025-01-01' → 那天 0 点的时间戳；空或格式不对返回 None。"""
+    try:
+        return int(datetime.strptime(str(since).strip()[:10], "%Y-%m-%d").timestamp()) if since else None
+    except ValueError:
+        return None
 
 
 def first(d, *keys):
@@ -282,13 +335,14 @@ def load(run_dir):
                     posts[key]["keywords"].add(keyword)
                 continue
             ptype = post_type(title, desc)
-            posts[key] = {"title": title, "url": url, "type": ptype, "keywords": {keyword} if keyword else set()}
+            raw_time = first(d, "time", "create_time", "created_time", "publish_time", "create_date_time")
+            posts[key] = {"title": title, "url": url, "type": ptype, "keywords": {keyword} if keyword else set(), "ts": to_ts(raw_time)}
             items.append({
                 "platform": platform, "kind": "帖子", "text": text, "likes": to_int(first(d, "liked_count", "voteup_count")),
                 "replies": to_int(first(d, "comment_count", "comments_count", "video_comment", "total_replay_num")),
                 "collects": to_int(first(d, "collected_count", "collect_count", "favorite_count")),
                 "post_title": title, "post_type": ptype, "url": url, "keyword": keyword,
-                "time": to_time(first(d, "time", "create_time", "created_time", "publish_time", "create_date_time")),
+                "time": to_time(raw_time), "ts": to_ts(raw_time),
                 "id": pid, "post_id": pid, "author": author(d), "author_id": author_id(d),
             })
     for path in files:
@@ -306,7 +360,8 @@ def load(run_dir):
                 "post_type": post.get("type", ""),
                 "url": post.get("url", "") or first(d, "note_url") or post_url(platform, d),
                 "keyword": "、".join(sorted(post.get("keywords", ()))),
-                "time": to_time(first(d, "create_time", "publish_time", "create_date_time")), "id": str(first(d, "comment_id")),
+                "time": to_time(first(d, "create_time", "publish_time", "create_date_time")),
+                "ts": to_ts(first(d, "create_time", "publish_time", "create_date_time")), "id": str(first(d, "comment_id")),
                 "post_id": pid, "author": author(d), "author_id": author_id(d),
             })
     for it in items:
@@ -375,6 +430,7 @@ def summarize_posts(items, posts):
             "total": total, "top": " | ".join(EMOJI.sub("", c["text"]).replace("\n", " ")[:60] for c in top),
             "url": post["url"], "keyword": "、".join(sorted(posts.get(key, {}).get("keywords", ()))),
             "post_id": post["post_id"], "hits": sorted(([post] if post["score"] > 0 else []) + hits, key=lambda c: -c["score"]),
+            "time": post.get("time", ""), "stale": post.get("stale", False),
         })
     rows.sort(key=lambda r: (-r["total"], -r["replies"]))
     return rows
@@ -404,7 +460,7 @@ POST_FIELDS = [("platform_name", "平台"), ("post_title", "帖子"), ("post_typ
                ("hit_comments", "命中评论"), ("crawled", "已抓评论"), ("replies", "平台评论数"), ("other_os", "求其他平台"),
                ("other_os_likes", "求其他平台点赞"), ("likes", "帖子点赞"), ("collects", "帖子收藏"), ("template_asks", "求模板"),
                ("keyword_asks", "口令评论"), ("top", "代表评论"), ("url", "链接"),
-               ("keyword", "搜索词")]
+               ("keyword", "搜索词"), ("time", "发帖时间")]
 
 
 def write_csv(path, rows, fields=FIELDS):
@@ -437,7 +493,7 @@ def write_xlsx(path, signal_rows, post_rows):
     wb = Workbook()
     sheets = [
         ("需求信号", FIELDS, signal_rows, [8, 6, 18, 8, 80, 8, 8, 40, 9, 40, 16, 17]),
-        ("按帖子汇总", POST_FIELDS, post_rows, [8, 40, 9, 9, 9, 9, 10, 10, 13, 9, 80, 40, 16]),
+        ("按帖子汇总", POST_FIELDS, post_rows, [8, 40, 9, 9, 9, 9, 10, 10, 13, 9, 9, 9, 9, 80, 40, 16, 17]),
     ]
     for i, (title, fields, rows, widths) in enumerate(sheets):
         ws = wb.active if i == 0 else wb.create_sheet()
@@ -452,11 +508,19 @@ def write_xlsx(path, signal_rows, post_rows):
     return True
 
 
-def write_summary(path, run_dir, items, signal_rows, post_rows, deep):
+def write_summary(path, run_dir, items, signal_rows, post_rows, deep, since="", stale=(0, 0)):
     by_platform = Counter(r["platform_name"] for r in items)
     sig_platform = Counter(r["platform_name"] for r in signal_rows)
     sig_type = Counter(s for r in signal_rows for s in r["signals"].split("、") if s)
     lines = [f"# 需求雷达结果：{os.path.basename(os.path.abspath(run_dir))}", ""]
+    if since:
+        lines.append(f"只算 {since} 以后发的帖子和评论。更早的 {stale[0]} 条（其中 {stale[1]} 条本来命中需求信号）没算进来，"
+                     "在全部数据.csv 里还能看到。")
+        lines.append("")
+    undated = sum(1 for r in signal_rows if not r.get("ts"))
+    if undated:
+        lines.append(f"有 {undated} 条命中的帖子或评论平台没给发布时间，看不出新旧。")
+        lines.append("")
     lines.append("| 平台 | 抓到的帖子和评论 | 命中需求信号 |")
     lines.append("|---|---|---|")
     for p, n in by_platform.most_common():
@@ -495,7 +559,8 @@ def write_summary(path, run_dir, items, signal_rows, post_rows, deep):
     one_post = len({(r["platform"], r["post_id"]) for r in signal_rows}) <= 1
     for r in signal_rows[:50]:
         text = r["text"].replace("\n", " ")[:140]
-        lines.append(f"- **{r['score']}** · {r['platform_name']}{r['kind']} · {r['signals']} · 赞 {r['likes']}：{text}")
+        when = f" · {r['time'][:10]}" if r.get("time") else ""
+        lines.append(f"- **{r['score']}** · {r['platform_name']}{r['kind']}{when} · {r['signals']} · 赞 {r['likes']}：{text}")
         if one_post:
             continue
         if r["post_title"] and r["kind"] != "帖子":
@@ -511,7 +576,8 @@ def write_summary(path, run_dir, items, signal_rows, post_rows, deep):
     lines.append("")
     lines.append("| 帖子 | 类型 | 赞 | 收藏 | 平台评论数 | 求模板 / 口令评论 / 已抓 |")
     lines.append("|---|---|---|---|---|---|")
-    for r in sorted(post_rows, key=lambda p: (-(p["likes"] + p["collects"]), -(p["template_asks"] + p["keyword_asks"])))[:20]:
+    fresh = [p for p in post_rows if not p.get("stale")]  # 太旧的帖子不放进"热度最高"
+    for r in sorted(fresh, key=lambda p: (-(p["likes"] + p["collects"]), -(p["template_asks"] + p["keyword_asks"])))[:20]:
         title = r["post_title"].replace("\n", " ").replace("|", "/")[:30]
         lines.append(f"| [{title}]({r['url']}) | {r['post_type']} | {r['likes']} | {r['collects']} | {r['replies']} | "
                      f"{r['template_asks']} / {r['keyword_asks']} / {r['crawled']} |")
@@ -551,17 +617,22 @@ def write_summary(path, run_dir, items, signal_rows, post_rows, deep):
     for r in [p for p in post_rows if p["hits"]]:
         title = r["post_title"].replace("\n", " ")[:60]
         lines.append(f"### {r['platform_name']}·{r['post_type']}：{title}")
-        lines.append(f"帖子赞 {r['likes']}，平台评论 {r['replies']}，已抓 {r['crawled']}，命中 {r['hit_comments']}。{r['url']}")
+        posted = f"{r['time'][:10]} 发，" if r.get("time") else ""
+        lines.append(f"{posted}帖子赞 {r['likes']}，平台评论 {r['replies']}，已抓 {r['crawled']}，命中 {r['hit_comments']}。{r['url']}")
         lines.append("")
         for c in r["hits"]:
             text = c["text"].replace("\n", " ")[:300]
-            lines.append(f"- [{c['score']}] {c['kind']} · {c['signals']} · 赞 {c['likes']} · 回复 {c['replies']}：{text}")
+            when = f" · {c['time'][:10]}" if c.get("time") else ""
+            lines.append(f"- [{c['score']}] {c['kind']}{when} · {c['signals']} · 赞 {c['likes']} · 回复 {c['replies']}：{text}")
         lines.append("")
     with open(path, "w", encoding="utf-8") as f:
         f.write("\n".join(lines) + "\n")
 
 
-def main(run_dir):
+def main(run_dir, since=""):
+    since = since or os.environ.get("RADAR_SINCE", "")
+    cutoff = since_ts(since)
+    since = since[:10] if cutoff else ""
     if not os.path.isdir(run_dir):
         print(f"找不到目录：{run_dir}")
         return 1
@@ -581,6 +652,16 @@ def main(run_dir):
         seen.add(key)
         uniq.append(it)
     score_items(uniq, posts)
+    # 太旧的不算需求：还留在全部数据里，但得分清零
+    stale = [0, 0]
+    if cutoff:
+        for it in uniq:
+            if it.get("ts") and it["ts"] < cutoff:
+                it["stale"] = True
+                stale[0] += 1
+                if it["score"] > 0:
+                    stale[1] += 1
+                    it["score"] = 0
     signal_rows = sorted([r for r in uniq if r["score"] > 0], key=lambda r: (-r["score"], -r["likes"]))
     all_rows = sorted(uniq, key=lambda r: (r["platform_name"], r["post_id"], r["kind"] != "帖子", -r["likes"]))
     post_rows = summarize_posts(uniq, posts)
@@ -590,8 +671,10 @@ def main(run_dir):
     write_csv(os.path.join(run_dir, "全部数据.csv"), all_rows)
     write_signals_jsonl(os.path.join(run_dir, "signals.jsonl"), signal_rows)
     has_xlsx = write_xlsx(os.path.join(run_dir, "需求信号.xlsx"), signal_rows, post_rows)
-    write_summary(os.path.join(run_dir, "summary.md"), run_dir, uniq, signal_rows, post_rows, deep)
+    write_summary(os.path.join(run_dir, "summary.md"), run_dir, uniq, signal_rows, post_rows, deep, since, stale)
     print(f"共 {len(uniq)} 条帖子和评论，其中 {len(signal_rows)} 条命中需求信号。")
+    if since:
+        print(f"只算 {since} 以后的：更早的 {stale[0]} 条（其中 {stale[1]} 条本来命中）没算进需求信号。")
     print("输出：需求信号.csv、按帖子汇总.csv、全部数据.csv、summary.md" + ("、需求信号.xlsx" if has_xlsx else ""))
     for r in signal_rows[:10]:
         print(f"  [{r['score']}] {r['platform_name']}{r['kind']} {r['signals']} 赞{r['likes']}：{r['text'].replace(chr(10), ' ')[:60]}")
@@ -602,7 +685,13 @@ def main(run_dir):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
+    args = sys.argv[1:]
+    since_arg = ""
+    if "--since" in args:
+        i = args.index("--since")
+        since_arg = args[i + 1] if i + 1 < len(args) else ""
+        del args[i:i + 2]
+    if len(args) != 1:
         print(__doc__)
         sys.exit(2)
-    sys.exit(main(sys.argv[1]))
+    sys.exit(main(args[0], since_arg))

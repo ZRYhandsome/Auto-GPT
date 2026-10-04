@@ -201,12 +201,20 @@ class JobManager:
         if mode != "search" and len(platforms) > 1:
             raise ValueError("深挖和抓作者一次只能选一个平台（链接是哪个平台的就选哪个）")
         clamp = lambda v, lo, hi, d: max(lo, min(hi, int(v))) if str(v).strip().lstrip("-").isdigit() else d
+        # 只要这天以后发的帖子和评论（空 = 不限）。更早的照样抓下来，但不算需求
+        since = str(spec.get("since") or "").strip()[:10]
+        if since:
+            try:
+                datetime.strptime(since, "%Y-%m-%d")
+            except ValueError:
+                raise ValueError("时间范围不对：要 2025-01-01 这样的日期") from None
         return {
             "platforms": platforms, "mode": mode, "keywords": [k.replace(",", " ") for k in keywords], "targets": targets,
             "notes": clamp(spec.get("notes", 20), 1, 500, 20),
             "comments": clamp(spec.get("comments", 20 if mode == "search" else 300), 0, 5000, 20),
             "sub": bool(spec.get("sub", False)),
             "label": str(spec.get("label", ""))[:60],
+            "since": since,
         }
 
     def create(self, spec):
@@ -488,7 +496,8 @@ class JobManager:
             self._save(job)
             return
         args, cwd = self.command(job["spec"], p, out)
-        env = {**os.environ, "PYTHONUNBUFFERED": "1", "PYTHONIOENCODING": "utf-8", **self.env_fn()}
+        env = {**os.environ, "PYTHONUNBUFFERED": "1", "PYTHONIOENCODING": "utf-8", **self.env_fn(),
+               "RADAR_SINCE": job["spec"].get("since", "")}
         base_posts, base_comments = data_counts(out)
         try:
             self.proc = subprocess.Popen(args, cwd=cwd, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
@@ -574,7 +583,8 @@ class JobManager:
         merge_py = os.path.join(self.home, "merge.py")
         if not os.path.exists(merge_py):
             merge_py = os.path.join(os.path.dirname(APP_DIR), "merge.py")
-        r = subprocess.run([sys.executable, merge_py, out], capture_output=True, text=True, encoding="utf-8", errors="replace")
+        env = {**os.environ, "RADAR_SINCE": job.get("spec", {}).get("since", "")}
+        r = subprocess.run([sys.executable, merge_py, out], capture_output=True, text=True, encoding="utf-8", errors="replace", env=env)
         self._append_log(out, (r.stdout or "") + (r.stderr or ""))
         m = re.search(r"共 (\d+) 条帖子和评论，其中 (\d+) 条命中需求信号", r.stdout or "")
         if m:

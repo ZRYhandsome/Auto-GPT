@@ -212,6 +212,7 @@ FAKE_MC = textwrap.dedent('''
     get = lambda k: args[args.index(k) + 1] if k in args else ""
     platform, out = get("--platform"), get("--save_data_path")
     print("[XiaoHongShuLogin] waiting for scan qrcode login", flush=True)
+    print("只要这天以后的：" + (os.environ.get("RADAR_SINCE") or "不限"), flush=True)
     if platform == "dy":
         print("Error: 登录失败，滑块验证没通过", flush=True)
         sys.exit(1)
@@ -355,6 +356,19 @@ class JobsTest(unittest.TestCase):
         finally:
             jm.stop_all()
 
+    def test_since_reaches_crawler_and_scoring(self):
+        with self.assertRaises(ValueError):
+            self.jm.validate({"platforms": ["xhs"], "mode": "search", "keywords": ["a"], "since": "去年"})
+        self.assertEqual(self.jm.validate({"platforms": ["xhs"], "mode": "search", "keywords": ["a"]})["since"], "")
+        job = self.jm.create({"platforms": ["xhs"], "mode": "search", "keywords": ["记账"], "since": "2025-01-01"})
+        done = wait_for(lambda: (j := self.jm.get(job["id"])) and j["status"] not in ("queued", "running") and j)
+        self.assertEqual(done["spec"]["since"], "2025-01-01")
+        log = self.jm.log_tail(job["id"])["text"]
+        self.assertIn("只要这天以后的：2025-01-01", log, "传给了采集程序")
+        self.assertIn("只算 2025-01-01 以后", log, "传给了打分")
+        again = self.jm.resume(job["id"]) if done.get("remaining") else self.jm.create(done["spec"])
+        self.assertEqual(again["spec"]["since"], "2025-01-01", "再跑一次、接着抓都保留时间范围")
+
     def test_explain(self):
         from jobs import explain
         self.assertIn("暂时拦住了请求", explain("小红书", "tenacity.RetryError: RetryError[<Future at 0x1 state=finished raised KeyError>]"))
@@ -486,6 +500,13 @@ class ServerTest(unittest.TestCase):
         code, r = self.call(f"/api/jobs/{again['id']}/delete", {})
         self.assertTrue(r["ok"])
         self.assertEqual(self.call(f"/api/jobs/{again['id']}")[0], 404)
+
+    def test_since_choice_setting(self):
+        code, st = self.call("/api/settings", {"since_choice": "chatgpt"})
+        self.assertEqual(st["settings"]["since_choice"], "chatgpt")
+        code, st = self.call("/api/settings", {"since_choice": "forever"})
+        self.assertEqual(st["settings"]["since_choice"], "chatgpt", "不认识的值不保存")
+        self.call("/api/settings", {"since_choice": "365"})
 
     def test_youtube_and_x_keys(self):
         plats = {p["id"]: p for p in self.call("/api/state")[1]["platforms"]}

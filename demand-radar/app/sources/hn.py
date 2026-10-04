@@ -10,7 +10,7 @@ HN 的用户名就是账号 ID，nickname 和 user_id 都记用户名。国内�
 """
 import re
 
-from .common import attempt, get_json, log, pause, strip_html
+from .common import attempt, get_json, log, pause, since_epoch, strip_html
 
 PLATFORM_DIR = "hn"
 API = "https://hn.algolia.com/api/v1"
@@ -26,7 +26,10 @@ def item_id_of(target):
 
 
 def search(q, tags, limit):
-    data = get_json(f"{API}/search", {"query": q, "tags": tags, "hitsPerPage": min(max(limit, 1), 100)})
+    params = {"query": q, "tags": tags, "hitsPerPage": min(max(limit, 1), 100)}
+    if since_epoch():
+        params["numericFilters"] = f"created_at_i>{since_epoch()}"  # 只要这天以后发的
+    data = get_json(f"{API}/search", params)
     return (data or {}).get("hits", [])
 
 

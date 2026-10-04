@@ -450,3 +450,78 @@ class AuthorTest(Base):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class SinceTest(unittest.TestCase):
+    """选了"只要多久以内的"：能按时间搜的网站，搜索时就只要这段时间的。"""
+
+    def setUp(self):
+        self.saved = {}
+        self.env = {k: os.environ.get(k) for k in ("RADAR_SINCE", "RADAR_YOUTUBE_KEY", "RADAR_X_BEARER")}
+
+    def tearDown(self):
+        for mod, fn in self.saved.items():
+            mod.get_json = fn
+        for k, v in self.env.items():
+            if v is None:
+                os.environ.pop(k, None)
+            else:
+                os.environ[k] = v
+
+    def fake(self, mod, resp):
+        self.saved.setdefault(mod, mod.get_json)
+        f = FakeHttp([("", resp)])
+        mod.get_json = f
+        return f
+
+    def query(self, f):
+        return urllib.parse.parse_qs(urllib.parse.urlparse(f.calls[0][0]).query)
+
+    def test_search_params(self):
+        from sources import github, hn, reddit
+        from sources.common import since_epoch
+        os.environ["RADAR_SINCE"] = "2025-01-01"
+        f = self.fake(reddit, {"data": []})
+        reddit.search("SaaS", "alternative to", 5)
+        self.assertEqual(self.query(f)["after"], ["2025-01-01"])
+        f = self.fake(hn, {"hits": []})
+        hn.search("invoice", "story", 5)
+        self.assertEqual(self.query(f)["numericFilters"], [f"created_at_i>{since_epoch()}"])
+        f = self.fake(github, {"items": []})
+        github.search("dark mode", 5)
+        self.assertEqual(self.query(f)["q"], ["dark mode is:issue created:>=2025-01-01"])
+        os.environ["RADAR_YOUTUBE_KEY"] = "k"
+        f = self.fake(youtube, {"items": []})
+        youtube.search("budget app", 5)
+        self.assertEqual(self.query(f)["publishedAfter"], ["2025-01-01T00:00:00Z"])
+        os.environ["RADAR_X_BEARER"] = "b"
+        f = self.fake(x, {"data": []})
+        x.search("app", 10)
+        self.assertNotIn("start_time", self.query(f), "X 只能搜 7 天，更早的日期不用传")
+
+    def test_x_start_time_inside_week_and_reddit_window(self):
+        from datetime import datetime, timedelta
+        from sources import reddit
+        day = (datetime.now() - timedelta(days=3)).strftime("%Y-%m-%d")
+        os.environ["RADAR_SINCE"] = day
+        os.environ["RADAR_X_BEARER"] = "b"
+        f = self.fake(x, {"data": []})
+        x.search("app", 10)
+        self.assertEqual(self.query(f)["start_time"], [f"{day}T00:00:00Z"])
+        self.assertEqual(reddit.reddit_window(), "week")
+        os.environ["RADAR_SINCE"] = ""
+        self.assertEqual(reddit.reddit_window(), "all")
+
+    def test_no_since_no_params(self):
+        from sources import github, hn
+        os.environ.pop("RADAR_SINCE", None)
+        f = self.fake(hn, {"hits": []})
+        hn.search("invoice", "story", 5)
+        self.assertNotIn("numericFilters", self.query(f))
+        f = self.fake(github, {"items": []})
+        github.search("dark mode created:>2020-01-01", 5)
+        self.assertEqual(self.query(f)["q"], ["dark mode created:>2020-01-01 is:issue"])
+        os.environ["RADAR_SINCE"] = "2025-01-01"
+        f = self.fake(github, {"items": []})
+        github.search("dark mode created:>2020-01-01", 5)
+        self.assertEqual(self.query(f)["q"], ["dark mode created:>2020-01-01 is:issue"], "自己写了 created: 就不再加")

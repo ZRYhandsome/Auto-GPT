@@ -10,7 +10,7 @@ API key 在 Google Cloud 控制台免费申请（启用 YouTube Data API v3 → 
 import os
 import re
 
-from .common import FetchError, attempt, get_json, iso_to_ts, log, pause
+from .common import FetchError, attempt, get_json, iso_to_ts, log, pause, since_date
 
 PLATFORM_DIR = "youtube"
 API = "https://www.googleapis.com/youtube/v3"
@@ -35,7 +35,10 @@ def call(path, params):
 
 
 def search(q, limit):
-    data = call("search", {"part": "snippet", "type": "video", "q": q, "maxResults": min(max(limit, 1), 50), "order": "relevance"})
+    params = {"part": "snippet", "type": "video", "q": q, "maxResults": min(max(limit, 1), 50), "order": "relevance"}
+    if since_date():
+        params["publishedAfter"] = f"{since_date()}T00:00:00Z"  # 只要这天以后发的视频
+    data = call("search", params)
     return [x["id"]["videoId"] for x in data.get("items", []) if (x.get("id") or {}).get("videoId")]
 
 

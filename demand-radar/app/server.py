@@ -45,6 +45,7 @@ DEFAULT_SETTINGS = {
     "reddit_subs": "SomebodyMakeThis,AppIdeas,SaaS,Entrepreneur,startups,productivity",
     "default_notes": 20,
     "default_comments": 20,
+    "since_choice": "365",     # 新建采集时默认"只要多久以内的"：天数，chatgpt = 2022 年 11 月 30 日以后，空 = 不限
     "keyword_sets": [],
     # 线索与回复：AI 判断和写回复
     "anthropic_api_key": "",
@@ -73,6 +74,7 @@ DEFAULT_SETTINGS = {
     "x_access_token": "",
     "x_access_secret": "",
 }
+SINCE_CHOICES = ("", "30", "90", "180", "365", "730", "chatgpt")
 SECRET_KEYS = {"github_token", "youtube_api_key", "x_bearer_token", "anthropic_api_key", "reddit_client_secret",
                "reddit_password", "x_api_key", "x_api_secret", "x_access_token", "x_access_secret"}  # 界面上只显示"已填写"
 TEXT_LIMITS = {"product_pitch": 1000, "reply_style": 1000, "reddit_subs": 2000, "browser_path": 1000}  # 其余文字最多 300 字
@@ -124,6 +126,8 @@ class Settings:
                 if k not in DEFAULT_SETTINGS:
                     continue
                 if k in SECRET_KEYS and v == "已填写":
+                    continue
+                if k == "since_choice" and str(v) not in SINCE_CHOICES:
                     continue
                 if k == "keyword_sets":
                     v = [{"name": str(s.get("name", ""))[:40] or "未命名", "keywords": [str(x).strip() for x in s.get("keywords", []) if str(x).strip()][:200]}

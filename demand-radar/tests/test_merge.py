@@ -6,7 +6,8 @@ import sys
 import tempfile
 import unittest
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, ROOT)
 import merge  # noqa: E402
 
 FIXTURES = {
@@ -398,3 +399,88 @@ class EnglishSignalTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TimeTest(unittest.TestCase):
+    """每条都写清楚是什么时候发的；早于 --since 的不算需求，但留在全部数据里。"""
+
+    NOW = merge.datetime(2026, 10, 4, 12, 0)
+
+    def ts(self, v):
+        t = merge.to_ts(v, self.NOW)
+        return merge.datetime.fromtimestamp(t).strftime("%Y-%m-%d %H:%M") if t else None
+
+    def test_parses_every_platform_style(self):
+        self.assertEqual(self.ts(1727000000), merge.datetime.fromtimestamp(1727000000).strftime("%Y-%m-%d %H:%M"))
+        self.assertEqual(self.ts(1727000000123), self.ts(1727000000), "毫秒和秒一样")
+        self.assertEqual(self.ts("2024-05-03 12:30"), "2024-05-03 12:30")
+        self.assertEqual(self.ts("2024年5月3日"), "2024-05-03 00:00")
+        self.assertEqual(self.ts("05-03"), "2026-05-03 00:00", "没写年份就是今年")
+        self.assertEqual(self.ts("12-30"), "2025-12-30 00:00", "今年还没到的日子是去年")
+        self.assertEqual(self.ts("3天前"), "2026-10-01 12:00")
+        self.assertEqual(self.ts("昨天 08:15"), "2026-10-03 08:15")
+        self.assertEqual(self.ts("刚刚"), "2026-10-04 12:00")
+        self.assertIsNotNone(self.ts("2025-01-02T03:04:05Z"))
+        self.assertIsNotNone(self.ts("Sat, 03 Oct 2026 10:00:00 +0800"))
+        for bad in ("", 0, "0", None, "abc", "2024", "2024-13-40", 12345):
+            self.assertIsNone(self.ts(bad), bad)
+        self.assertEqual(merge.to_time("abc"), "abc")
+        self.assertEqual(merge.since_ts("2025-01-01"), int(merge.datetime(2025, 1, 1).timestamp()))
+        self.assertIsNone(merge.since_ts("not a date"))
+
+    def make_run(self, root):
+        d = os.path.join(root, "xhs", "jsonl")
+        os.makedirs(d)
+        new, old = "2026-09-01 10:00", "2021-06-01 10:00"
+        with open(os.path.join(d, "search_contents_2026-10-04.jsonl"), "w", encoding="utf-8") as f:
+            for pid, t, title in (("p-new", new, "有没有app可以记录每天喝了多少水"), ("p-old", old, "有没有app可以帮我写周报")):
+                f.write(json.dumps({"note_id": pid, "title": title, "desc": "", "liked_count": 300, "comment_count": 2,
+                                    "time": t, "note_url": f"https://www.xiaohongshu.com/explore/{pid}", "source_keyword": "有没有app"},
+                                   ensure_ascii=False) + "\n")
+        with open(os.path.join(d, "search_comments_2026-10-04.jsonl"), "w", encoding="utf-8") as f:
+            for cid, pid, t in (("c-new", "p-old", new), ("c-old", "p-old", old), ("c-new2", "p-new", new)):
+                f.write(json.dumps({"comment_id": cid, "note_id": pid, "content": "谁做出来我第一个买", "like_count": 50,
+                                    "parent_comment_id": 0, "create_time": t}, ensure_ascii=False) + "\n")
+
+    def test_since_keeps_old_out_of_signals(self):
+        with tempfile.TemporaryDirectory() as root:
+            self.make_run(root)
+            self.assertEqual(merge.main(root, "2025-01-01"), 0)
+            sig = read_csv(os.path.join(root, "需求信号.csv"))
+            all_rows = read_csv(os.path.join(root, "全部数据.csv"))
+            ids_sig = {(r["内容"], r["时间"][:10]) for r in sig}
+            self.assertTrue(all(t >= "2025-01-01" for _, t in ids_sig), ids_sig)
+            self.assertIn(("谁做出来我第一个买", "2026-09-01"), ids_sig, "老帖子下面的新评论照样算")
+            self.assertEqual(len(all_rows), 5, "旧的照样留在全部数据里")
+            with open(os.path.join(root, "summary.md"), encoding="utf-8") as f:
+                summary = f.read()
+            self.assertIn("只算 2025-01-01 以后发的帖子和评论", summary)
+            self.assertIn("2026-09-01", summary, "得分最高的那些写着日期")
+            posts = read_csv(os.path.join(root, "按帖子汇总.csv"))
+            self.assertIn("发帖时间", posts[0])
+            with open(os.path.join(root, "signals.jsonl"), encoding="utf-8") as f:
+                self.assertTrue(all(json.loads(x)["time"] >= "2025-01-01" for x in f))
+
+    def test_no_since_counts_everything(self):
+        with tempfile.TemporaryDirectory() as root:
+            self.make_run(root)
+            os.environ.pop("RADAR_SINCE", None)
+            self.assertEqual(merge.main(root), 0)
+            sig = read_csv(os.path.join(root, "需求信号.csv"))
+            self.assertIn("2021-06-01", {r["时间"][:10] for r in sig})
+
+    def test_env_and_cli(self):
+        with tempfile.TemporaryDirectory() as root:
+            self.make_run(root)
+            os.environ["RADAR_SINCE"] = "2025-01-01"
+            try:
+                merge.main(root)
+            finally:
+                os.environ.pop("RADAR_SINCE", None)
+            self.assertNotIn("2021-06-01", {r["时间"][:10] for r in read_csv(os.path.join(root, "需求信号.csv"))})
+            import subprocess
+            r = subprocess.run([sys.executable, os.path.join(ROOT, "merge.py"), root, "--since", "2025-01-01"],
+                               capture_output=True, text=True, env={**os.environ, "RADAR_SINCE": ""})
+            self.assertEqual(r.returncode, 0, r.stderr)
+            self.assertIn("只算 2025-01-01 以后的", r.stdout)
+            self.assertIn("共 5 条帖子和评论", r.stdout, "jobs.py 认的那一行不变")

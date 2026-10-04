@@ -22,6 +22,7 @@
    - 某条帖子取详情或评论失败：跳过这条，接着抓；
    - 看起来是被平台拦住了（验证码、限流、IP 或账号被限制）：不再发新请求，正常收尾，
      已经抓到的照常保存；退出码 3，最后一行写明原因和还没抓完的关键词，软件据此显示"没抓完"。
+7. 只要多久以内的（RADAR_SINCE=2025-10-01）：抖音搜索按发布时间筛（一天、一周、半年内）。
 """
 import asyncio
 import json
@@ -231,6 +232,15 @@ def guard_xhs_search(guard):
     return True
 
 
+def since_days(since):
+    """'2025-10-01' 距今几天；不限或格式不对返回 None。"""
+    from datetime import datetime
+    try:
+        return max(0, (datetime.now() - datetime.strptime(since.strip()[:10], "%Y-%m-%d")).days)
+    except ValueError:
+        return None
+
+
 def arg(name):
     return sys.argv[sys.argv.index(name) + 1] if name in sys.argv[:-1] else ""
 
@@ -247,6 +257,11 @@ def main():
 
     if os.environ.get("RADAR_SLEEP_SEC"):
         config.CRAWLER_MAX_SLEEP_SEC = float(os.environ["RADAR_SLEEP_SEC"])
+
+    # 只要多久以内的：抖音搜索自己能按发布时间筛（一天、一周、半年）；更长的时间段由 merge.py 事后筛
+    days = since_days(os.environ.get("RADAR_SINCE", ""))
+    if days is not None:
+        config.PUBLISH_TIME_TYPE = next((t for t in (1, 7, 180) if days <= t), 0)
 
     tolerate_slow_pages()
 
